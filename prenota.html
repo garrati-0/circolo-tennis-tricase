@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         /* Variabili di Colore */
-       
+        
 
         /* Barra di Navigazione Superiore */
         .top-bar-nav {
@@ -76,7 +76,7 @@
             -webkit-overflow-scrolling: touch;
         }
         .date-selector::-webkit-scrollbar { height: 6px; }
-        .date-selector::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .date-selector::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); } /* Modificato */
         .date-selector::-webkit-scrollbar-thumb { background: var(--sabbia); border-radius: 3px; }
         
         .date-picker {
@@ -86,13 +86,14 @@
         .date-option {
             flex: 0 0 80px;
             padding: 0.75rem 0.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.6); /* Modificato */
             border-radius: 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease;
+            background-color: rgba(0, 0, 0, 0.3);
         }
-        .date-option:hover { background-color: rgba(255, 203, 130, 0.2); }
+        .date-option:hover { background-color: rgba(255, 203, 130, 0.4); } /* Modificato */
         .date-option.selected { background-color: var(--sabbia); color: var(--verde); border-color: var(--sabbia); font-weight: bold; }
         .date-option strong { text-transform: uppercase; }
 
@@ -100,14 +101,14 @@
         .field-options {
             display: flex;
             gap: 1rem;
-            background-color: rgba(0,0,0,0.2);
+            background-color: rgba(0,0,0,0.5); /* Modificato */
             padding: 0.5rem;
             border-radius: 8px;
         }
         .field-option {
             flex-grow: 1; text-align: center; padding: 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;
         }
-        .field-option:hover { background-color: rgba(255, 203, 130, 0.2); }
+        .field-option:hover { background-color: rgba(255, 203, 130, 0.4); } /* Modificato */
         .field-option.selected { background-color: var(--sabbia); color: var(--verde); font-weight: bold; }
 
         /* Selettore Orario */
@@ -116,19 +117,19 @@
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
             gap: 0.75rem;
         }
-        .time-slot { padding: 0.75rem; text-align: center; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 4px; cursor: pointer; transition: all 0.2s ease; }
-        .time-slot:hover { background-color: rgba(255, 203, 130, 0.2); }
+        .time-slot { padding: 0.75rem; text-align: center; border: 2px solid rgba(255, 255, 255, 0.6,);background-color: rgba(0, 0, 0, 0.4); border-radius: 4px; cursor: pointer; transition: all 0.2s ease; } /* Modificato */
+        .time-slot:hover { background-color: rgba(255, 203, 130, 0.4); } /* Modificato */
         .time-slot.selected { background-color: var(--sabbia); color: var(--verde); border-color: var(--sabbia); font-weight: bold; }
-        .time-slot.unavailable { background-color: rgba(0,0,0,0.3); color: rgba(255, 203, 130, 0.3); border-color: transparent; cursor: not-allowed; text-decoration: line-through; }
+        .time-slot.unavailable { background-color: rgba(0,0,0,0.6); color: rgba(255, 255, 255, 0.4); border-color: transparent; cursor: not-allowed; text-decoration: line-through; } /* Modificato */
         
         /* Form Dati Utente */
         .user-details-form {
             display: none;
             margin-top: 40px;
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4); /* Modificato */
             border-radius: 8px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.7); /* Modificato */
         }
         .user-details-form.active {
             display: block;
@@ -137,7 +138,7 @@
         .user-details-form h3 { margin-top: 0; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
-        .form-group input { width: 100%; box-sizing: border-box; padding: 12px; background-color: rgba(0,0,0,0.2); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 4px; color: #fff; font-size: 1rem; }
+        .form-group input { width: 100%; box-sizing: border-box; padding: 12px; background-color: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 4px; color: #fff; font-size: 1rem; } /* Modificato */
         .confirm-button { display: block; width: 100%; padding: 15px; font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 1px; background-color: var(--sabbia); color: var(--verde); border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; }
         
         .confirmation-message { display: none; text-align: center; padding: 40px; }
