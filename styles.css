@@ -223,24 +223,66 @@ body.light-theme #theme-toggle .fa-moon { display: none; }
 .club-section { gap: 5rem; }
 .merch-section { padding: 5rem 0; overflow: hidden; }
 .corsi-section, .news-section { max-width: 1000px; }
-
 .club-block {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    align-items: center;
+    align-items: center; /* Mantiene il contenuto centrato verticalmente */
     gap: 3rem;
     background-color: rgba(0,0,0,0.15);
     padding: 2rem;
     border-radius: 8px;
     border: 1px solid rgba(255, 203, 130, 0.1);
 }
-body.light-theme .club-block { background-color: rgba(255,255,255,0.2); border-color: rgba(56, 123, 102, 0.2); }
-.club-block:nth-child(even) .club-image { order: 2; }
-.club-block:nth-child(even) .club-content { order: 1; }
-.club-image img { width: 100%; height: auto; border-radius: 8px; box-shadow: 0 10px 30px var(--ombra); transition: transform 0.3s ease; }
-.club-image img:hover { transform: scale(1.05); }
-.club-content h3 { font-size: 2.5rem; font-family: 'Bebas Neue', sans-serif; color: var(--sabbia); margin-top: 0; margin-bottom: 1rem; border-left: 4px solid var(--sabbia); padding-left: 1rem; }
-.club-content p { font-size: 1.1rem; line-height: 1.7; color: var(--sabbia); opacity: 0.9; }
+
+body.light-theme .club-block {
+    background-color: rgba(255,255,255,0.2);
+    border-color: rgba(56, 123, 102, 0.2);
+}
+
+.club-block:nth-child(even) .club-image {
+    order: 2;
+}
+
+.club-block:nth-child(even) .club-content {
+    order: 1;
+}
+
+/* --- MODIFICA 1: Imposta un'altezza fissa per il contenitore dell'immagine --- */
+.club-image {
+    height: 400px; /* << ESEMPIO: Puoi cambiare questo valore */
+    border-radius: 8px; /* Spostato qui per contenere l'immagine */
+    overflow: hidden; /* Nasconde le parti dell'immagine che escono */
+}
+
+.club-image img {
+    width: 100%;
+    height: 100%; /* << MODIFICA: L'immagine riempie il contenitore */
+    border-radius: 0; /* Rimuoviamo il raggio dall'immagine stessa */
+    box-shadow: 0 10px 30px var(--ombra);
+    transition: transform 0.3s ease;
+    object-fit: cover; /* << NUOVA PROPRIETÀ: La più importante! */
+}
+
+.club-image img:hover {
+    transform: scale(1.05);
+}
+
+.club-content h3 {
+    font-size: 2.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--sabbia);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--sabbia);
+    padding-left: 1rem;
+}
+
+.club-content p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--sabbia);
+    opacity: 0.9;
+}
 
 /* Card dei maestri */
 .maestri-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; width: 100%; }
@@ -305,10 +347,26 @@ body.light-theme .site-footer { background-color: var(--sabbia); color: var(--ma
     .club-block:nth-child(even) .club-image, .club-block:nth-child(even) .club-content { order: initial; }
 }
 @media (max-width: 768px) {
-    .merch-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 1rem 1.5rem 1rem; gap: 1.5rem; }
-    .merch-container::-webkit-scrollbar { height: 8px; }
-    .merch-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-    .merch-container::-webkit-scrollbar-thumb { background: var(--sabbia); border-radius: 4px; }
+   .merch-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 1rem 1.5rem 1rem;
+    gap: 1.5rem;
+    
+    /* --- CODICE PER NASCONDERE LA SCROLLBAR --- */
+
+    /* Per Firefox */
+    scrollbar-width: none;
+    
+    /* Per Internet Explorer e Edge (versioni vecchie) */
+    -ms-overflow-style: none;
+}
+
+/* Per Chrome, Safari, Opera e browser basati su WebKit */
+.merch-container::-webkit-scrollbar {
+    display: none;
+}
     .merch-card { flex: 0 0 80%; max-width: 300px; scroll-snap-align: start; }
 }
 @media (max-width: 600px) {
