@@ -232,7 +232,7 @@
         </div>
     </div>
     <div class="container" id="confirmation-container" style="display: none;"><div id="confirmation-message"><div class="icon-wrapper"><i class="fa-solid fa-circle-check"></i></div><h1>Grazie!</h1><p>La tua richiesta di prenotazione è stata inviata con successo. Riceverai una mail di conferma non appena verrà approvata dal nostro staff.</p></div></div>
-    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
    <script>
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Theme Toggler ---
@@ -444,6 +444,97 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Auto-refresh every 10 seconds
     setInterval(refreshUI, 10000);
+});
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('name');
+    const surnameInput = document.getElementById('surname');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+
+    // --- Validazione dei campi (nessuna modifica qui) ---
+    if (!nameInput.value.trim() || !surnameInput.value.trim() || !emailInput.value.trim() || !phoneInput.value.trim()) {
+        alert("Per favore, compila tutti i campi: Nome, Cognome, Email e Telefono.");
+        return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailInput.value)) {
+        alert("Per favore, inserisci un indirizzo email valido.");
+        return;
+    }
+
+    const submitBtn = form.querySelector('.submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Verifica disponibilità...';
+
+    // --- Controllo disponibilità (nessuna modifica qui) ---
+    const latestBookings = await fetchAllBookings();
+    const latestUnavailable = latestBookings[booking.date]?.[booking.field] || [];
+    const isSlotTaken = booking.timeSlots.some(slot => latestUnavailable.includes(slot));
+
+    if (isSlotTaken) {
+        alert('Spiacente, uno degli orari scelti è stato appena prenotato! La pagina si aggiornerà.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Conferma Prenotazione';
+        refreshUI();
+        return;
+    }
+
+    submitBtn.textContent = 'Conferma in corso...';
+
+    // --- Preparazione dei dati (nessuna modifica qui) ---
+    const formData = new FormData(form);
+    const baseData = Object.fromEntries(formData.entries());
+    const bookingsToSend = booking.timeSlots.map(slot => ({
+        ...baseData,
+        Data: booking.date,
+        Orario: slot,
+        Campo: booking.field,
+        ID: `ID-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+    }));
+
+    // --- Chiamata a SheetDB per salvare i dati ---
+    fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: bookingsToSend })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('La risposta del server non è stata positiva');
+        return res.json();
+    })
+    .then(data => {
+        // --- NUOVO: INVIA L'EMAIL DI CONFERMA CON EMAILJS ---
+        const templateParams = {
+            name: form.Nome.value,
+            email: form.Email.value,
+            date: summaryDate.textContent, // Usa la data già formattata dal riepilogo
+            field: `Campo ${booking.field}`,
+            time: booking.timeSlots.sort().join(', ')
+        };
+
+        // Sostituisci con le tue credenziali di EmailJS
+        emailjs.send('service_v16vlev', 'template_4venqp8', templateParams, 'B0iydLemcww93J2-H')
+            .then((response) => {
+                console.log('Email inviata con successo!', response.status, response.text);
+            }, (error) => {
+                console.error('Errore durante l\'invio dell\'email:', error);
+                // Puoi anche avvisare l'utente che l'email potrebbe non essere stata inviata
+            });
+
+        // --- Mostra messaggio di conferma (nessuna modifica qui) ---
+        document.getElementById('booking-container').style.display = 'none';
+        const confirmationContainer = document.getElementById('confirmation-container');
+        confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
+        confirmationContainer.style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Errore durante la prenotazione:', error);
+        alert('Si è verificato un errore durante la prenotazione. Riprova.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Conferma Prenotazione';
+    });
 });
 </script>
 </body>
