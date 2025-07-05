@@ -3,351 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prenota un Campo - C.T. Tricase</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>Prenotazione Campo - C.T. Tricase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Variabili di Colore */
-        
-
-        /* Barra di Navigazione Superiore */
-        .top-bar-nav {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 40px;
-            background-color: transparent;
-            z-index: 50;
+        :root {
+            --colore-primario: #007BFF; --colore-primario-hover: #0056b3; --colore-sfondo: #F4F7FC; --colore-superficie: #FFFFFF; --colore-bordo: #DEE2E6; --colore-testo-principale: #212529; --colore-testo-secondario: #6C757D; --colore-testo-invertito: #FFFFFF;
         }
-
-        .back-to-home-btn {
-            display: inline-flex;
-            align-items: center;
-            color: var(--sabbia);
-            text-decoration: none;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.5rem;
-            letter-spacing: 1.5px;
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-        
-        .back-to-home-btn svg {
-            width: 24px;
-            height: 24px;
-            margin-right: 12px;
-            fill: var(--sabbia);
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .back-to-home-btn:hover {
-            transform: translateX(-5px);
-        }
-        
-        /* Contenitore Principale */
-        .booking-page-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 120px 20px 50px 20px;
-        }
-        
-        .booking-page-container h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--sabbia);
-            padding-bottom: 1rem;
-        }
-
-        .booking-page-container h3 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2rem;
-            margin-top: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Selettore Data Orizzontale */
-        .date-selector {
-            overflow-x: auto;
-            padding-bottom: 1rem;
-            -webkit-overflow-scrolling: touch;
-        }
-        .date-selector::-webkit-scrollbar { height: 6px; }
-        .date-selector::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); } /* Modificato */
-        .date-selector::-webkit-scrollbar-thumb { background: var(--sabbia); border-radius: 3px; }
-        
-        .date-picker {
-            display: flex;
-            gap: 10px;
-        }
-        .date-option {
-            flex: 0 0 80px;
-            padding: 0.75rem 0.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.6); /* Modificato */
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background-color: rgba(0, 0, 0, 0.3);
-        }
-        .date-option:hover { background-color: rgba(255, 203, 130, 0.4); } /* Modificato */
-        .date-option.selected { background-color: var(--sabbia); color: var(--verde); border-color: var(--sabbia); font-weight: bold; }
-        .date-option strong { text-transform: uppercase; }
-
-        /* Selettore Campo */
-        .field-options {
-            display: flex;
-            gap: 1rem;
-            background-color: rgba(0,0,0,0.5); /* Modificato */
-            padding: 0.5rem;
-            border-radius: 8px;
-        }
-        .field-option {
-            flex-grow: 1; text-align: center; padding: 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;
-        }
-        .field-option:hover { background-color: rgba(255, 203, 130, 0.4); } /* Modificato */
-        .field-option.selected { background-color: var(--sabbia); color: var(--verde); font-weight: bold; }
-
-        /* Selettore Orario */
-        .time-slots {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-            gap: 0.75rem;
-        }
-        .time-slot { padding: 0.75rem; text-align: center; border: 2px solid rgba(255, 255, 255, 0.6,);background-color: rgba(0, 0, 0, 0.4); border-radius: 4px; cursor: pointer; transition: all 0.2s ease; } /* Modificato */
-        .time-slot:hover { background-color: rgba(255, 203, 130, 0.4); } /* Modificato */
-        .time-slot.selected { background-color: var(--sabbia); color: var(--verde); border-color: var(--sabbia); font-weight: bold; }
-        .time-slot.unavailable { background-color: rgba(0,0,0,0.6); color: rgba(255, 255, 255, 0.4); border-color: transparent; cursor: not-allowed; text-decoration: line-through; } /* Modificato */
-        
-        /* Form Dati Utente */
-        .user-details-form {
-            display: none;
-            margin-top: 40px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.4); /* Modificato */
-            border-radius: 8px;
-            background: rgba(0,0,0,0.7); /* Modificato */
-        }
-        .user-details-form.active {
-            display: block;
-        }
-        
-        .user-details-form h3 { margin-top: 0; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
-        .form-group input { width: 100%; box-sizing: border-box; padding: 12px; background-color: rgba(0,0,0,0.4); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 4px; color: #fff; font-size: 1rem; } /* Modificato */
-        .confirm-button { display: block; width: 100%; padding: 15px; font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 1px; background-color: var(--sabbia); color: var(--verde); border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; }
-        
-        .confirmation-message { display: none; text-align: center; padding: 40px; }
-        .confirmation-message i { font-size: 3rem; }
-
-        @media (max-width: 600px) {
-            .booking-page-container { padding-top: 100px; }
-            .top-bar-nav { padding: 20px; }
-            .back-to-home-btn { font-size: 1.2rem; }
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); }
+        .navbar { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; z-index: 10; }
+        .home-link { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background-color: var(--colore-superficie); border: 1px solid var(--colore-bordo); border-radius: 50%; color: var(--colore-testo-principale); text-decoration: none; font-size: 1.2rem; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .home-link:hover { transform: scale(1.1); background-color: var(--colore-primario); color: var(--colore-testo-invertito); border-color: var(--colore-primario); }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 80px 20px 40px; }
+        .booking-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: flex-start; }
+        .selection-panel, .summary-panel { background-color: var(--colore-superficie); border-radius: 16px; padding: 32px; border: 1px solid var(--colore-bordo); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h1, h2 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--colore-testo-principale); font-weight: 800; }
+        h1 { font-size: 2.2rem; margin-bottom: 8px; }
+        .selection-panel > p { font-size: 1rem; margin-bottom: 32px; color: var(--colore-testo-secondario); }
+        h2 { font-size: 1.5rem; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--colore-bordo); }
+        .step { margin-bottom: 32px; }
+        .date-picker, .field-selector, .time-slots { display: flex; flex-wrap: wrap; gap: 12px; }
+        .date-option, .field-option, .time-slot { background-color: var(--colore-sfondo); border: 1px solid var(--colore-bordo); border-radius: 8px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; text-align: center; font-weight: 500; }
+        .date-option { display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+        .date-option .day-name { font-size: 0.8rem; text-transform: uppercase; color: var(--colore-testo-secondario); }
+        .date-option .day-num { font-size: 1.2rem; font-weight: 700; }
+        .field-option { flex-grow: 1; }
+        .date-option:hover, .field-option:hover, .time-slot:hover { border-color: var(--colore-primario); color: var(--colore-primario); }
+        .date-option.selected, .field-option.selected, .time-slot.selected { background-color: var(--colore-primario); border-color: var(--colore-primario); color: var(--colore-testo-invertito); transform: scale(1.05); }
+        .date-option.selected .day-name, .date-option.selected .day-num { color: var(--colore-testo-invertito); }
+        .time-slot.unavailable { background-color: #e9ecef; border-color: var(--colore-bordo); color: var(--colore-testo-secondario); cursor: not-allowed; text-decoration: line-through; }
+        .time-slot.unavailable:hover { color: var(--colore-testo-secondario); transform: none; }
+        #booking-summary { background-color: var(--colore-sfondo); border: 1px solid #e9ecef; border-radius: 12px; padding: 24px; margin-top: 24px; display: none; }
+        .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--colore-bordo); }
+        .summary-item:last-child { border-bottom: none; }
+        .summary-item .value { font-weight: 700; }
+        #booking-form { margin-top: 24px; display: none; }
+        .form-group { position: relative; margin-bottom: 20px; }
+        .form-group i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--colore-testo-secondario); }
+        .form-group input { width: 100%; background-color: var(--colore-sfondo); border: 1px solid var(--colore-bordo); border-radius: 8px; padding: 14px 14px 14px 48px; color: var(--colore-testo-principale); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-group input:focus { outline: none; border-color: var(--colore-primario); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); }
+        .submit-btn { width: 100%; background-color: var(--colore-primario); border: none; border-radius: 8px; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--colore-testo-invertito); cursor: pointer; transition: all 0.2s; }
+        .submit-btn:hover { background-color: var(--colore-primario-hover); }
+        .submit-btn:disabled { background-color: #6c757d; cursor: wait; }
+        #confirmation-message { text-align: center; padding: 80px 40px; }
+        #confirmation-message .icon-wrapper { width: 80px; height: 80px; margin: 0 auto 24px; background-color: rgba(0,123,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        #confirmation-message i { color: var(--colore-primario); font-size: 2.5rem; }
+        #confirmation-message h1 { font-size: 2rem; margin-bottom: 12px; }
+        @media (max-width: 992px) { .booking-layout { grid-template-columns: 1fr; } h1 { font-size: 2rem; } }
     </style>
 </head>
 <body>
-      <canvas id="arrows"></canvas>
-
-    <div id="theme-toggle" role="button" aria-label="Cambia tema">
-        <i class="fas fa-moon"></i>
-        <i class="fas fa-sun"></i>
-    </div>
-    <header class="top-bar-nav">
-        <a href="index.html" class="back-to-home-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z"></path></svg>
-            <span>Torna alla Home</span>
-        </a>
+    <header class="navbar">
+        <a href="index.html" class="home-link" aria-label="Torna alla Home"><i class="fa-solid fa-arrow-left"></i></a>
     </header>
-
-    <main class="booking-page-container">
-        <section id="selection-section">
-            <h2>Prenota il tuo campo</h2>
-            
-            <h3>1. Seleziona la Data (max 7 giorni)</h3>
-            <div class="date-selector">
-                <div class="date-picker" id="datePicker"></div>
+    <div class="container" id="booking-container">
+        <div class="booking-layout">
+            <div class="selection-panel">
+                <h1>Effettua una Prenotazione</h1>
+                <p>Seleziona data, campo e orario. La disponibilità è aggiornata in tempo reale per garantirti una prenotazione sicura.</p>
+                <div class="step"><h2>1. Seleziona la Data</h2><div class="date-picker" id="date-picker"></div></div>
+                <div class="step"><h2>2. Seleziona il Campo</h2><div class="field-selector" id="field-selector"><div class="field-option selected" data-field="1">Campo 1</div><div class="field-option" data-field="2">Campo 2</div><div class="field-option" data-field="3">Campo 3</div></div></div>
+                <div class="step"><h2>3. Seleziona l'Orario</h2><div class="time-slots" id="time-slots"></div></div>
             </div>
-            
-            <h3>2. Seleziona il Campo</h3>
-            <div class="field-selector">
-                <div class="field-options">
-                    <div class="field-option selected" data-field="1">Campo 1 (ore 00')</div>
-                    <div class="field-option" data-field="2">Campo 2 (ore 15')</div>
-                    <div class="field-option" data-field="3">Campo 3 (ore 30')</div>
-                </div>
+            <div class="summary-panel">
+                <h2>La Tua Prenotazione</h2>
+                <div id="booking-summary"><div class="summary-item"><span>Data</span><span class="value" id="summary-date">-</span></div><div class="summary-item"><span>Campo</span><span class="value" id="summary-field">-</span></div><div class="summary-item"><span>Orari</span><span class="value" id="summary-time">-</span></div></div>
+                <form id="booking-form" novalidate><div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="name" name="Nome" placeholder="Nome" required></div><div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="surname" name="Cognome" placeholder="Cognome" required></div><div class="form-group"><i class="fa-solid fa-envelope"></i><input type="email" id="email" name="Email" placeholder="Email" required></div><div class="form-group"><i class="fa-solid fa-phone"></i><input type="tel" id="phone" name="Telefono" placeholder="Numero di Telefono" required></div><button type="submit" class="submit-btn">Conferma Prenotazione</button></form>
             </div>
-            
-            <h3>3. Seleziona l'Orario</h3>
-            <p>Puoi selezionare fino a un massimo di 2 ore.</p>
-            <div class="time-slots" id="timeSlots"></div>
-        </section>
+        </div>
+    </div>
+    <div class="container" id="confirmation-container" style="display: none;"><div id="confirmation-message"><div class="icon-wrapper"><i class="fa-solid fa-circle-check"></i></div><h1>Grazie!</h1><p>La tua richiesta di prenotazione è stata inviata con successo. Riceverai una mail di conferma non appena verrà approvata dal nostro staff.</p></div></div>
+    
+   <script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const datePicker = document.getElementById('date-picker');
+    const fieldSelector = document.getElementById('field-selector');
+    const timeSlotsContainer = document.getElementById('time-slots');
+    const summaryDiv = document.getElementById('booking-summary');
+    const form = document.getElementById('booking-form');
+    const summaryDate = document.getElementById('summary-date');
+    const summaryField = document.getElementById('summary-field');
+    const summaryTime = document.getElementById('summary-time');
 
-        <section class="user-details-form" id="booking-form">
-            <h3>4. Completa la tua prenotazione</h3>
-            <form id="details-form">
-                <div class="form-group"><label for="name">Nome</label><input type="text" id="name" name="name" required></div>
-                <div class="form-group"><label for="surname">Cognome</label><input type="text" id="surname" name="surname" required></div>
-                <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" required></div>
-                <div class="form-group"><label for="phone">Numero di telefono</label><input type="tel" id="phone" name="phone" required></div>
-                <input type="hidden" id="selected-date" name="selected-date">
-                <input type="hidden" id="selected-time" name="selected-time">
-                <input type="hidden" id="selected-field" name="selected-field">
-                <button type="submit" class="confirm-button">Conferma Prenotazione</button>
-            </form>
-        </section>
+    const booking = { date: null, field: '1', timeSlots: [] };
+    let allBookings = {};
 
-        <section class="confirmation-message" id="confirmation-message">
-             <i class="fas fa-check-circle"></i>
-             <h3>Prenotazione Inviata!</h3>
-             <p>Grazie, la tua richiesta è stata registrata. Riceverai una mail di conferma a breve.</p>
-        </section>
-    </main>
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="script.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const datePickerContainer = document.getElementById('datePicker');
-        const timeSlotContainer = document.getElementById('timeSlots');
-        const bookingForm = document.getElementById('booking-form');
-        const detailsForm = document.getElementById('details-form');
-        const selectionSection = document.getElementById('selection-section');
-        const confirmationMessage = document.getElementById('confirmation-message');
-        
-        let booking = { date: null, field: '1', timeSlots: [] };
-        const bookedSlots = { '2025-06-27': {'1': ['09:00'], '2': ['10:15'], '3': ['11:30']}, '2025-06-28': {'1': ['11:00'], '2': ['18:15']} };
+    const API_URL = 'https://sheetdb.io/api/v1/2asw3l7zf8wzl';
 
-        function formatDate(date) {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        function initDatePicker() {
-            datePickerContainer.innerHTML = '';
-            const today = new Date();
-            for (let i = 0; i < 7; i++) { // Limite di 7 giorni
-                const date = new Date();
-                date.setDate(today.getDate() + i);
-                const dateOption = document.createElement('div');
-                dateOption.classList.add('date-option');
-                dateOption.dataset.date = formatDate(date);
-                const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
-                const dayNum = date.getDate();
-                const month = new Intl.DateTimeFormat('it-IT', { month: 'short' }).format(date);
-                dateOption.innerHTML = `<strong>${dayName}</strong><br>${dayNum} ${month}`;
-                if (i === 0) {
-                    dateOption.classList.add('selected');
-                    booking.date = formatDate(date);
-                }
-                dateOption.addEventListener('click', function() {
-                    document.querySelectorAll('.date-option.selected').forEach(d => d.classList.remove('selected'));
-                    this.classList.add('selected');
-                    booking.date = this.dataset.date;
-                    booking.timeSlots = []; // Reset selezione orari
-                    initTimeSlots();
-                    bookingForm.classList.remove('active');
-                });
-                datePickerContainer.appendChild(dateOption);
-            }
-        }
-        
-        function initTimeSlots() {
-            timeSlotContainer.innerHTML = '';
-            const unavailableSlots = bookedSlots[booking.date]?.[booking.field] || [];
-            let minuteOffset = 0;
-            if (booking.field === '2') minuteOffset = 15;
-            else if (booking.field === '3') minuteOffset = 30;
-
-            for (let hour = 8; hour < 23; hour++) {
-                const timeStr = `${hour.toString().padStart(2, '0')}:${minuteOffset.toString().padStart(2, '0')}`;
-                const timeSlot = document.createElement('div');
-                timeSlot.classList.add('time-slot');
-                timeSlot.dataset.time = timeStr;
-                timeSlot.textContent = timeStr;
-
-                if (unavailableSlots.includes(timeStr)) {
-                    timeSlot.classList.add('unavailable');
-                } else {
-                    // Mantiene la selezione visuale dopo un refresh (es. cambio campo)
-                    if (booking.timeSlots.includes(timeStr)) {
-                        timeSlot.classList.add('selected');
+    const fetchAllBookings = async () => {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error(`Errore di rete: ${response.statusText}`);
+            const data = await response.json();
+            const grouped = {};
+            for (const b of data) {
+                if (b.Data && b.Campo && b.Orario) {
+                    if (!grouped[b.Data]) grouped[b.Data] = {};
+                    if (!grouped[b.Data][b.Campo]) grouped[b.Data][b.Campo] = [];
+                    const timeParts = b.Orario.split(' - ');
+                    const startTime = timeParts[0];
+                    const startHour = parseInt(startTime.split(':')[0]);
+                    const minute = startTime.split(':')[1];
+                    let duration = 1;
+                    if (timeParts.length > 1) {
+                        const endTimeHour = parseInt(timeParts[1].split(':')[0]);
+                        duration = endTimeHour - startHour;
                     }
-
-                    timeSlot.addEventListener('click', function() {
-                        const isSelected = this.classList.contains('selected');
-                        
-                        if (isSelected) {
-                            // Deseleziona
-                            this.classList.remove('selected');
-                            booking.timeSlots = booking.timeSlots.filter(t => t !== timeStr);
-                        } else {
-                            // Seleziona se non si supera il limite di 2 ore
-                            if (booking.timeSlots.length < 2) {
-                                this.classList.add('selected');
-                                booking.timeSlots.push(timeStr);
-                            } else {
-                                alert('Puoi prenotare al massimo 2 ore.');
-                            }
-                        }
-
-                        // Mostra o nascondi il form
-                        if (booking.timeSlots.length > 0) {
-                            if (!bookingForm.classList.contains('active')) {
-                                bookingForm.classList.add('active');
-                                bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }
-                        } else {
-                            bookingForm.classList.remove('active');
-                        }
-                    });
+                    for (let i = 0; i < duration; i++) {
+                        const currentHour = startHour + i;
+                        grouped[b.Data][b.Campo].push(`${String(currentHour).padStart(2, '0')}:${minute}`);
+                    }
                 }
-                timeSlotContainer.appendChild(timeSlot);
             }
+            return grouped;
+        } catch (error) { console.error("Impossibile caricare le prenotazioni:", error); return {}; }
+    };
+
+    const renderDatePicker = () => {
+        datePicker.innerHTML = ''; const today = new Date();
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(); date.setDate(today.getDate() + i);
+            const dateValue = date.toISOString().split('T')[0];
+            const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
+            const dayNum = date.getDate();
+            const option = document.createElement('div'); option.className = 'date-option'; option.dataset.date = dateValue;
+            option.innerHTML = `<span class="day-name">${dayName}</span><span class="day-num">${dayNum}</span>`;
+            if (i === 0) { booking.date = dateValue; option.classList.add('selected'); }
+            datePicker.appendChild(option);
+        }
+    };
+
+    const renderTimeSlots = () => {
+        timeSlotsContainer.innerHTML = ''; const unavailable = allBookings[booking.date]?.[booking.field] || [];
+        let minuteOffset = 0;
+        if (booking.field === '2') minuteOffset = 15; else if (booking.field === '3') minuteOffset = 30;
+        for (let hour = 8; hour < 22; hour++) {
+            const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
+            const slot = document.createElement('div'); slot.className = 'time-slot'; slot.dataset.time = time; slot.textContent = time;
+            if (unavailable.includes(time)) { slot.classList.add('unavailable'); }
+            if (booking.timeSlots.includes(time)) { slot.classList.add('selected'); }
+            timeSlotsContainer.appendChild(slot);
+        }
+    };
+
+    const updateSummary = () => {
+        if (booking.date) {
+            summaryDate.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(booking.date + "T00:00:00"));
+            summaryDiv.style.display = 'block';
+        }
+        summaryField.textContent = `Campo ${booking.field}`;
+        summaryTime.textContent = booking.timeSlots.length > 0 ? booking.timeSlots.sort().join(', ') : '-';
+        form.style.display = booking.timeSlots.length > 0 ? 'block' : 'none';
+    };
+
+    const refreshUI = async () => {
+        const latestBookings = await fetchAllBookings();
+        // Aggiorna solo se i dati sono cambiati per evitare sfarfallio
+        if(JSON.stringify(allBookings) !== JSON.stringify(latestBookings)) {
+            allBookings = latestBookings;
+            renderTimeSlots();
+            updateSummary();
+        }
+    };
+
+    datePicker.addEventListener('click', e => {
+        const target = e.target.closest('.date-option'); if (!target || target.classList.contains('selected')) return;
+        datePicker.querySelector('.selected').classList.remove('selected'); target.classList.add('selected');
+        booking.date = target.dataset.date; booking.timeSlots = []; renderTimeSlots(); updateSummary();
+    });
+
+    fieldSelector.addEventListener('click', e => {
+        const target = e.target.closest('.field-option'); if (!target || target.classList.contains('selected')) return;
+        fieldSelector.querySelector('.selected').classList.remove('selected'); target.classList.add('selected');
+        booking.field = target.dataset.field; booking.timeSlots = []; renderTimeSlots(); updateSummary();
+    });
+
+    timeSlotsContainer.addEventListener('click', e => {
+        const target = e.target.closest('.time-slot'); if (!target || target.classList.contains('unavailable')) return;
+        const time = target.dataset.time;
+        const isSelected = booking.timeSlots.includes(time);
+        if (!isSelected && booking.timeSlots.length >= 2) { alert("Puoi selezionare al massimo 2 ore."); return; }
+        target.classList.toggle('selected');
+        booking.timeSlots = Array.from(timeSlotsContainer.querySelectorAll('.time-slot.selected')).map(el => el.dataset.time);
+        updateSummary();
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // --- NUOVO: Logica di validazione del form ---
+        const nameInput = document.getElementById('name');
+        const surnameInput = document.getElementById('surname');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+
+        if (!nameInput.value.trim() || !surnameInput.value.trim() || !emailInput.value.trim() || !phoneInput.value.trim()) {
+            alert("Per favore, compila tutti i campi: Nome, Cognome, Email e Telefono.");
+            return; // Interrompe l'invio del form se i campi sono vuoti
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailInput.value)) {
+            alert("Per favore, inserisci un indirizzo email valido.");
+            return; // Interrompe l'invio se l'email non è valida
+        }
+        // --- FINE Logica di validazione ---
+
+        const submitBtn = form.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifica disponibilità...';
+
+        const latestBookings = await fetchAllBookings();
+        const latestUnavailable = latestBookings[booking.date]?.[booking.field] || [];
+        const isSlotTaken = booking.timeSlots.some(slot => latestUnavailable.includes(slot));
+
+        if (isSlotTaken) {
+            alert('Spiacente, uno degli orari scelti è stato appena prenotato! La pagina si aggiornerà.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Conferma Prenotazione';
+            refreshUI();
+            return;
         }
 
-        document.querySelectorAll('.field-option').forEach(option => {
-            option.addEventListener('click', function() {
-                document.querySelectorAll('.field-option.selected').forEach(f => f.classList.remove('selected'));
-                this.classList.add('selected');
-                booking.field = this.dataset.field;
-                booking.timeSlots = []; // Reset selezione orari
-                initTimeSlots();
-                bookingForm.classList.remove('active');
-            });
+        submitBtn.textContent = 'Conferma in corso...';
+        const formData = new FormData(form);
+        const baseData = Object.fromEntries(formData.entries());
+
+        const bookingsToSend = booking.timeSlots.map(slot => ({
+            ...baseData,
+            Data: booking.date,
+            Orario: slot,
+            Campo: booking.field,
+            ID: `ID-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+        }));
+        
+        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({data: bookingsToSend}) })
+        .then(res => {
+            if (!res.ok) throw new Error('La risposta del server non è stata positiva');
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById('booking-container').style.display = 'none';
+            const confirmationContainer = document.getElementById('confirmation-container');
+            confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
+            confirmationContainer.querySelector('p').textContent = `La tua richiesta di prenotazione è stata inviata con successo. Riceverai una mail di conferma non appena verrà approvata dal nostro staff.`;
+            confirmationContainer.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Errore durante la prenotazione:', error);
+            alert('Si è verificato un errore durante la prenotazione. Riprova.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Conferma Prenotazione';
         });
-
-        detailsForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const confirmButton = detailsForm.querySelector('.confirm-button');
-            confirmButton.disabled = true;
-            confirmButton.textContent = 'Invio...';
-
-            const formData = new FormData(detailsForm);
-            formData.set('selected-date', booking.date);
-            formData.set('selected-time', booking.timeSlots.sort().join(' - ')); // Invia array orari
-            formData.set('selected-field', booking.field);
-
-            const bookingData = Object.fromEntries(formData.entries());
-            console.log("Dati inviati:", bookingData);
-            
-            setTimeout(() => {
-                selectionSection.style.display = 'none';
-                bookingForm.style.display = 'none';
-                confirmationMessage.style.display = 'block';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 1000);
-        });
-
-        initDatePicker();
-        initTimeSlots();
     });
-    </script>
+
+    // Esecuzione iniziale
+    renderDatePicker();
+    allBookings = await fetchAllBookings();
+    renderTimeSlots();
+    updateSummary();
+
+    // NUOVO: Aggiornamento automatico ogni 10 secondi
+    setInterval(refreshUI, 10000); // 10000 ms = 10 secondi
+});
+</script>
 </body>
 </html>

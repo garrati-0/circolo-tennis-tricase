@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Prenotazioni</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --colore-primario: #007BFF; --colore-accento: #DC3545; --colore-successo: #28a745; --colore-sfondo: #F4F7FC; --colore-superficie: #FFFFFF; --colore-bordo: #E9ECEF; --colore-testo-principale: #212529; --colore-testo-secondario: #6C757D; }
+        body { font-family: 'Noto Sans', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); margin: 0; }
+        .container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        h1, h2 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .date-navigation { display: flex; justify-content: space-between; align-items: center; gap: 15px; background-color: var(--colore-superficie); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .date-navigation button { background: none; border: 1px solid var(--colore-bordo); color: var(--colore-primario); padding: 10px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .date-navigation button:hover { background-color: var(--colore-primario); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); }
+        .date-navigation #today-btn { color: var(--colore-successo); }
+        .date-navigation #today-btn:hover { background-color: var(--colore-successo); color: white; box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2); }
+        .date-navigation h2 { color: var(--colore-primario); font-size: 1.8rem; margin: 0; text-align: center; flex-grow: 1; }
+        
+        /* NUOVO: Stile per le intestazioni delle colonne */
+        .column-headers {
+            display: grid;
+            grid-template-columns: 80px repeat(3, 1fr); /* Allineato con la griglia */
+            gap: 2px;
+            margin-bottom: -2px; /* Sovrappone il bordo per un look pulito */
+            padding: 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .header-item {
+            background-color: #343A40;
+            color: white;
+            padding: 15px;
+            border-radius: 6px 6px 0 0;
+        }
+        .header-item:first-child {
+            background-color: transparent; /* Il primo header (Orario) è vuoto */
+            color: transparent;
+        }
+
+        .calendar-container { display: grid; grid-template-columns: 80px repeat(3, 1fr); gap: 2px; background-color: var(--colore-bordo); border: 1px solid var(--colore-bordo); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .time-label { grid-column: 1 / 2; text-align: center; font-size: 0.9rem; font-weight: bold; color: var(--colore-testo-secondario); background-color: #F8F9FA; display: flex; align-items: center; justify-content: center; border-top: 1px solid var(--colore-bordo); }
+        .time-slot { position: relative; background-color: var(--colore-superficie); min-height: 100px; border-top: 1px solid var(--colore-bordo); }
+        .booking-card { position: absolute; left: 3px; right: 3px; background-color: var(--colore-primario); color: white; padding: 8px; border-radius: 6px; font-size: 0.85rem; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5; display: flex; flex-direction: column; transition: opacity 0.3s ease; }
+        .booking-card-content { flex-grow: 1; }
+        .booking-card strong { display: block; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 4px; margin-bottom: 4px; }
+        .booking-card p { margin: 2px 0; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
+        .delete-btn { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.2); border: none; color: white; cursor: pointer; font-size: 0.8rem; opacity: 0.6; transition: all 0.2s; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .delete-btn:hover { opacity: 1; color: white; background-color: var(--colore-accento); transform: scale(1.1); }
+        .loading-indicator { text-align: center; font-size: 1.2rem; padding: 50px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard Prenotazioni</h1>
+        <div class="date-navigation">
+            <button id="prev-day"><i class="fa-solid fa-chevron-left"></i> Precedente</button>
+            <button id="today-btn"><i class="fa-solid fa-calendar-day"></i> Oggi</button>
+            <h2 id="current-date">Caricamento...</h2>
+            <button id="next-day">Successivo <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        
+        <div class="column-headers">
+            <div class="header-item">Orario</div>
+            <div class="header-item">Campo 1</div>
+            <div class="header-item">Campo 2</div>
+            <div class="header-item">Campo 3</div>
+        </div>
+
+        <div id="calendar-grid" class="calendar-container" style="display: none;"></div>
+        <div id="loading" class="loading-indicator"><i class="fa-solid fa-spinner fa-spin"></i> Caricamento prenotazioni...</div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // ... (element getters)
+        const prevDayBtn = document.getElementById('prev-day');
+        const nextDayBtn = document.getElementById('next-day');
+        const todayBtn = document.getElementById('today-btn');
+        const currentDateElem = document.getElementById('current-date');
+        const calendarGrid = document.getElementById('calendar-grid');
+        const loadingIndicator = document.getElementById('loading');
+        
+        let currentDate = new Date();
+        let allBookings = {};
+        const API_URL = 'https://sheetdb.io/api/v1/2asw3l7zf8wzl';
+
+        /**
+         * Funzione dedicata solo al recupero e raggruppamento dei dati.
+         */
+        const fetchData = async () => {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Risposta di rete non valida');
+                const data = await response.json();
+                const grouped = {};
+                for (const booking of data) {
+                    if (booking.Data) {
+                        if (!grouped[booking.Data]) grouped[booking.Data] = [];
+                        grouped[booking.Data].push(booking);
+                    }
+                }
+                return grouped;
+            } catch (error) {
+                console.error("Errore nel caricamento dati:", error);
+                // Non mostrare l'errore se è un refresh in background
+                if (loadingIndicator.style.display === 'block') {
+                    loadingIndicator.textContent = 'Errore nel caricamento dati.';
+                }
+                return null;
+            }
+        };
+
+        const renderCalendar = () => {
+            // ... (logica di rendering invariata)
+            calendarGrid.style.display = 'grid';
+            loadingIndicator.style.display = 'none';
+            calendarGrid.innerHTML = '';
+            currentDateElem.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'full' }).format(currentDate);
+            const dateString = currentDate.toISOString().split('T')[0];
+            const dayBookings = allBookings[dateString] || [];
+            const fragment = document.createDocumentFragment();
+            const slots = {};
+            for (let hour = 8; hour < 22; hour++) {
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                timeLabel.textContent = `${String(hour).padStart(2, '0')}:00`;
+                fragment.appendChild(timeLabel);
+                for (let field = 1; field <= 3; field++) {
+                    const slotId = `slot-${hour}-${field}`;
+                    const slotDiv = document.createElement('div');
+                    slotDiv.className = 'time-slot';
+                    slotDiv.id = slotId;
+                    slots[slotId] = slotDiv;
+                    fragment.appendChild(slotDiv);
+                }
+            }
+            for (const booking of dayBookings) {
+                if (!booking.Orario || !booking.Campo || !booking.ID) continue;
+                const timeParts = booking.Orario.split(' - ');
+                const startTime = timeParts[0];
+                const [startHour, startMinute] = startTime.split(':').map(Number);
+                let durationHours = 1;
+                if (timeParts.length > 1) {
+                    const endTimeHour = parseInt(timeParts[1].split(':')[0]);
+                    durationHours = endTimeHour - startHour;
+                }
+                const topPosition = (startMinute / 60) * 100;
+                const cardHeight = durationHours * 100;
+                const targetSlotId = `slot-${startHour}-${booking.Campo}`;
+                const targetSlot = slots[targetSlotId];
+                if (targetSlot) {
+                    const card = document.createElement('div');
+                    card.className = 'booking-card';
+                    card.style.top = `${topPosition}%`;
+                    card.style.height = `calc(${cardHeight}% - 4px)`;
+                    card.innerHTML = `<button class="delete-btn" data-id="${booking.ID}" title="Cancella prenotazione"><i class="fa-solid fa-trash-can"></i></button><div class="booking-card-content"><strong>${booking.Nome || 'Prenotato'} ${booking.Cognome || ''}</strong><p><i class="fa-solid fa-clock fa-fw"></i> ${booking.Orario}</p><p><i class="fa-solid fa-phone fa-fw"></i> ${booking.Telefono || '-'}</p></div>`;
+                    targetSlot.appendChild(card);
+                }
+            }
+            calendarGrid.appendChild(fragment);
+        };
+        
+        calendarGrid.addEventListener('click', async (e) => {
+            // ... (logica di cancellazione invariata)
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (!deleteBtn) return;
+            const bookingId = deleteBtn.dataset.id;
+            const card = deleteBtn.closest('.booking-card');
+            const bookingName = card.querySelector('strong').textContent;
+            if (confirm(`Sei sicuro di voler cancellare la prenotazione di ${bookingName}?`)) {
+                try {
+                    card.style.opacity = '0.5';
+                    const response = await fetch(`${API_URL}/ID/${bookingId}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('La cancellazione dal server non è riuscita.');
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    if(allBookings[dateString]) {
+                        allBookings[dateString] = allBookings[dateString].filter(b => b.ID !== bookingId);
+                    }
+                    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        renderCalendar();
+                    }, 300);
+                } catch (error) {
+                    alert(`Errore: ${error.message}`);
+                    card.style.opacity = '1';
+                }
+            }
+        });
+
+        const initialLoad = async () => {
+            loadingIndicator.style.display = 'block';
+            calendarGrid.style.display = 'none';
+            const data = await fetchData();
+            if (data) {
+                allBookings = data;
+                renderCalendar();
+            }
+        };
+
+        /**
+         * NUOVO: Funzione per l'aggiornamento automatico in background.
+         */
+        const backgroundRefresh = async () => {
+            console.log("Controllo aggiornamenti...");
+            const latestBookings = await fetchData();
+            // Aggiorna la vista solo se i dati sono cambiati e ci sono nuovi dati
+            if (latestBookings && JSON.stringify(allBookings) !== JSON.stringify(latestBookings)) {
+                console.log("Dati cambiati, aggiorno la vista.");
+                allBookings = latestBookings;
+                renderCalendar();
+            }
+        };
+
+        // Event listeners per la navigazione
+        prevDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() - 1); renderCalendar(); });
+        nextDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() + 1); renderCalendar(); });
+        todayBtn.addEventListener('click', () => { currentDate = new Date(); renderCalendar(); });
+
+        // Avvio iniziale e impostazione dell'intervallo
+        initialLoad();
+        setInterval(backgroundRefresh, 10000); // 30000 ms = 30 secondi
+    });
+    </script>
+</body>
+</html>

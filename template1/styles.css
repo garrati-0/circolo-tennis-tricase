@@ -1,0 +1,381 @@
+/* :root aggiornato con tutte le variabili definite */
+:root {
+    --verde: #387B66;
+    --sabbia: #FFCB82;
+    --marrone: #381E05;
+    --ombra: rgba(35, 20, 12, 0.25);
+}
+
+/* --- Tema Chiaro --- */
+body.light-theme {
+    --verde:rgb(240, 223, 181);
+    --sabbia:rgb(105, 39, 4);
+    --marrone:rgb(117, 42, 9);
+    --ombra: rgba(56, 30, 5, 0.15);
+}
+
+body {
+    margin: 0;
+    background-color: var(--verde);
+    font-family: 'Inter', sans-serif;
+    color: var(--sabbia);
+    overflow-x: hidden;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    transition: opacity 0.4s ease;
+}
+
+/* --- Hero Section --- */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    padding: 0 1rem;
+    overflow: hidden; /* Nasconde elementi che potrebbero sbordare */
+}
+
+.text-layer {
+    position: relative;
+    z-index: 1;
+}
+
+h1, h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 12vw, 8rem);
+    margin: 0;
+    letter-spacing: 0.05em;
+    color: var(--sabbia);
+    text-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.tagline { 
+    font-size: clamp(1rem, 2vw, 1.5rem); 
+    margin-top: 1rem; 
+    letter-spacing: 2px; 
+    text-transform: uppercase; 
+    color: var(--sabbia); 
+}
+
+/* --- Stili per i Pulsanti --- */
+.hero-buttons { 
+    margin-top: 3rem; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 1.5rem;
+}
+
+.hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2.5rem;
+    min-width: 280px;
+    border: 2px solid var(--sabbia);
+    color: var(--sabbia);
+    border-radius: 0px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px var(--ombra);
+    transform: translateY(0);
+}
+
+.hero-button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px var(--ombra);
+}
+
+.hero-button.primary {
+    background-color: var(--sabbia);
+    color: var(--verde);
+}
+
+body.light-theme .hero-button.primary {
+     color: #E9E1D3;
+}
+
+.hero-button.primary:hover {
+    background-color: transparent;
+    color: var(--sabbia);
+}
+
+.hero-button.secondary {
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+body.light-theme .hero-button.secondary {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.hero-button.secondary:hover {
+    background-color: var(--sabbia);
+    color: var(--verde);
+}
+
+body.light-theme .hero-button.secondary:hover {
+     color: #E9E1D3;
+}
+
+.hero-button .arrow {
+    display: inline-block;
+    margin-left: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.hero-button:hover .arrow {
+    transform: translateX(6px);
+}
+
+a {
+    color: var(--sabbia);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* --- Pulsante Cambio Tema --- */
+#theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(0,0,0,0.3);
+    color: var(--sabbia);
+    border: 1px solid var(--sabbia);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+#theme-toggle:hover {
+    transform: scale(1.1) rotate(15deg);
+    background-color: var(--sabbia);
+    color: var(--verde);
+}
+body.light-theme #theme-toggle {
+     background-color: rgba(255,255,255,0.3);
+     border-color: var(--verde);
+}
+body.light-theme #theme-toggle:hover {
+     color: #E9E1D3;
+}
+
+#theme-toggle .fa-sun { display: none; }
+#theme-toggle .fa-moon { display: block; }
+body.light-theme #theme-toggle .fa-sun { display: block; }
+body.light-theme #theme-toggle .fa-moon { display: none; }
+
+
+/* Titolo di sezione generico */
+.section-title {
+    font-size: 4rem;
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--sabbia);
+    margin-bottom: 1rem;
+    text-align: center;
+    border-bottom: 4px solid var(--sabbia);
+    padding-bottom: 1rem;
+    display: inline-block;
+    align-self: center;
+}
+
+.section-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 2rem 0 4rem 0;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    opacity: 0.9;
+}
+
+/* Sezioni */
+.club-section, .maestri-section, .corsi-section, .merch-section, .news-section {
+    padding: 5rem 2rem;
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.club-section { gap: 5rem; }
+.merch-section { padding: 5rem 0; overflow: hidden; }
+.corsi-section, .news-section { max-width: 1000px; }
+.club-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center; /* Mantiene il contenuto centrato verticalmente */
+    gap: 3rem;
+    background-color: rgba(0,0,0,0.15);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 203, 130, 0.1);
+}
+
+body.light-theme .club-block {
+    background-color: rgba(255,255,255,0.2);
+    border-color: rgba(56, 123, 102, 0.2);
+}
+
+.club-block:nth-child(even) .club-image {
+    order: 2;
+}
+
+.club-block:nth-child(even) .club-content {
+    order: 1;
+}
+
+/* --- MODIFICA 1: Imposta un'altezza fissa per il contenitore dell'immagine --- */
+.club-image {
+    height: 400px; /* << ESEMPIO: Puoi cambiare questo valore */
+    border-radius: 8px; /* Spostato qui per contenere l'immagine */
+    overflow: hidden; /* Nasconde le parti dell'immagine che escono */
+}
+
+.club-image img {
+    width: 100%;
+    height: 100%; /* << MODIFICA: L'immagine riempie il contenitore */
+    border-radius: 0; /* Rimuoviamo il raggio dall'immagine stessa */
+    box-shadow: 0 10px 30px var(--ombra);
+    transition: transform 0.3s ease;
+    object-fit: cover; /* << NUOVA PROPRIETÀ: La più importante! */
+}
+
+.club-image img:hover {
+    transform: scale(1.05);
+}
+
+.club-content h3 {
+    font-size: 2.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--sabbia);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--sabbia);
+    padding-left: 1rem;
+}
+
+.club-content p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--sabbia);
+    opacity: 0.9;
+}
+
+/* Card dei maestri */
+.maestri-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; width: 100%; }
+.maestro-card { background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 203, 130, 0.15); border-radius: 8px; text-align: center; padding: 2rem; transition: transform 0.3s ease, box-shadow 0.3s ease; backdrop-filter: blur(5px); }
+body.light-theme .maestro-card { background-color: rgba(255,255,255,0.3); border-color: rgba(56, 123, 102, 0.2); }
+.maestro-card:hover { transform: translateY(-10px); box-shadow: 0 12px 40px var(--ombra); }
+.maestro-card img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--sabbia); margin-bottom: 1.5rem; box-shadow: 0 4px 15px var(--ombra); }
+.maestro-card h4 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--sabbia); margin: 0 0 0.5rem 0; }
+.maestro-card .qualifica { display: block; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; color: var(--sabbia); opacity: 0.8; margin-bottom: 1rem; }
+.maestro-card p { font-size: 1rem; line-height: 1.6; color: var(--sabbia); opacity: 0.9; }
+
+/* Card dei corsi */
+.corsi-container { width: 100%; display: flex; flex-direction: column; gap: 2rem; margin-top: 3rem; }
+.corso-card { display: flex; align-items: center; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 203, 130, 0.1); border-radius: 8px; padding: 2rem; gap: 2rem; transition: transform 0.3s ease, background-color 0.3s ease; }
+body.light-theme .corso-card { background-color: rgba(255,255,255,0.25); border-color: rgba(56, 123, 102, 0.2); }
+.corso-card:hover { transform: scale(1.03); background: rgba(0, 0, 0, 0.3); }
+body.light-theme .corso-card:hover { background: rgba(255,255,255,0.4); }
+.corso-icon { font-size: 3rem; color: var(--sabbia); background-color: rgba(0,0,0,0.2); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; }
+body.light-theme .corso-icon { background-color: rgba(255,255,255,0.2); }
+.corso-details h4 { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--sabbia); margin: 0 0 0.5rem 0; }
+.corso-details p { margin: 0; font-size: 1rem; line-height: 1.6; color: var(--sabbia); opacity: 0.9; }
+
+/* Card del Merch */
+.merch-container { width: 100%; max-width: 1200px; margin-top: 3rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; padding: 0 2rem; }
+.merch-card { background: rgba(0, 0, 0, 0.25); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 203, 130, 0.15); transition: transform 0.3s ease; }
+body.light-theme .merch-card { background-color: rgba(255,255,255,0.3); border-color: rgba(56, 123, 102, 0.2); }
+.merch-card:hover { transform: translateY(-8px); }
+.merch-card img { width: 100%; height: 300px; object-fit: cover; display: block; }
+.merch-info { padding: 1.5rem; text-align: center; }
+.merch-info h5 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; margin: 0 0 0.5rem 0; color: var(--sabbia); }
+.merch-info p { margin: 0; font-size: 1.1rem; font-weight: bold; color: var(--sabbia); opacity: 0.9; }
+
+/* Card News e Eventi */
+.news-container { width: 100%; display: flex; flex-direction: column; gap: 2rem; margin-top: 3rem; }
+.news-card { display: flex; align-items: stretch; background: rgba(0, 0, 0, 0.2); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 203, 130, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+body.light-theme .news-card { background-color: rgba(255,255,255,0.25); border-color: rgba(56, 123, 102, 0.2); }
+.news-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px var(--ombra); }
+.news-date { background-color: var(--sabbia); color: var(--verde); padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; flex-shrink: 0; }
+body.light-theme .news-date { color: var(--marrone); }
+.news-date .day { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; line-height: 1; }
+.news-date .month { text-transform: uppercase; font-weight: 700; font-size: 1rem; line-height: 1; }
+.news-content { padding: 1.5rem 2rem; display: flex; flex-direction: column; justify-content: center; }
+.news-content h4 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--sabbia); margin: 0 0 0.5rem 0; }
+.news-content p { margin: 0 0 1rem 0; font-size: 1rem; line-height: 1.6; opacity: 0.8; }
+.news-content a { font-weight: 700; opacity: 0.9; transition: opacity 0.3s; }
+.news-content a:hover { opacity: 1; }
+
+/* Footer */
+.site-footer { background-color: var(--marrone); color: var(--sabbia); padding: 4rem 2rem 2rem 2rem; border-top: 4px solid var(--sabbia); }
+body.light-theme .site-footer { background-color: var(--sabbia); color: var(--marrone); border-top-color: var(--verde); }
+.footer-container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; }
+.footer-col h5 { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; text-transform: uppercase; }
+.footer-col p, .footer-col ul, .footer-col li { list-style: none; padding: 0; margin: 0; font-size: 1rem; line-height: 1.8; opacity: 0.8; }
+.footer-col a { opacity: 0.8; transition: opacity 0.3s ease; color: inherit; }
+.footer-col a:hover { opacity: 1; }
+.social-links a { font-size: 1.5rem; margin: 0 0.75rem; }
+.footer-bottom { max-width: 1200px; margin: 3rem auto 0 auto; padding-top: 2rem; text-align: center; border-top: 1px solid; opacity: 0.6; font-size: 0.9rem; }
+
+/* Media Queries */
+@media (max-width: 900px) {
+    .club-block { grid-template-columns: 1fr; gap: 2rem; padding: 1.5rem; }
+    .club-block:nth-child(even) .club-image, .club-block:nth-child(even) .club-content { order: initial; }
+}
+@media (max-width: 768px) {
+   .merch-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 1rem 1.5rem 1rem;
+    gap: 1.5rem;
+    
+    /* --- CODICE PER NASCONDERE LA SCROLLBAR --- */
+
+    /* Per Firefox */
+    scrollbar-width: none;
+    
+    /* Per Internet Explorer e Edge (versioni vecchie) */
+    -ms-overflow-style: none;
+}
+
+/* Per Chrome, Safari, Opera e browser basati su WebKit */
+.merch-container::-webkit-scrollbar {
+    display: none;
+}
+    .merch-card { flex: 0 0 80%; max-width: 300px; scroll-snap-align: start; }
+}
+@media (max-width: 600px) {
+    h1, h2 { font-size: 15vw; }
+    .hero-button { min-width: 240px; padding: 0.8rem 2rem; }
+    .club-section, .maestri-section, .corsi-section, .merch-section, .news-section { padding: 3rem 1rem; }
+    .section-title { font-size: 3rem; }
+    .club-content h3, .maestro-card h4, .corso-details h4, .news-content h4 { font-size: 2rem; }
+    .club-content p, .maestro-card p, .corso-details p, .news-content p { font-size: 1rem; }
+    .corso-card { flex-direction: column; text-align: center; gap: 1.5rem; padding: 1.5rem; }
+    .news-card { flex-direction: column; }
+}

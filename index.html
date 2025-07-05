@@ -1,218 +1,315 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CIRCOLO TENNIS TRICASE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <title>Circolo Tennis Tricase</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="root-container">
+  <header class="header">
+      <div class="header-logo">
+    <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fill-rule="evenodd"></path></svg>
+    <h2 class="header-logo-title">Circolo Tennis Tricase</h2>
+      </div>
+      <nav class="main-nav">
+    <a class="nav-link" href="#">Home</a>
+    <a class="nav-link" href="#about">Chi Siamo</a>
+    <a class="nav-link" href="#corsi">I Nostri Corsi</a>
+    <a class="nav-link" href="#maestri">I Nostri Maestri</a>
+    <a class="nav-link" href="#merch">Merchandising</a>
+    <a class="nav-link" href="#gallery">Galleria</a>
+    <a class="nav-link" href="#news">News</a>
+    <a class="nav-link" href="#membership">Tesseramento</a>
+    <a class="nav-link" href="#contact">Contatti</a>
+      </nav>
+      <div class="header-actions">
+    <a href="#contact" class="btn btn-primary">
+        <span class="truncate">Iscriviti Ora</span>
+    </a>
+    <button class="lg:hidden mobile-menu-button" id="mobile-menu-button">
+        <span class="material-icons text-3xl">menu</span>
+    </button>
+      </div>
+  </header>
 
-    <canvas id="arrows"></canvas>
+  <div id="mobile-menu" class="hidden">
+      <nav>
+    <a class="nav-link" href="#">Home</a>
+    <a class="nav-link" href="#about">Chi Siamo</a>
+    <a class="nav-link" href="#corsi">I Nostri Corsi</a>
+    <a class="nav-link" href="#maestri">I Nostri Maestri</a>
+    <a class="nav-link" href="#merch">Merchandising</a>
+    <a class="nav-link" href="#gallery">Galleria</a>
+    <a class="nav-link" href="#news">News</a>
+    <a class="nav-link" href="#membership">Tesseramento</a>
+    <a class="nav-link" href="#contact">Contatti</a>
+      </nav>
+  </div>
 
+  <main>
+      <div class="hero">
+         <div class="hero-content">
+        <div class="hero-text-container">
+      <h1 class="hero-title">Benvenuti al Circolo Tennis Tricase</h1>
+      <p class="hero-subtitle">
+          Vivi il miglior club di tennis di Tricase, che offre strutture di prim'ordine, coaching professionale e una vivace comunità per giocatori di tutti i livelli.
+      </p>
+        </div>
+        <a href="prenota.html" class="btn btn-primary hero-button">
+      <span class="truncate">Prenota Ora</span>
+      <span class="material-icons">arrow_forward</span>
+        </a>
+    </div>
+      </div>
+
+      <div class="main-content">
+    <section id="about">
+        <h2 class="section-title">Chi Siamo</h2>
+        <p class="section-paragraph">
+      Il Circolo Tennis Tricase è un club di tennis di prim'ordine dedicato a fornire esperienze tennistiche eccezionali. Le nostre strutture all'avanguardia includono più campi, una
+      club house e uno staff di allenatori professionisti. Ci rivolgiamo a giocatori di tutte le età e livelli di abilità, dai principianti ai competitori avanzati. La nostra missione è promuovere l'amore
+      per il tennis, incoraggiare stili di vita sani e costruire una solida comunità di appassionati di tennis.
+        </p>
+    </section>
+
+    <section id="corsi">
+        <h2 class="section-title">I Nostri Corsi</h2>
+        <div class="grid md-grid-cols-3">
+      <div class="card">
+          <div class="icon-primary"><span class="material-icons">child_care</span></div>
+          <h3 class="card-title">Mini Tennis</h3>
+          <p class="card-text">Corsi per bambini dai 4 ai 7 anni, per imparare le basi del tennis divertendosi.</p>
+      </div>
+      <div class="card">
+          <div class="icon-primary"><span class="material-icons">school</span></div>
+          <h3 class="card-title">Scuola Agonistica</h3>
+          <p class="card-text">Programmi intensivi per giovani atleti che vogliono competere a livello agonistico.</p>
+      </div>
+      <div class="card">
+          <div class="icon-primary"><span class="material-icons">groups</span></div>
+          <h3 class="card-title">Corsi per Adulti</h3>
+          <p class="card-text">Lezioni di gruppo e individuali per adulti di ogni livello, dal principiante all'avanzato.</p>
+      </div>
+        </div>
+    </section>
+
+    <section id="maestri">
+        <h2 class="section-title">I Nostri Maestri</h2>
+        <div class="grid sm-grid-cols-2 lg-grid-cols-3">
+      <div class="card">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1887&auto=format&fit=crop" alt="Mario Rossi, Maestro di Tennis">
+          <h3>Mario Rossi</h3>
+          <p>Maestro Nazionale FITP, con esperienza decennale nell'insegnamento a bambini e adulti.</p>
+      </div>
+      <div class="card">
+    _
+          <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1888&auto=format&fit=crop" alt="Laura Bianchi, Istruttrice di Tennis">
+          <h3>Laura Bianchi</h3>
+          <p>Istruttrice di II livello, specializzata nella preparazione atletica e nel tennis femminile.</p>
+      </div>
+      <div class="card">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887&auto=format&fit=crop" alt="Marco Verdi, Preparatore Fisico">
+          <h3>Marco Verdi</h3>
+          <p>Preparatore Fisico, si occupa dello sviluppo delle capacità motorie degli atleti.</p>
+      </div>
+        </div>
+    </section>
+
+    <section id="merch">
+        <h2 class="section-title">Merch Ufficiale</h2>
+        <div class="grid sm-grid-cols-2 lg-grid-cols-4" style="gap: 1.5rem;">
+      <div class="card">
+          <div class="img-container">
+        <img src="https://images.unsplash.com/photo-1583922617639-6d8031a07633?q=80&w=1887&auto=format&fit=crop" alt="T-Shirt Ufficiale">
+          </div>
+          <h3>T-Shirt Ufficiale</h3>
+          <p class="price">€25.00</p>
+      </div>
+      <div class="card">
+          <div class="img-container">
+        <img src="https://images.unsplash.com/photo-1612831455749-5f2a3a5f3d6b?q=80&w=1887&auto=format&fit=crop" alt="Cappellino da Tennis">
+  _
+      </div>
+          <h3>Cappellino</h3>
+          <p class="price">€18.00</p>
+      </div>
+      <div class="card">
+         <div class="img-container">
+             <img src="https://images.unsplash.com/photo-1594223274522-44145f0614e5?q=80&w=1887&auto=format&fit=crop" alt="Polsini">
+          </div>
+          <h3>Polsini</h3>
+          <p class="price">€12.00</p>
+      </div>
+      <div class="card">
+         <div class="img-container">
+             <img src="https://images.unsplash.com/photo-1549465220-1a8a9238cd0c?q=80&w=1887&auto=format&fit=crop" alt="Borraccia">
+         </div>
+          <h3>Borraccia</h3>
+          <p class="price">€15.00</p>
+      </div>
+        </div>
+    </section>
     
-
-    <header class="hero" id="home">
-        <div class="text-layer">
-            <h1>CIRCOLO TENNIS</h1>
-            <h2>TRICASE</h2>
-            <p class="tagline">La tua passione, la nostra casa.</p>
-            <div class="hero-buttons">
-                <a href="prenota.html" class="hero-button primary">
-                    Prenota Ora <span class="arrow">→</span>
-                </a>
-                <a href="#club" class="hero-button secondary">
-                    Scopri il Club <span class="arrow">→</span>
-                </a>
-            </div>
+    <section id="news">
+        <h2 class="section-title">Ultime Notizie</h2>
+        <div class="card">
+      <div class="md-flex">
+              <div class="md-w-1-2 img-container"></div>
+          <div class="md-w-1-2 content-container">
+        <h3>Prossimo Torneo</h3>
+        <p>Partecipa al nostro torneo di tennis annuale e competi per fantastici premi. Le iscrizioni sono aperte! Non perderti l'azione.</p>
+        <button class="btn btn-secondary">
+            <span class="truncate">Registrati Ora</span>
+            <span class="material-icons">arrow_forward</span>
+        </button>
+          </div>
+      </div>
         </div>
-    </header>
+    </section>
 
-    <main>
-        <section class="club-section" id="club">
-            <h2 class="section-title">Il Club</h2>
-            <div class="club-block">
-                <div class="club-image">
-                    <img src="club.png" alt="Vista panoramica del Circolo Tennis Tricase">
-                </div>
-                <div class="club-content">
-                    <h3>Benvenuti al Circolo</h3>
-                    <p>Un'oasi di sport e relax nel cuore del Salento. Il nostro club è il luogo ideale per coltivare la passione per il tennis in un ambiente accogliente, moderno e professionale, pensato per atleti e famiglie.</p>
-                </div>
-            </div>
-            <div class="club-block">
-                <div class="club-image">
-                    <img src="campi.png" alt="Campi da tennis in terra rossa del circolo">
-                </div>
-                <div class="club-content">
-                    <h3>3 Campi in Terra Rossa</h3>
-                    <p>Disponiamo di tre campi in terra rossa di alta qualità, curati meticolosamente per offrire la migliore esperienza di gioco. Tutti i campi sono dotati di un moderno impianto di illuminazione a LED per le partite serali.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="maestri-section" id="maestri">
-            <h2 class="section-title">I Nostri Maestri</h2>
-            <p class="section-intro">
-                Il nostro team è il cuore pulsante del club. Maestri esperti e qualificati sono pronti a seguirti in un percorso di crescita personalizzato, che tu sia un principiante o un agonista.
-            </p>
-            <div class="maestri-container">
-                <div class="maestro-card">
-                    <img src="m1.png" alt="Foto del maestro Mario Rossi">
-                    <h4>Ricchiuto Fernando</h4>
-                    <span class="qualifica">Maestro Nazionale FITP</span>
-                    <p>Con oltre 20 anni di esperienza, Fernando è specializzato nel perfezionamento della tecnica per giocatori agonisti e nella preparazione ai tornei.</p>
-                </div>
-                <div class="maestro-card">
-                    <img src="m2.png" alt="Foto della maestra Laura Bianchi">
-                    <h4>GIuseppe cosi</h4>
-                    <span class="qualifica">Istruttore 2° Grado FITP</span>
-                    <p>Responsabile della Scuola Tennis per bambini e ragazzi. Con il suo metodo basato sul gioco, Giuseppe fa innamorare i più piccoli di questo sport.</p>
-                </div>
-                <div class="maestro-card">
-                    <img src="m1.png" alt="Foto del maestro Alessandro Verdi">
-                    <h4>Ricchiuto Fernando</h4>
-                    <span class="qualifica">Preparatore Atletico</span>
-                    <p>Cura la preparazione fisica di tutti i nostri atleti, con programmi specifici per migliorare resistenza, agilità e prevenire gli infortuni.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="corsi-section" id="corsi">
-            <h2 class="section-title">Tipologie di Corsi</h2>
-            <div class="corsi-container">
-                <div class="corso-card">
-                    <div class="corso-icon"><i class="fa-solid fa-users"></i></div>
-                    <div class="corso-details">
-                        <h4>Corsi per Adulti</h4>
-                        <p>Per chi vuole iniziare a giocare o per chi desidera perfezionare il proprio stile. Lezioni di gruppo o individuali per tutti i livelli, dal principiante all'avanzato.</p>
-                    </div>
-                </div>
-                <div class="corso-card">
-                    <div class="corso-icon"><i class="fa-solid fa-child"></i></div>
-                    <div class="corso-details">
-                        <h4>Scuola Tennis Bambini</h4>
-                        <p>Programmi divertenti e formativi per i più piccoli. Attraverso il gioco, i bambini imparano le basi del tennis, sviluppando coordinazione e spirito di squadra.</p>
-                    </div>
-                </div>
-                <div class="corso-card">
-                    <div class="corso-icon"><i class="fa-solid fa-trophy"></i></div>
-                    <div class="corso-details">
-                        <h4>Sezione Agonistica</h4>
-                        <p>Allenamenti intensivi per atleti che partecipano a tornei e campionati a squadre. Programmi personalizzati di tecnica, tattica e preparazione fisica.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="merch-section" id="merch">
-            <h2 class="section-title">Il Nostro Merch</h2>
-            <div class="merch-container">
-                <div class="merch-card">
-                    <img src="maglietta.jpg" alt="T-shirt ufficiale del Circolo Tennis Tricase">
-                    <div class="merch-info">
-                        <h5>T-Shirt Ufficiale</h5>
-                        <p>€25.00</p>
-                    </div>
-                </div>
-                <div class="merch-card">
-                    <img src="maglietta.jpg" alt="Cappellino ufficiale del Circolo Tennis Tricase">
-                    <div class="merch-info">
-                         <h5>T-Shirt Ufficiale</h5>
-                        <p>€25.00</p>
-                    </div>
-                </div>
-                <div class="merch-card">
-                    <img src="maglietta.jpg" alt="Polsino ufficiale del Circolo Tennis Tricase">
-                    <div class="merch-info">
-                         <h5>T-Shirt Ufficiale</h5>
-                        <p>€25.00</p>
-                    </div>
-                </div>
-                 
-            </div>
-        </section>
-
-        <section class="news-section" id="news">
-            <h2 class="section-title">News e Eventi</h2>
-             <div class="news-container">
-                <div class="news-card">
-                    <div class="news-date">
-                        <span class="day">25</span>
-                        <span class="month">LUG</span>
-                    </div>
-                    <div class="news-content">
-                        <h4>Torneo La Vallone 2025</h4>
-                        <p>Sono aperte le iscrizioni per il nostro tradizionale torneo estivo! Categorie maschile, femminile e doppio misto. Non mancare!</p>
-                        <a href="#">Leggi di più →</a>
-                    </div>
-                </div>
-                <div class="news-card">
-                    <div class="news-date">
-                        <span class="day">01</span>
-                        <span class="month">SET</span>
-                    </div>
-                    <div class="news-content">
-                        <h4>Iscrizioni Scuola Tennis 2025/26</h4>
-                        <p>A partire da settembre sarà possibile iscriversi ai corsi della nuova stagione. Contattaci per una lezione di prova gratuita.</p>
-                        <a href="#">Scopri i corsi →</a>
-                    </div>
-                </div>
-                 <div class="news-card">
-                    <div class="news-date">
-                        <span class="day">20</span>
-                        <span class="month">SET</span>
-                    </div>
-                    <div class="news-content">
-                        <h4>Nuova Illuminazione LED</h4>
-                        <p>Siamo felici di annunciare che tutti i campi sono stati dotati di un nuovo impianto di illuminazione a LED per un'esperienza di gioco serale perfetta.</p>
-                        <a href="#">Dettagli →</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="site-footer" id="contatti">
-        <div class="footer-container">
-            <div class="footer-col">
-                <h5>Contatti</h5>
-                <p>
-                    Via dei Campi, 123<br>
-                    73039 Tricase (LE)<br>
-                    <a href="mailto:info@cttricase.it">info@cttricase.it</a><br>
-                    <a href="tel:+390833123456">+39 0833 123456</a>
-                </p>
-            </div>
-            <div class="footer-col">
-                <h5>Link Utili</h5>
-                <ul>
-                    <li><a href="#club">Il Club</a></li>
-                    <li><a href="#maestri">I Maestri</a></li>
-                    <li><a href="#corsi">I Corsi</a></li>
-                    <li><a href="#merch">Merch</a></li>
-                    <li><a href="#news">News</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h5>Seguici</h5>
-                 <div class="social-links">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
+    <section id="membership">
+        <h2 class="section-title">Vantaggi del Tesseramento</h2>
+        <div class="grid sm-grid-cols-2 lg-grid-cols-4" style="gap: 1.5rem;">
+      <div class="card">
+          <div class="icon-primary"><span class="material-icons">emoji_events</span></div>
+          <h3>Accesso Esclusivo</h3>
+          <p>Goditi l'accesso illimitato ai nostri campi e alle nostre strutture.</p>
+      </div>
+      <div class="card">
+      _
+      <div class="icon-primary"><span class="material-icons">groups</span></div>
+          <h3>Comunità</h3>
+          <p>Entra a far parte di una vivace comunità di tennisti.</p>
+      </div>
+      <div class="card">
+          <div class="icon-primary"><span class="material-icons">event</span></div>
+          <h3>Eventi</h3>
+          <p>Partecipa a tornei regolari ed eventi sociali.</p>
+      </div>
+      <div class="card">
+          <div class="icon-primary"><span class="material-icons">sports_tennis</span></div>
+          <h3>Allenamento</h3>
+          <p>Approfitta di coaching professionale e programmi di allenamento.</p>
+      </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 Circolo Tennis Tricase. Tutti i diritti riservati.</p>
+    </section>
+
+    <section id="gallery">
+        <h2 class="section-title">Galleria</h2>
+        <div class="grid">
+      <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1594498659132-15f3d339199d?q=80&w=2070&auto=format&fit=crop" alt="Veduta del campo da tennis dall'alto">
+      </div>
+      <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1574281358313-9b81b214f4e7?q=80&w=2070&auto=format&fit=crop" alt="Giocatore che serve su un campo in terra rossa">
+      </div>
+      <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1622240506393-26c7c130310a?q=80&w=2070&auto=format&fit=crop" alt="Primo piano di una racchetta e una pallina da tennis sul campo">
+      </div>
+      <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1563293883-99d8b0213898?q=80&w=1964&auto=format&fit=crop" alt="Strutture del club di tennis e area posti a sedere">
+      </div>
         </div>
-    </footer>
+    </section>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="script.js"></script>
+    <section id="contact">
+        <h2 class="section-title">Contattaci</h2>
+        <p class="section-paragraph">
+      Per informazioni, contattaci all'indirizzo <a href="mailto:info@circolotennistricase.com">info@circolotennistricase.com</a> o chiamaci al <a href="tel:+391234567890">+39 123 456 7890</a>.
+        </p>
+        <p class="section-paragraph" style="margin-top: 0.5rem;">
+      Vieni a trovarci in Via dello Sport, 1, 73540 Tricase, Italia.
+        </p>
+    </section>
+      </div>
+  </main>
 
+  <footer class="footer">
+      <div class="footer-content">
+    <div class="footer-grid">
+        <div>
+      <h5 class="footer-heading">Link Rapidi</h5>
+      <ul class="footer-links">
+          <li><a href="#">Home</a></li>
+          <li><a href="#about">Chi Siamo</a></li>
+          <li><a href="#corsi">Corsi</a></li>
+          <li><a href="#maestri">Maestri</a></li>
+      </ul>
+        </div>
+        <div>
+      <h5 class="footer-heading" style="opacity: 0;">Link</h5>
+      <ul class="footer-links footer-links-hidden-md">
+          <li><a href="#merch">Merchandising</a></li>
+          <li><a href="#gallery">Galleria</a></li>
+          <li><a href="#news">News</a></li>
+          <li><a href="#membership">Tesseramento</a></li>
+          <li><a href="#contact">Contatti</a></li>
+      </ul>
+        </div>
+        <div class="footer-info-col">
+      <h5 class="footer-heading">Circolo Tennis Tricase</h5>
+      <p>Via dello Sport, 1, 73540 Tricase, Italia</p>
+      <p><a href="mailto:info@circolotennistricase.com">info@circolotennistricase.com</a></p>
+      <p><a href="tel:+391234567890">+39 123 456 7890</a></p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p class="footer-copyright">© 2024 Circolo Tennis Tricase. Tutti i diritti riservati.</p>
+        <div class="footer-socials">
+      <a href="https://www.facebook.com/circolotennistricase" target="_blank" rel="noopener noreferrer" class="social-link">
+          <span class="material-icons">facebook</span>
+      </a>
+      <a href="https://www.instagram.com/circolotennistricase" target="_blank" rel="noopener noreferrer" class="social-link">
+          <span class="material-icons">instagram</span>
+      </a>
+      <a href="https://www.twitter.com/circolotennistricase" target="_blank" rel="noopener noreferrer" class="social-link">
+          <span class="material-icons">twitter</span>
+      </a>
+        </div>
+    </div>
+      </div>
+  </footer>
+    </div>
+    <script>
+  document.addEventListener("DOMContentLoaded", () => {
+      // Intersection Observer per le animazioni di fade-in
+      const sections = document.querySelectorAll('section');
+      const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+      entry.target.classList.add('fade-in-up');
+      observer.unobserve(entry.target);
+        }
+    });
+      }, { threshold: 0.1 });
+
+      sections.forEach(section => {
+    observer.observe(section);
+      });
+
+      // Funzionalità per attivare/disattivare il menu mobile
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const navLinks = mobileMenu.querySelectorAll('a');
+
+      mobileMenuButton.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+      });
+
+      // Chiude il menu mobile quando si clicca su un link
+      navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+    });
+      });
+
+  });
+    </script>
 </body>
 </html>
