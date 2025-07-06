@@ -12,206 +12,70 @@
     <style>
         /* --- THEME VARIABLES --- */
         :root {
-            --primary-color: #007BFF;
-            --primary-color-hover: #0056b3;
-            --background-primary: #FFFFFF;
-            --background-secondary: #F4F7FC;
-            --surface-color: #FFFFFF;
-            --border-color: #DEE2E6;
-            --text-primary: #212529;
-            --text-secondary: #6C757D;
-            --text-inverted: #FFFFFF;
-            --accent-color: #e9ecef;
+            --primary-color: #007BFF; --primary-color-hover: #0056b3;
+            --background-primary: #FFFFFF; --background-secondary: #F4F7FC;
+            --surface-color: #FFFFFF; --border-color: #DEE2E6;
+            --text-primary: #212529; --text-secondary: #6C757D;
+            --text-inverted: #FFFFFF; --accent-color: #e9ecef;
             --shadow-color: rgba(0,0,0,0.05);
         }
-
         .dark-theme {
-            --primary-color: #007BFF;
-            --primary-color-hover: #2196f3;
-            --background-primary: #1a202c;
-            --background-secondary: #121822;
-            --surface-color: #1a202c;
-            --border-color: #2d3748;
-            --text-primary: #e2e8f0;
-            --text-secondary: #a0aec0;
-            --text-inverted: #FFFFFF;
-            --accent-color: #2d3748;
+            --primary-color: #007BFF; --primary-color-hover: #2196f3;
+            --background-primary: #1a202c; --background-secondary: #121822;
+            --surface-color: #1a202c; --border-color: #2d3748;
+            --text-primary: #e2e8f0; --text-secondary: #a0aec0;
+            --text-inverted: #FFFFFF; --accent-color: #2d3748;
             --shadow-color: rgba(0,0,0,0.2);
         }
         /* --- END THEME VARIABLES --- */
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            font-family: 'Noto Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--background-secondary); 
-            color: var(--text-primary); 
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .navbar { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            padding: 20px 30px; 
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .nav-button {
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            width: 45px; 
-            height: 45px; 
-            background-color: var(--surface-color); 
-            border: 1px solid var(--border-color); 
-            border-radius: 50%; 
-            color: var(--text-primary); 
-            text-decoration: none; 
-            font-size: 1.2rem; 
-            transition: all 0.2s; 
-            box-shadow: 0 2px 8px var(--shadow-color);
-            cursor: pointer;
-        }
-        .nav-button:hover { 
-            transform: scale(1.1); 
-            background-color: var(--primary-color); 
-            color: var(--text-inverted); 
-            border-color: var(--primary-color); 
-        }
-        .nav-button .material-icons {
-            font-size: 24px;
-        }
-
+        body { font-family: 'Noto Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--background-secondary); color: var(--text-primary); transition: background-color 0.3s, color 0.3s; }
+        .navbar { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; z-index: 10; display: flex; align-items: center; gap: 1rem; }
+        .nav-button { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 50%; color: var(--text-primary); text-decoration: none; font-size: 1.2rem; transition: all 0.2s; box-shadow: 0 2px 8px var(--shadow-color); cursor: pointer; }
+        .nav-button:hover { transform: scale(1.1); background-color: var(--primary-color); color: var(--text-inverted); border-color: var(--primary-color); }
+        .nav-button .material-icons { font-size: 24px; }
         .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 80px 20px 40px; }
         .booking-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: flex-start; }
-        .selection-panel, .summary-panel { 
-            background-color: var(--surface-color); 
-            border-radius: 16px; 
-            padding: 32px; 
-            border: 1px solid var(--border-color); 
-            box-shadow: 0 4px 12px var(--shadow-color); 
-        }
-
+        .selection-panel, .summary-panel { background-color: var(--surface-color); border-radius: 16px; padding: 32px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px var(--shadow-color); }
         h1, h2 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-primary); font-weight: 800; }
         h1 { font-size: 2.2rem; margin-bottom: 8px; }
         .selection-panel > p { font-size: 1rem; margin-bottom: 32px; color: var(--text-secondary); }
         h2 { font-size: 1.5rem; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
         .step { margin-bottom: 32px; }
-
         .date-picker, .field-selector, .time-slots { display: flex; flex-wrap: wrap; gap: 12px; }
-        .date-option, .field-option, .time-slot { 
-            background-color: var(--background-secondary); 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            padding: 10px 16px; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            text-align: center; 
-            font-weight: 500; 
-            color: var(--text-primary);
-        }
+        .date-option, .field-option, .time-slot { background-color: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; text-align: center; font-weight: 500; color: var(--text-primary); }
         .date-option { display: flex; flex-direction: column; align-items: center; min-width: 70px; }
         .date-option .day-name { font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); }
         .date-option .day-num { font-size: 1.2rem; font-weight: 700; }
         .field-option { flex-grow: 1; }
-
-        .date-option:hover, .field-option:hover, .time-slot:hover { 
-            border-color: var(--primary-color); 
-            color: var(--primary-color); 
-        }
-        .date-option.selected, .field-option.selected, .time-slot.selected { 
-            background-color: var(--primary-color); 
-            border-color: var(--primary-color); 
-            color: var(--text-inverted); 
-            transform: scale(1.05); 
-        }
+        .date-option:hover, .field-option:hover, .time-slot:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .date-option.selected, .field-option.selected, .time-slot.selected { background-color: var(--primary-color); border-color: var(--primary-color); color: var(--text-inverted); transform: scale(1.05); }
         .date-option.selected .day-name, .date-option.selected .day-num { color: var(--text-inverted); }
-        
-        .time-slot.unavailable { 
-            background-color: var(--accent-color); 
-            border-color: var(--border-color); 
-            color: var(--text-secondary); 
-            cursor: not-allowed; 
-            text-decoration: line-through; 
-        }
+        .time-slot.unavailable { background-color: var(--accent-color); border-color: var(--border-color); color: var(--text-secondary); cursor: not-allowed; text-decoration: line-through; }
         .time-slot.unavailable:hover { color: var(--text-secondary); transform: none; border-color: var(--border-color); }
-        
-        #booking-summary { 
-            background-color: var(--background-secondary); 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            padding: 24px; 
-            margin-top: 24px; 
-            display: none; 
-        }
+        #booking-summary { background-color: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-top: 24px; display: none; }
         .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
         .summary-item:last-child { border-bottom: none; }
         .summary-item .value { font-weight: 700; }
-        
         #booking-form { margin-top: 24px; display: none; }
         .form-group { position: relative; margin-bottom: 20px; }
         .form-group i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
-        .form-group input { 
-            width: 100%; 
-            background-color: var(--background-secondary); 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            padding: 14px 14px 14px 48px; 
-            color: var(--text-primary); 
-            font-size: 1rem; 
-            transition: border-color 0.2s, box-shadow 0.2s; 
-        }
-        .form-group input:focus { 
-            outline: none; 
-            border-color: var(--primary-color); 
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); 
-        }
-        
-        .submit-btn { 
-            width: 100%; 
-            background-color: var(--primary-color); 
-            border: none; 
-            border-radius: 8px; 
-            padding: 16px; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            font-size: 1.1rem; 
-            font-weight: 700; 
-            color: var(--text-inverted); 
-            cursor: pointer; 
-            transition: all 0.2s; 
-        }
+        .form-group input { width: 100%; background-color: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 14px 14px 48px; color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); }
+        .submit-btn { width: 100%; background-color: var(--primary-color); border: none; border-radius: 8px; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text-inverted); cursor: pointer; transition: all 0.2s; }
         .submit-btn:hover { background-color: var(--primary-color-hover); }
         .submit-btn:disabled { background-color: #6c757d; cursor: wait; }
-        
         #confirmation-message { text-align: center; padding: 80px 40px; }
-        #confirmation-message .icon-wrapper { 
-            width: 80px; 
-            height: 80px; 
-            margin: 0 auto 24px; 
-            background-color: rgba(0,123,255,0.1); 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
+        #confirmation-message .icon-wrapper { width: 80px; height: 80px; margin: 0 auto 24px; background-color: rgba(0,123,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         #confirmation-message i { color: var(--primary-color); font-size: 2.5rem; }
         #confirmation-message h1 { font-size: 2rem; margin-bottom: 12px; }
-
-        @media (max-width: 992px) { 
-            .booking-layout { grid-template-columns: 1fr; } 
-            h1 { font-size: 2rem; } 
-        }
+        @media (max-width: 992px) { .booking-layout { grid-template-columns: 1fr; } h1 { font-size: 2rem; } }
     </style>
 </head>
 <body>
     <header class="navbar">
         <a href="index.html" class="nav-button" aria-label="Torna alla Home"><i class="fa-solid fa-arrow-left"></i></a>
-        <button class="nav-button" id="theme-toggle" title="Toggle theme">
+        <button class="nav-button" id="theme-toggle" title="Cambia Tema">
             <span class="material-icons" id="theme-icon">light_mode</span>
         </button>
     </header>
@@ -232,10 +96,10 @@
         </div>
     </div>
     <div class="container" id="confirmation-container" style="display: none;"><div id="confirmation-message"><div class="icon-wrapper"><i class="fa-solid fa-circle-check"></i></div><h1>Grazie!</h1><p>La tua richiesta di prenotazione è stata inviata con successo. Riceverai una mail di conferma non appena verrà approvata dal nostro staff.</p></div></div>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-   <script>
+    
+    <script>
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- Theme Toggler ---
+    // --- Gestore del Tema (Chiaro/Scuro) ---
     const themeToggleButton = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
     const currentTheme = localStorage.getItem('theme');
@@ -249,17 +113,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     themeToggleButton.addEventListener('click', () => {
         document.body.classList.toggle('dark-theme');
-        let theme = 'light';
-        if (document.body.classList.contains('dark-theme')) {
-            theme = 'dark';
-            themeIcon.textContent = 'dark_mode';
-        } else {
-            themeIcon.textContent = 'light_mode';
-        }
+        let theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+        themeIcon.textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
         localStorage.setItem('theme', theme);
     });
     
-    // --- Booking Logic ---
+    // --- Logica di Prenotazione ---
     const datePicker = document.getElementById('date-picker');
     const fieldSelector = document.getElementById('field-selector');
     const timeSlotsContainer = document.getElementById('time-slots');
@@ -269,67 +128,89 @@ document.addEventListener('DOMContentLoaded', async () => {
     const summaryField = document.getElementById('summary-field');
     const summaryTime = document.getElementById('summary-time');
 
+    // Oggetto che memorizza la selezione corrente dell'utente
     const booking = { date: null, field: '1', timeSlots: [] };
+    // Cache per le prenotazioni esistenti
     let allBookings = {};
 
-    const API_URL = 'https://sheetdb.io/api/v1/2asw3l7zf8wzl';
+    // !!! INCOLLA QUI L'URL DELLA TUA APP WEB DI GOOGLE SCRIPT !!!
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNzXtkaPIQSYQp6N3VRpw-442hAtaqHkEztUBMhB6yywWNdBt7S_Cw9ryWtcV-QFHz/exec';
 
+    // Funzione per recuperare tutte le prenotazioni dal backend
     const fetchAllBookings = async () => {
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(GOOGLE_SCRIPT_URL);
             if (!response.ok) throw new Error(`Errore di rete: ${response.statusText}`);
             const data = await response.json();
+            
+            // Raggruppa le prenotazioni per data e campo per una facile consultazione
             const grouped = {};
             for (const b of data) {
                 if (b.Data && b.Campo && b.Orario) {
                     if (!grouped[b.Data]) grouped[b.Data] = {};
                     if (!grouped[b.Data][b.Campo]) grouped[b.Data][b.Campo] = [];
-                    const timeParts = b.Orario.split(' - ');
-                    const startTime = timeParts[0];
-                    const startHour = parseInt(startTime.split(':')[0]);
-                    const minute = startTime.split(':')[1];
-                    let duration = 1;
-                    if (timeParts.length > 1) {
-                        const endTimeHour = parseInt(timeParts[1].split(':')[0]);
-                        duration = endTimeHour - startHour;
-                    }
-                    for (let i = 0; i < duration; i++) {
-                        const currentHour = startHour + i;
-                        grouped[b.Data][b.Campo].push(`${String(currentHour).padStart(2, '0')}:${minute}`);
-                    }
+                    grouped[b.Data][b.Campo].push(b.Orario);
                 }
             }
             return grouped;
-        } catch (error) { console.error("Impossibile caricare le prenotazioni:", error); return {}; }
+        } catch (error) {
+            console.error("Impossibile caricare le prenotazioni:", error);
+            return {}; // Restituisce un oggetto vuoto in caso di errore
+        }
     };
 
+    // Funzione per generare il selettore di date (prossimi 7 giorni)
     const renderDatePicker = () => {
-        datePicker.innerHTML = ''; const today = new Date();
+        datePicker.innerHTML = ''; 
+        const today = new Date();
         for (let i = 0; i < 7; i++) {
-            const date = new Date(); date.setDate(today.getDate() + i);
-            const dateValue = date.toISOString().split('T')[0];
+            const date = new Date(); 
+            date.setDate(today.getDate() + i);
+            const dateValue = date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
             const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
             const dayNum = date.getDate();
-            const option = document.createElement('div'); option.className = 'date-option'; option.dataset.date = dateValue;
+            
+            const option = document.createElement('div');
+            option.className = 'date-option';
+            option.dataset.date = dateValue;
             option.innerHTML = `<span class="day-name">${dayName}</span><span class="day-num">${dayNum}</span>`;
-            if (i === 0) { booking.date = dateValue; option.classList.add('selected'); }
+            
+            if (i === 0) { // Seleziona oggi come predefinito
+                booking.date = dateValue;
+                option.classList.add('selected');
+            }
             datePicker.appendChild(option);
         }
     };
 
+    // Funzione per generare gli slot orari disponibili
     const renderTimeSlots = () => {
-        timeSlotsContainer.innerHTML = ''; const unavailable = allBookings[booking.date]?.[booking.field] || [];
+        timeSlotsContainer.innerHTML = '';
+        const unavailable = allBookings[booking.date]?.[booking.field] || [];
+        
+        // Imposta un offset in minuti per diversificare gli orari tra i campi
         let minuteOffset = 0;
-        if (booking.field === '2') minuteOffset = 15; else if (booking.field === '3') minuteOffset = 30;
+        if (booking.field === '2') minuteOffset = 15;
+        else if (booking.field === '3') minuteOffset = 30;
+        
         for (let hour = 8; hour < 22; hour++) {
             const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
-            const slot = document.createElement('div'); slot.className = 'time-slot'; slot.dataset.time = time; slot.textContent = time;
-            if (unavailable.includes(time)) { slot.classList.add('unavailable'); }
-            if (booking.timeSlots.includes(time)) { slot.classList.add('selected'); }
+            const slot = document.createElement('div');
+            slot.className = 'time-slot';
+            slot.dataset.time = time;
+            slot.textContent = time;
+            
+            if (unavailable.includes(time)) {
+                slot.classList.add('unavailable');
+            }
+            if (booking.timeSlots.includes(time)) {
+                slot.classList.add('selected');
+            }
             timeSlotsContainer.appendChild(slot);
         }
     };
 
+    // Aggiorna il pannello di riepilogo con le selezioni correnti
     const updateSummary = () => {
         if (booking.date) {
             summaryDate.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(booking.date + "T00:00:00"));
@@ -337,11 +218,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         summaryField.textContent = `Campo ${booking.field}`;
         summaryTime.textContent = booking.timeSlots.length > 0 ? booking.timeSlots.sort().join(', ') : '-';
+        // Mostra il modulo per i dati personali solo se è stato selezionato almeno un orario
         form.style.display = booking.timeSlots.length > 0 ? 'block' : 'none';
     };
 
+    // Funzione per ricaricare le prenotazioni e aggiornare l'interfaccia
     const refreshUI = async () => {
         const latestBookings = await fetchAllBookings();
+        // Aggiorna solo se i dati sono cambiati per evitare sfarfallio
         if(JSON.stringify(allBookings) !== JSON.stringify(latestBookings)) {
             allBookings = latestBookings;
             renderTimeSlots();
@@ -349,30 +233,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    // Gestore di eventi per la selezione della data
     datePicker.addEventListener('click', e => {
-        const target = e.target.closest('.date-option'); if (!target || target.classList.contains('selected')) return;
-        datePicker.querySelector('.selected').classList.remove('selected'); target.classList.add('selected');
-        booking.date = target.dataset.date; booking.timeSlots = []; renderTimeSlots(); updateSummary();
+        const target = e.target.closest('.date-option');
+        if (!target || target.classList.contains('selected')) return;
+        
+        datePicker.querySelector('.selected').classList.remove('selected');
+        target.classList.add('selected');
+        booking.date = target.dataset.date;
+        booking.timeSlots = []; // Resetta gli orari quando cambia la data
+        renderTimeSlots();
+        updateSummary();
     });
 
+    // Gestore di eventi per la selezione del campo
     fieldSelector.addEventListener('click', e => {
-        const target = e.target.closest('.field-option'); if (!target || target.classList.contains('selected')) return;
-        fieldSelector.querySelector('.selected').classList.remove('selected'); target.classList.add('selected');
-        booking.field = target.dataset.field; booking.timeSlots = []; renderTimeSlots(); updateSummary();
+        const target = e.target.closest('.field-option');
+        if (!target || target.classList.contains('selected')) return;
+        
+        fieldSelector.querySelector('.selected').classList.remove('selected');
+        target.classList.add('selected');
+        booking.field = target.dataset.field;
+        booking.timeSlots = []; // Resetta gli orari quando cambia il campo
+        renderTimeSlots();
+        updateSummary();
     });
 
+    // Gestore di eventi per la selezione dell'orario
     timeSlotsContainer.addEventListener('click', e => {
-        const target = e.target.closest('.time-slot'); if (!target || target.classList.contains('unavailable')) return;
+        const target = e.target.closest('.time-slot');
+        if (!target || target.classList.contains('unavailable')) return;
+        
         const time = target.dataset.time;
-        const isSelected = booking.timeSlots.includes(time);
-        if (!isSelected && booking.timeSlots.length >= 2) { alert("Puoi selezionare al massimo 2 ore."); return; }
+        const isSelected = target.classList.contains('selected');
+        
+        if (!isSelected && booking.timeSlots.length >= 2) {
+            alert("Puoi selezionare un massimo di 2 ore consecutive.");
+            return;
+        }
+        
         target.classList.toggle('selected');
         booking.timeSlots = Array.from(timeSlotsContainer.querySelectorAll('.time-slot.selected')).map(el => el.dataset.time);
         updateSummary();
     });
 
+    // Gestore di eventi per l'invio del modulo di prenotazione
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Validazione dei campi del modulo
         const nameInput = document.getElementById('name');
         const surnameInput = document.getElementById('surname');
         const emailInput = document.getElementById('email');
@@ -390,24 +299,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const submitBtn = form.querySelector('.submit-btn');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Verifica disponibilità...';
-
-        const latestBookings = await fetchAllBookings();
-        const latestUnavailable = latestBookings[booking.date]?.[booking.field] || [];
-        const isSlotTaken = booking.timeSlots.some(slot => latestUnavailable.includes(slot));
-
-        if (isSlotTaken) {
-            alert('Spiacente, uno degli orari scelti è stato appena prenotato! La pagina si aggiornerà.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Conferma Prenotazione';
-            refreshUI();
-            return;
-        }
-
-        submitBtn.textContent = 'Conferma in corso...';
+        submitBtn.textContent = 'Invio in corso...';
+        
+        // Prepara i dati da inviare al backend
         const formData = new FormData(form);
         const baseData = Object.fromEntries(formData.entries());
-
         const bookingsToSend = booking.timeSlots.map(slot => ({
             ...baseData,
             Data: booking.date,
@@ -416,125 +312,45 @@ document.addEventListener('DOMContentLoaded', async () => {
             ID: `ID-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
         }));
         
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({data: bookingsToSend}) })
-        .then(res => {
-            if (!res.ok) throw new Error('La risposta del server non è stata positiva');
-            return res.json();
-        })
-        .then(data => {
-            document.getElementById('booking-container').style.display = 'none';
-            const confirmationContainer = document.getElementById('confirmation-container');
-            confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
-            confirmationContainer.querySelector('p').textContent = `La tua richiesta di prenotazione è stata inviata con successo. Riceverai una mail di conferma non appena verrà approvata dal nostro staff.`;
-            confirmationContainer.style.display = 'block';
-        })
-        .catch(error => {
+        // Invia i dati al backend (Google Apps Script)
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: bookingsToSend })
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                // Mostra il messaggio di conferma
+                document.getElementById('booking-container').style.display = 'none';
+                const confirmationContainer = document.getElementById('confirmation-container');
+                confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
+                confirmationContainer.style.display = 'block';
+            } else if (result.status === 'conflitto') {
+                // Se il server rileva un conflitto, avvisa l'utente e aggiorna la UI
+                alert('Spiacente, uno degli orari scelti è stato appena prenotato! La pagina si aggiornerà.');
+                refreshUI(); // Ricarica le disponibilità
+            } else {
+                throw new Error(result.details || 'Errore sconosciuto dal server.');
+            }
+        } catch (error) {
             console.error('Errore durante la prenotazione:', error);
             alert('Si è verificato un errore durante la prenotazione. Riprova.');
+        } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Conferma Prenotazione';
-        });
+        }
     });
 
-    // Initial Execution
+    // Esecuzione Iniziale
     renderDatePicker();
     allBookings = await fetchAllBookings();
     renderTimeSlots();
     updateSummary();
 
-    // Auto-refresh every 10 seconds
-    setInterval(refreshUI, 10000);
-});
-
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nameInput = document.getElementById('name');
-    const surnameInput = document.getElementById('surname');
-    const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
-
-    // --- Validazione dei campi (nessuna modifica qui) ---
-    if (!nameInput.value.trim() || !surnameInput.value.trim() || !emailInput.value.trim() || !phoneInput.value.trim()) {
-        alert("Per favore, compila tutti i campi: Nome, Cognome, Email e Telefono.");
-        return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailInput.value)) {
-        alert("Per favore, inserisci un indirizzo email valido.");
-        return;
-    }
-
-    const submitBtn = form.querySelector('.submit-btn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Verifica disponibilità...';
-
-    // --- Controllo disponibilità (nessuna modifica qui) ---
-    const latestBookings = await fetchAllBookings();
-    const latestUnavailable = latestBookings[booking.date]?.[booking.field] || [];
-    const isSlotTaken = booking.timeSlots.some(slot => latestUnavailable.includes(slot));
-
-    if (isSlotTaken) {
-        alert('Spiacente, uno degli orari scelti è stato appena prenotato! La pagina si aggiornerà.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Conferma Prenotazione';
-        refreshUI();
-        return;
-    }
-
-    submitBtn.textContent = 'Conferma in corso...';
-
-    // --- Preparazione dei dati (nessuna modifica qui) ---
-    const formData = new FormData(form);
-    const baseData = Object.fromEntries(formData.entries());
-    const bookingsToSend = booking.timeSlots.map(slot => ({
-        ...baseData,
-        Data: booking.date,
-        Orario: slot,
-        Campo: booking.field,
-        ID: `ID-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-    }));
-
-    // --- Chiamata a SheetDB per salvare i dati ---
-    fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: bookingsToSend })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error('La risposta del server non è stata positiva');
-        return res.json();
-    })
-    .then(data => {
-        // --- NUOVO: INVIA L'EMAIL DI CONFERMA CON EMAILJS ---
-        const templateParams = {
-            name: form.Nome.value,
-            email: form.Email.value,
-            date: summaryDate.textContent, // Usa la data già formattata dal riepilogo
-            field: `Campo ${booking.field}`,
-            time: booking.timeSlots.sort().join(', ')
-        };
-
-        // Sostituisci con le tue credenziali di EmailJS
-        emailjs.send('service_v16vlev', 'template_4venqp8', templateParams, 'B0iydLemcww93J2-H')
-            .then((response) => {
-                console.log('Email inviata con successo!', response.status, response.text);
-            }, (error) => {
-                console.error('Errore durante l\'invio dell\'email:', error);
-                // Puoi anche avvisare l'utente che l'email potrebbe non essere stata inviata
-            });
-
-        // --- Mostra messaggio di conferma (nessuna modifica qui) ---
-        document.getElementById('booking-container').style.display = 'none';
-        const confirmationContainer = document.getElementById('confirmation-container');
-        confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
-        confirmationContainer.style.display = 'block';
-    })
-    .catch(error => {
-        console.error('Errore durante la prenotazione:', error);
-        alert('Si è verificato un errore durante la prenotazione. Riprova.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Conferma Prenotazione';
-    });
+    // Aggiornamento automatico ogni 30 secondi per mantenere aggiornate le disponibilità
+    setInterval(refreshUI, 30000);
 });
 </script>
 </body>
