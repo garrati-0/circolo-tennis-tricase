@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <style>
-        /* --- THEME VARIABLES --- */
+        /* --- VARIABILI TEMA --- */
         :root {
             --primary-color: #007BFF;
             --primary-color-hover: #0056b3;
@@ -38,7 +38,7 @@
             --accent-color: #2d3748;
             --shadow-color: rgba(0,0,0,0.2);
         }
-        /* --- END THEME VARIABLES --- */
+        /* --- FINE VARIABILI TEMA --- */
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
@@ -215,6 +215,7 @@
             <span class="material-icons" id="theme-icon">light_mode</span>
         </button>
     </header>
+    
     <div class="container" id="booking-container">
         <div class="booking-layout">
             <div class="selection-panel">
@@ -231,311 +232,271 @@
             </div>
         </div>
     </div>
+    
     <div class="container" id="confirmation-container" style="display: none;"><div id="confirmation-message"><div class="icon-wrapper"><i class="fa-solid fa-circle-check"></i></div><h1>Grazie!</h1><p>La tua richiesta di prenotazione è stata inviata con successo. Riceverai una mail di conferma non appena verrà approvata dal nostro staff.</p></div></div>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-   <script>
-document.addEventListener('DOMContentLoaded', async () => {
-    // --- Theme Toggler ---
-    const themeToggleButton = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    const currentTheme = localStorage.getItem('theme');
 
-    if (currentTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-        themeIcon.textContent = 'dark_mode';
-    } else {
-        themeIcon.textContent = 'light_mode';
-    }
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. CONFIGURAZIONE DI FIREBASE ---
+        // IMPORTANTE: Sostituisci questo oggetto con la configurazione del tuo progetto Firebase.
+const firebaseConfig = {
+  apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+  authDomain: "ct-tricase.firebaseapp.com",
+  databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "ct-tricase",
+  storageBucket: "ct-tricase.firebasestorage.app",
+  messagingSenderId: "931504527474",
+  appId: "1:931504527474:web:165880ec30f3785ff54aeb",
+  measurementId: "G-7M4D22L352"
+};
 
-    themeToggleButton.addEventListener('click', () => {
-        document.body.classList.toggle('dark-theme');
-        let theme = 'light';
-        if (document.body.classList.contains('dark-theme')) {
-            theme = 'dark';
+
+        // --- 2. INIZIALIZZAZIONE DI FIREBASE ---
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // --- Gestione Tema (chiaro/scuro) ---
+        const themeToggleButton = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-theme');
             themeIcon.textContent = 'dark_mode';
         } else {
             themeIcon.textContent = 'light_mode';
         }
-        localStorage.setItem('theme', theme);
-    });
-    
-    // --- Booking Logic ---
-    const datePicker = document.getElementById('date-picker');
-    const fieldSelector = document.getElementById('field-selector');
-    const timeSlotsContainer = document.getElementById('time-slots');
-    const summaryDiv = document.getElementById('booking-summary');
-    const form = document.getElementById('booking-form');
-    const summaryDate = document.getElementById('summary-date');
-    const summaryField = document.getElementById('summary-field');
-    const summaryTime = document.getElementById('summary-time');
 
-    const booking = { date: null, field: '1', timeSlots: [] };
-    let allBookings = {};
-
-    const API_URL = 'https://sheetdb.io/api/v1/2asw3l7zf8wzl';
-
-    const fetchAllBookings = async () => {
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error(`Errore di rete: ${response.statusText}`);
-            const data = await response.json();
-            const grouped = {};
-            for (const b of data) {
-                if (b.Data && b.Campo && b.Orario) {
-                    if (!grouped[b.Data]) grouped[b.Data] = {};
-                    if (!grouped[b.Data][b.Campo]) grouped[b.Data][b.Campo] = [];
-                    const timeParts = b.Orario.split(' - ');
-                    const startTime = timeParts[0];
-                    const startHour = parseInt(startTime.split(':')[0]);
-                    const minute = startTime.split(':')[1];
-                    let duration = 1;
-                    if (timeParts.length > 1) {
-                        const endTimeHour = parseInt(timeParts[1].split(':')[0]);
-                        duration = endTimeHour - startHour;
-                    }
-                    for (let i = 0; i < duration; i++) {
-                        const currentHour = startHour + i;
-                        grouped[b.Data][b.Campo].push(`${String(currentHour).padStart(2, '0')}:${minute}`);
-                    }
-                }
-            }
-            return grouped;
-        } catch (error) { console.error("Impossibile caricare le prenotazioni:", error); return {}; }
-    };
-
-    const renderDatePicker = () => {
-        datePicker.innerHTML = ''; const today = new Date();
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(); date.setDate(today.getDate() + i);
-            const dateValue = date.toISOString().split('T')[0];
-            const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
-            const dayNum = date.getDate();
-            const option = document.createElement('div'); option.className = 'date-option'; option.dataset.date = dateValue;
-            option.innerHTML = `<span class="day-name">${dayName}</span><span class="day-num">${dayNum}</span>`;
-            if (i === 0) { booking.date = dateValue; option.classList.add('selected'); }
-            datePicker.appendChild(option);
-        }
-    };
-
-    const renderTimeSlots = () => {
-        timeSlotsContainer.innerHTML = ''; const unavailable = allBookings[booking.date]?.[booking.field] || [];
-        let minuteOffset = 0;
-        if (booking.field === '2') minuteOffset = 15; else if (booking.field === '3') minuteOffset = 30;
-        for (let hour = 8; hour < 22; hour++) {
-            const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
-            const slot = document.createElement('div'); slot.className = 'time-slot'; slot.dataset.time = time; slot.textContent = time;
-            if (unavailable.includes(time)) { slot.classList.add('unavailable'); }
-            if (booking.timeSlots.includes(time)) { slot.classList.add('selected'); }
-            timeSlotsContainer.appendChild(slot);
-        }
-    };
-
-    const updateSummary = () => {
-        if (booking.date) {
-            summaryDate.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(booking.date + "T00:00:00"));
-            summaryDiv.style.display = 'block';
-        }
-        summaryField.textContent = `Campo ${booking.field}`;
-        summaryTime.textContent = booking.timeSlots.length > 0 ? booking.timeSlots.sort().join(', ') : '-';
-        form.style.display = booking.timeSlots.length > 0 ? 'block' : 'none';
-    };
-
-    const refreshUI = async () => {
-        const latestBookings = await fetchAllBookings();
-        if(JSON.stringify(allBookings) !== JSON.stringify(latestBookings)) {
-            allBookings = latestBookings;
-            renderTimeSlots();
-            updateSummary();
-        }
-    };
-
-    datePicker.addEventListener('click', e => {
-        const target = e.target.closest('.date-option'); if (!target || target.classList.contains('selected')) return;
-        datePicker.querySelector('.selected').classList.remove('selected'); target.classList.add('selected');
-        booking.date = target.dataset.date; booking.timeSlots = []; renderTimeSlots(); updateSummary();
-    });
-
-    fieldSelector.addEventListener('click', e => {
-        const target = e.target.closest('.field-option'); if (!target || target.classList.contains('selected')) return;
-        fieldSelector.querySelector('.selected').classList.remove('selected'); target.classList.add('selected');
-        booking.field = target.dataset.field; booking.timeSlots = []; renderTimeSlots(); updateSummary();
-    });
-
-    timeSlotsContainer.addEventListener('click', e => {
-        const target = e.target.closest('.time-slot'); if (!target || target.classList.contains('unavailable')) return;
-        const time = target.dataset.time;
-        const isSelected = booking.timeSlots.includes(time);
-        if (!isSelected && booking.timeSlots.length >= 2) { alert("Puoi selezionare al massimo 2 ore."); return; }
-        target.classList.toggle('selected');
-        booking.timeSlots = Array.from(timeSlotsContainer.querySelectorAll('.time-slot.selected')).map(el => el.dataset.time);
-        updateSummary();
-    });
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const nameInput = document.getElementById('name');
-        const surnameInput = document.getElementById('surname');
-        const emailInput = document.getElementById('email');
-        const phoneInput = document.getElementById('phone');
-
-        if (!nameInput.value.trim() || !surnameInput.value.trim() || !emailInput.value.trim() || !phoneInput.value.trim()) {
-            alert("Per favore, compila tutti i campi: Nome, Cognome, Email e Telefono.");
-            return;
-        }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(emailInput.value)) {
-            alert("Per favore, inserisci un indirizzo email valido.");
-            return;
-        }
-
-        const submitBtn = form.querySelector('.submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Verifica disponibilità...';
-
-        const latestBookings = await fetchAllBookings();
-        const latestUnavailable = latestBookings[booking.date]?.[booking.field] || [];
-        const isSlotTaken = booking.timeSlots.some(slot => latestUnavailable.includes(slot));
-
-        if (isSlotTaken) {
-            alert('Spiacente, uno degli orari scelti è stato appena prenotato! La pagina si aggiornerà.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Conferma Prenotazione';
-            refreshUI();
-            return;
-        }
-
-        submitBtn.textContent = 'Conferma in corso...';
-        const formData = new FormData(form);
-        const baseData = Object.fromEntries(formData.entries());
-
-        const bookingsToSend = booking.timeSlots.map(slot => ({
-            ...baseData,
-            Data: booking.date,
-            Orario: slot,
-            Campo: booking.field,
-            ID: `ID-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-        }));
-        
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({data: bookingsToSend}) })
-        .then(res => {
-            if (!res.ok) throw new Error('La risposta del server non è stata positiva');
-            return res.json();
-        })
-        .then(data => {
-            document.getElementById('booking-container').style.display = 'none';
-            const confirmationContainer = document.getElementById('confirmation-container');
-            confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
-            confirmationContainer.querySelector('p').textContent = `La tua richiesta di prenotazione è stata inviata con successo. Riceverai una mail di conferma non appena verrà approvata dal nostro staff.`;
-            confirmationContainer.style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Errore durante la prenotazione:', error);
-            alert('Si è verificato un errore durante la prenotazione. Riprova.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Conferma Prenotazione';
+        themeToggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            let theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+            themeIcon.textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
+            localStorage.setItem('theme', theme);
         });
-    });
+        
+        // --- 3. LOGICA DI PRENOTAZIONE ---
+        // Riferimenti agli elementi del DOM
+        const datePicker = document.getElementById('date-picker');
+        const fieldSelector = document.getElementById('field-selector');
+        const timeSlotsContainer = document.getElementById('time-slots');
+        const summaryDiv = document.getElementById('booking-summary');
+        const form = document.getElementById('booking-form');
+        const summaryDate = document.getElementById('summary-date');
+        const summaryField = document.getElementById('summary-field');
+        const summaryTime = document.getElementById('summary-time');
 
-    // Initial Execution
-    renderDatePicker();
-    allBookings = await fetchAllBookings();
-    renderTimeSlots();
-    updateSummary();
+        // Stato della prenotazione corrente
+        const booking = { date: null, field: '1', timeSlots: [] };
+        let unavailableSlots = []; // Memorizza gli orari non disponibili per la selezione corrente
 
-    // Auto-refresh every 10 seconds
-    setInterval(refreshUI, 10000);
-});
-
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nameInput = document.getElementById('name');
-    const surnameInput = document.getElementById('surname');
-    const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
-
-    // --- Validazione dei campi (nessuna modifica qui) ---
-    if (!nameInput.value.trim() || !surnameInput.value.trim() || !emailInput.value.trim() || !phoneInput.value.trim()) {
-        alert("Per favore, compila tutti i campi: Nome, Cognome, Email e Telefono.");
-        return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailInput.value)) {
-        alert("Per favore, inserisci un indirizzo email valido.");
-        return;
-    }
-
-    const submitBtn = form.querySelector('.submit-btn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Verifica disponibilità...';
-
-    // --- Controllo disponibilità (nessuna modifica qui) ---
-    const latestBookings = await fetchAllBookings();
-    const latestUnavailable = latestBookings[booking.date]?.[booking.field] || [];
-    const isSlotTaken = booking.timeSlots.some(slot => latestUnavailable.includes(slot));
-
-    if (isSlotTaken) {
-        alert('Spiacente, uno degli orari scelti è stato appena prenotato! La pagina si aggiornerà.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Conferma Prenotazione';
-        refreshUI();
-        return;
-    }
-
-    submitBtn.textContent = 'Conferma in corso...';
-
-    // --- Preparazione dei dati (nessuna modifica qui) ---
-    const formData = new FormData(form);
-    const baseData = Object.fromEntries(formData.entries());
-    const bookingsToSend = booking.timeSlots.map(slot => ({
-        ...baseData,
-        Data: booking.date,
-        Orario: slot,
-        Campo: booking.field,
-        ID: `ID-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-    }));
-
-    // --- Chiamata a SheetDB per salvare i dati ---
-    fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: bookingsToSend })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error('La risposta del server non è stata positiva');
-        return res.json();
-    })
-    .then(data => {
-        // --- NUOVO: INVIA L'EMAIL DI CONFERMA CON EMAILJS ---
-        const templateParams = {
-            name: form.Nome.value,
-            email: form.Email.value,
-            date: summaryDate.textContent, // Usa la data già formattata dal riepilogo
-            field: `Campo ${booking.field}`,
-            time: booking.timeSlots.sort().join(', ')
+        // Funzione per generare i prossimi 7 giorni
+        const renderDatePicker = () => {
+            datePicker.innerHTML = '';
+            const today = new Date();
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() + i);
+                const dateValue = date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+                const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
+                const dayNum = date.getDate();
+                
+                const option = document.createElement('div');
+                option.className = 'date-option';
+                option.dataset.date = dateValue;
+                option.innerHTML = `<span class="day-name">${dayName}</span><span class="day-num">${dayNum}</span>`;
+                
+                if (i === 0) {
+                    booking.date = dateValue;
+                    option.classList.add('selected');
+                }
+                datePicker.appendChild(option);
+            }
         };
 
-        // Sostituisci con le tue credenziali di EmailJS
-        emailjs.send('service_v16vlev', 'template_4venqp8', templateParams, 'B0iydLemcww93J2-H')
-            .then((response) => {
-                console.log('Email inviata con successo!', response.status, response.text);
-            }, (error) => {
-                console.error('Errore durante l\'invio dell\'email:', error);
-                // Puoi anche avvisare l'utente che l'email potrebbe non essere stata inviata
-            });
+        // Funzione per mostrare gli orari
+        const renderTimeSlots = () => {
+            timeSlotsContainer.innerHTML = '';
+            let minuteOffset = 0;
+            if (booking.field === '2') minuteOffset = 15;
+            else if (booking.field === '3') minuteOffset = 30;
 
-        // --- Mostra messaggio di conferma (nessuna modifica qui) ---
-        document.getElementById('booking-container').style.display = 'none';
-        const confirmationContainer = document.getElementById('confirmation-container');
-        confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
-        confirmationContainer.style.display = 'block';
-    })
-    .catch(error => {
-        console.error('Errore durante la prenotazione:', error);
-        alert('Si è verificato un errore durante la prenotazione. Riprova.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Conferma Prenotazione';
+            for (let hour = 8; hour < 22; hour++) {
+                const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
+                const slot = document.createElement('div');
+                slot.className = 'time-slot';
+                slot.dataset.time = time;
+                slot.textContent = time;
+
+                if (unavailableSlots.includes(time)) {
+                    slot.classList.add('unavailable');
+                }
+                if (booking.timeSlots.includes(time)) {
+                    slot.classList.add('selected');
+                }
+                timeSlotsContainer.appendChild(slot);
+            }
+        };
+        
+        // Funzione per aggiornare il riepilogo
+        const updateSummary = () => {
+            if (booking.date) {
+                summaryDate.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(booking.date + "T00:00:00"));
+                summaryDiv.style.display = 'block';
+            }
+            summaryField.textContent = `Campo ${booking.field}`;
+            summaryTime.textContent = booking.timeSlots.length > 0 ? booking.timeSlots.sort().join(', ') : '-';
+            form.style.display = booking.timeSlots.length > 0 ? 'block' : 'none';
+        };
+
+        // --- 4. GESTIONE DATI CON FIREBASE ---
+        
+        // Funzione chiave: si mette in ascolto dei cambiamenti sul database per la data/campo scelti
+        const listenForBookings = () => {
+            if (!booking.date || !booking.field) return;
+
+            // Il percorso nel database dove sono salvate le prenotazioni (es. /prenotazioni/2025-07-06/campo-1)
+            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+            
+            // 'on' è il listener in tempo reale. Si attiva subito e ogni volta che i dati cambiano.
+            bookingsRef.on('value', (snapshot) => {
+                const bookingsData = snapshot.val();
+                // Estrae le chiavi (gli orari) dagli oggetti prenotati
+                unavailableSlots = bookingsData ? Object.keys(bookingsData) : [];
+                renderTimeSlots(); // Aggiorna la vista con i nuovi dati
+            });
+        };
+
+        // --- 5. GESTIONE EVENTI UTENTE ---
+
+        datePicker.addEventListener('click', e => {
+            const target = e.target.closest('.date-option');
+            if (!target || target.classList.contains('selected')) return;
+            
+            // Prima di cambiare, scollega il listener precedente per non consumare risorse
+            database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`).off();
+
+            datePicker.querySelector('.selected').classList.remove('selected');
+            target.classList.add('selected');
+            booking.date = target.dataset.date;
+            booking.timeSlots = [];
+            
+            listenForBookings(); // Attiva il nuovo listener sulla nuova data
+            updateSummary();
+        });
+
+        fieldSelector.addEventListener('click', e => {
+            const target = e.target.closest('.field-option');
+            if (!target || target.classList.contains('selected')) return;
+
+            database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`).off();
+
+            fieldSelector.querySelector('.selected').classList.remove('selected');
+            target.classList.add('selected');
+            booking.field = target.dataset.field;
+            booking.timeSlots = [];
+            
+            listenForBookings(); // Attiva il nuovo listener sul nuovo campo
+            updateSummary();
+        });
+
+        timeSlotsContainer.addEventListener('click', e => {
+            const target = e.target.closest('.time-slot');
+            if (!target || target.classList.contains('unavailable')) return;
+            
+            const time = target.dataset.time;
+            const index = booking.timeSlots.indexOf(time);
+
+            if (index > -1) { // Deseleziona
+                booking.timeSlots.splice(index, 1);
+                target.classList.remove('selected');
+            } else { // Seleziona
+                if (booking.timeSlots.length >= 2) {
+                    alert("Puoi selezionare al massimo 2 ore.");
+                    return;
+                }
+                booking.timeSlots.push(time);
+                target.classList.add('selected');
+            }
+            updateSummary();
+        });
+
+        // --- 6. INVIO DEL FORM CON TRANSAZIONE FIREBASE ---
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Validazione campi
+            if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !form.Email.value.trim() || !form.Telefono.value.trim()) {
+                alert("Per favore, compila tutti i campi.");
+                return;
+            }
+
+            const submitBtn = form.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verifica disponibilità...';
+
+            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+            const userData = {
+                nome: form.Nome.value,
+                cognome: form.Cognome.value,
+                email: form.Email.value,
+                telefono: form.Telefono.value,
+                prenotatoIl: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Usa una transazione per evitare che due utenti prenotino lo stesso slot contemporaneamente.
+            // È una operazione "atomica": o riesce tutta, o fallisce tutta.
+            bookingsRef.transaction((currentData) => {
+                // Se non c'è nulla, inizializza come oggetto vuoto
+                if (currentData === null) {
+                    currentData = {};
+                }
+
+                // Controlla se uno degli slot scelti è stato appena prenotato da qualcun altro
+                const isSlotTaken = booking.timeSlots.some(slot => currentData[slot]);
+                if (isSlotTaken) {
+                    // Se lo slot è occupato, la transazione viene annullata restituendo 'undefined'.
+                    // Firebase sa che non deve scrivere nulla.
+                    return; 
+                }
+
+                // Se liberi, aggiungi i dati della nuova prenotazione
+                booking.timeSlots.forEach(slot => {
+                    currentData[slot] = userData;
+                });
+                
+                // Restituisci i dati aggiornati. Firebase li salverà.
+                return currentData;
+
+            }, (error, committed, snapshot) => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Conferma Prenotazione';
+
+                if (error) {
+                    console.error('Transazione fallita:', error);
+                    alert('Si è verificato un errore tecnico. Riprova.');
+                } else if (!committed) {
+                    // 'committed' è false se la transazione è stata annullata da noi (slot già occupato)
+                    alert('Spiacente, uno degli orari scelti è stato appena prenotato! La lista si è aggiornata.');
+                    // L'interfaccia si è già aggiornata grazie al listener in tempo reale.
+                } else {
+                    // 'committed' è true, la prenotazione è andata a buon fine!
+                    console.log('Prenotazione salvata con successo!');
+                    document.getElementById('booking-container').style.display = 'none';
+                    const confirmationContainer = document.getElementById('confirmation-container');
+                    confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
+                    confirmationContainer.querySelector('p').textContent = `La tua richiesta di prenotazione per il campo ${booking.field} il giorno ${summaryDate.textContent} alle ore ${booking.timeSlots.sort().join(', ')} è stata confermata.`;
+                    confirmationContainer.style.display = 'block';
+                }
+            });
+        });
+
+        // --- 7. ESECUZIONE INIZIALE ---
+        renderDatePicker();
+        listenForBookings(); // Imposta il primo listener
+        updateSummary();
     });
-});
-</script>
+    </script>
 </body>
 </html>
