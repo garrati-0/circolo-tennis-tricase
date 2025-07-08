@@ -225,7 +225,7 @@
                 <div class="step"><h2>2. Seleziona il Campo</h2><div class="field-selector" id="field-selector"><div class="field-option selected" data-field="1">Campo 1</div><div class="field-option" data-field="2">Campo 2</div><div class="field-option" data-field="3">Campo 3</div></div></div>
                 <div class="step"><h2>3. Seleziona l'Orario</h2><div class="time-slots" id="time-slots"></div></div>
             </div>
-            <div class="summary-panel">
+            <div class="summary-panel" id="summary-panel">
                 <h2>La Tua Prenotazione</h2>
                 <div id="booking-summary"><div class="summary-item"><span>Data</span><span class="value" id="summary-date">-</span></div><div class="summary-item"><span>Campo</span><span class="value" id="summary-field">-</span></div><div class="summary-item"><span>Orari</span><span class="value" id="summary-time">-</span></div></div>
                 <form id="booking-form" novalidate><div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="name" name="Nome" placeholder="Nome" required></div><div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="surname" name="Cognome" placeholder="Cognome" required></div><div class="form-group"><i class="fa-solid fa-envelope"></i><input type="email" id="email" name="Email" placeholder="Email" required></div><div class="form-group"><i class="fa-solid fa-phone"></i><input type="tel" id="phone" name="Telefono" placeholder="Numero di Telefono" required></div><button type="submit" class="submit-btn">Conferma Prenotazione</button></form>
@@ -242,17 +242,16 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- 1. CONFIGURAZIONE DI FIREBASE ---
         // IMPORTANTE: Sostituisci questo oggetto con la configurazione del tuo progetto Firebase.
-const firebaseConfig = {
-  apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
-  authDomain: "ct-tricase.firebaseapp.com",
-  databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ct-tricase",
-  storageBucket: "ct-tricase.firebasestorage.app",
-  messagingSenderId: "931504527474",
-  appId: "1:931504527474:web:165880ec30f3785ff54aeb",
-  measurementId: "G-7M4D22L352"
-};
-
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+            authDomain: "ct-tricase.firebaseapp.com",
+            databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ct-tricase",
+            storageBucket: "ct-tricase.firebasestorage.app",
+            messagingSenderId: "931504527474",
+            appId: "1:931504527474:web:165880ec30f3785ff54aeb",
+            measurementId: "G-7M4D22L352"
+        };
 
         // --- 2. INIZIALIZZAZIONE DI FIREBASE ---
         firebase.initializeApp(firebaseConfig);
@@ -284,6 +283,7 @@ const firebaseConfig = {
         const timeSlotsContainer = document.getElementById('time-slots');
         const summaryDiv = document.getElementById('booking-summary');
         const form = document.getElementById('booking-form');
+        const summaryPanel = document.getElementById('summary-panel'); // Riferimento al pannello del riepilogo
         const summaryDate = document.getElementById('summary-date');
         const summaryField = document.getElementById('summary-field');
         const summaryTime = document.getElementById('summary-time');
@@ -417,8 +417,21 @@ const firebaseConfig = {
                     alert("Puoi selezionare al massimo 2 ore.");
                     return;
                 }
+                
+                // --- MODIFICA: Logica per lo scroll ---
+                // Controlla se questa è la prima selezione prima di aggiungere l'orario
+                const isFirstSelection = booking.timeSlots.length === 0;
+
                 booking.timeSlots.push(time);
                 target.classList.add('selected');
+
+                // Se era la prima selezione, esegui lo scroll
+                if (isFirstSelection) {
+                    // Un piccolo timeout assicura che il DOM si aggiorni prima dello scroll
+                    setTimeout(() => {
+                        summaryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                }
             }
             updateSummary();
         });
