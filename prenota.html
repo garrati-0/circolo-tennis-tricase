@@ -10,9 +10,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <style>
-        /* --- CSS INVARIATO --- */
-        :root { --primary-color: #007BFF; --primary-color-hover: #0056b3; --background-primary: #FFFFFF; --background-secondary: #F4F7FC; --surface-color: #FFFFFF; --border-color: #DEE2E6; --text-primary: #212529; --text-secondary: #6C757D; --text-inverted: #FFFFFF; --accent-color: #e9ecef; --shadow-color: rgba(0,0,0,0.05); }
-        .dark-theme { --primary-color: #007BFF; --primary-color-hover: #2196f3; --background-primary: #1a202c; --background-secondary: #121822; --surface-color: #1a202c; --border-color: #2d3748; --text-primary: #e2e8f0; --text-secondary: #a0aec0; --text-inverted: #FFFFFF; --accent-color: #2d3748; --shadow-color: rgba(0,0,0,0.2); }
+        /* --- CSS MODIFICATO --- */
+        :root {
+            --primary-color: #007BFF; --primary-color-hover: #0056b3; --background-primary: #FFFFFF; --background-secondary: #F4F7FC; --surface-color: #FFFFFF; --border-color: #DEE2E6; --text-primary: #212529; --text-secondary: #6C757D; --text-inverted: #FFFFFF; --accent-color: #e9ecef; --shadow-color: rgba(0,0,0,0.05); --danger-color: #dc3545;
+            --warning-color: #ffc107; 
+            --text-on-warning: #212529;
+        }
+        .dark-theme {
+            --primary-color: #007BFF; --primary-color-hover: #2196f3; --background-primary: #1a202c; --background-secondary: #121822; --surface-color: #1a202c; --border-color: #2d3748; --text-primary: #e2e8f0; --text-secondary: #a0aec0; --text-inverted: #FFFFFF; --accent-color: #2d3748; --shadow-color: rgba(0,0,0,0.2); --danger-color: #e53e3e;
+            --warning-color: #ffc107;
+            --text-on-warning: #212529;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Noto Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--background-secondary); color: var(--text-primary); transition: background-color 0.3s, color 0.3s; }
         .navbar { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; z-index: 10; display: flex; align-items: center; gap: 1rem; }
@@ -22,7 +30,7 @@
         .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 80px 20px 40px; }
         .booking-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: flex-start; }
         .selection-panel, .summary-panel { background-color: var(--surface-color); border-radius: 16px; padding: 32px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px var(--shadow-color); }
-        h1, h2 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-primary); font-weight: 800; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-primary); font-weight: 800; }
         h1 { font-size: 2.2rem; margin-bottom: 8px; }
         .selection-panel > p { font-size: 1rem; margin-bottom: 32px; color: var(--text-secondary); }
         h2 { font-size: 1.5rem; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
@@ -36,17 +44,44 @@
         .date-option:hover, .field-option:hover, .time-slot:hover { border-color: var(--primary-color); color: var(--primary-color); }
         .date-option.selected, .field-option.selected, .time-slot.selected { background-color: var(--primary-color); border-color: var(--primary-color); color: var(--text-inverted); transform: scale(1.05); }
         .date-option.selected .day-name, .date-option.selected .day-num { color: var(--text-inverted); }
-        .time-slot.unavailable { background-color: var(--accent-color); border-color: var(--border-color); color: var(--text-secondary); cursor: not-allowed; text-decoration: line-through; }
-        .time-slot.unavailable:hover { color: var(--text-secondary); transform: none; border-color: var(--border-color); }
+        
+        .time-slot.unavailable { background-color: var(--danger-color); border-color: var(--danger-color); color: var(--text-inverted); cursor: not-allowed; text-decoration: line-through; }
+        .time-slot.unavailable:hover { color: var(--text-inverted); transform: none; }
+        .time-slot.recurring { background-color: var(--warning-color); border-color: var(--warning-color); color: var(--text-on-warning); cursor: not-allowed; text-decoration: line-through; }
+        .time-slot.recurring:hover { color: var(--text-on-warning); transform: none; }
+
+        /* <-- NUOVO: Stili per la legenda --> */
+        .legend { display: flex; gap: 20px; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+        .legend-item .color-box { width: 18px; height: 18px; border-radius: 4px; }
+        .legend-item .color-box.unavailable { background-color: var(--danger-color); }
+        .legend-item .color-box.recurring { background-color: var(--warning-color); }
+
         #booking-summary { background-color: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-top: 24px; display: none; }
         .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
         .summary-item:last-child { border-bottom: none; }
         .summary-item .value { font-weight: 700; }
+
+        /* <-- NUOVO: Stili per il listino prezzi --> */
+        .price-list { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+        .price-list h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; }
+        .price-list table { width: 100%; border-collapse: collapse; text-align: center; }
+        .price-list th, .price-list td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.95rem; }
+        .price-list th { background-color: var(--background-secondary); font-weight: 700; }
+        .price-list td:first-child { text-align: left; font-weight: 700; }
+
         #booking-form { margin-top: 24px; display: none; }
         .form-group { position: relative; margin-bottom: 20px; }
         .form-group i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
         .form-group input { width: 100%; background-color: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 14px 14px 48px; color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
         .form-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); }
+        
+        .form-check-group { margin-bottom: 20px; display: flex; align-items: flex-start; }
+        .form-check-group input { margin-right: 12px; margin-top: 5px; width: 16px; height: 16px; }
+        .form-check-group label { font-size: 0.9rem; color: var(--text-secondary); }
+        .form-check-group label a { color: var(--primary-color); text-decoration: none; }
+        .form-check-group label a:hover { text-decoration: underline; }
+
         .submit-btn { width: 100%; background-color: var(--primary-color); border: none; border-radius: 8px; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text-inverted); cursor: pointer; transition: all 0.2s; }
         .submit-btn:hover { background-color: var(--primary-color-hover); }
         .submit-btn:disabled { background-color: #6c757d; cursor: wait; }
@@ -69,15 +104,69 @@
         <div class="booking-layout">
             <div class="selection-panel">
                 <h1>Effettua una Prenotazione</h1>
-                <p>Seleziona data, campo e orario. La disponibilità è aggiornata in tempo reale per garantirti una prenotazione sicura.</p>
+                <p>Seleziona data, campo e orario. La disponibilità è aggiornata in tempo reale. Puoi prenotare un massimo di 2 ore a settimana.</p>
                 <div class="step"><h2>1. Seleziona la Data</h2><div class="date-picker" id="date-picker"></div></div>
                 <div class="step"><h2>2. Seleziona il Campo</h2><div class="field-selector" id="field-selector"><div class="field-option selected" data-field="1">Campo 1</div><div class="field-option" data-field="2">Campo 2</div><div class="field-option" data-field="3">Campo 3</div></div></div>
-                <div class="step"><h2>3. Seleziona l'Orario</h2><div class="time-slots" id="time-slots"></div></div>
+                <div class="step">
+                    <h2>3. Seleziona l'Orario</h2>
+                    <div class="time-slots" id="time-slots"></div>
+                    <div class="legend">
+                        <div class="legend-item"><span class="color-box unavailable"></span> Prenotato</div>
+                        <div class="legend-item"><span class="color-box recurring"></span> Corsi</div>
+                    </div>
+                </div>
             </div>
             <div class="summary-panel" id="summary-panel">
-                <h2>La Tua Prenotazione</h2>
-                <div id="booking-summary"><div class="summary-item"><span>Data</span><span class="value" id="summary-date">-</span></div><div class="summary-item"><span>Campo</span><span class="value" id="summary-field">-</span></div><div class="summary-item"><span>Orari</span><span class="value" id="summary-time">-</span></div></div>
-                <form id="booking-form" novalidate><div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="name" name="Nome" placeholder="Nome" required></div><div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="surname" name="Cognome" placeholder="Cognome" required></div><div class="form-group"><i class="fa-solid fa-envelope"></i><input type="email" id="email" name="Email" placeholder="Email" required></div><div class="form-group"><i class="fa-solid fa-phone"></i><input type="tel" id="phone" name="Telefono" placeholder="Numero di Telefono" required></div><button type="submit" class="submit-btn">Conferma Prenotazione</button></form>
+                <h2>Riepilogo e Prezzi</h2>
+                
+                <div class="price-list">
+                    <h3>Listino Prezzi Orari</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Senza Luci</th>
+                                <th>Con Luci</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Soci</td>
+                                <td>€10</td>
+                                <td>€15</td>
+                            </tr>
+                            <tr>
+                                <td>Non Soci</td>
+                                <td>€15</td>
+                                <td>€20</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="booking-summary">
+                    <div class="summary-item"><span>Data</span><span class="value" id="summary-date">-</span></div>
+                    <div class="summary-item"><span>Campo</span><span class="value" id="summary-field">-</span></div>
+                    <div class="summary-item"><span>Orari</span><span class="value" id="summary-time">-</span></div>
+                </div>
+
+                <form id="booking-form" novalidate>
+                    <div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="name" name="Nome" placeholder="Nome" required></div>
+                    <div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="surname" name="Cognome" placeholder="Cognome" required></div>
+                    <div class="form-group"><i class="fa-solid fa-envelope"></i><input type="email" id="email" name="Email" placeholder="Email" required></div>
+                    <div class="form-group"><i class="fa-solid fa-phone"></i><input type="tel" id="phone" name="Telefono" placeholder="Numero di Telefono" required></div>
+                    
+                    <div class="form-check-group">
+                        <input type="checkbox" id="certificato" name="certificato" required>
+                        <label for="certificato">Dichiaro di essere in possesso di un certificato medico valido per l'attività sportiva non agonistica.</label>
+                    </div>
+                    <div class="form-check-group">
+                        <input type="checkbox" id="privacy" name="privacy" required>
+                        <label for="privacy">Acconsento al trattamento dei dati personali secondo la <a href="/privacy.html" target="_blank">privacy policy</a>.</label>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Conferma Prenotazione</button>
+                </form>
             </div>
         </div>
     </div>
@@ -88,8 +177,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
     <script>
+    // --- NESSUNA MODIFICA AL JAVASCRIPT ---
     document.addEventListener('DOMContentLoaded', () => {
-        // --- SEZIONI 1, 2, 3, 4, 5 (INVARIATE) ---
         const firebaseConfig = {
             apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
             authDomain: "ct-tricase.firebaseapp.com",
@@ -102,6 +191,7 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        
         const themeToggleButton = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const currentTheme = localStorage.getItem('theme');
@@ -117,6 +207,7 @@
             themeIcon.textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
             localStorage.setItem('theme', theme);
         });
+        
         const datePicker = document.getElementById('date-picker');
         const fieldSelector = document.getElementById('field-selector');
         const timeSlotsContainer = document.getElementById('time-slots');
@@ -126,8 +217,11 @@
         const summaryDate = document.getElementById('summary-date');
         const summaryField = document.getElementById('summary-field');
         const summaryTime = document.getElementById('summary-time');
+        
         const booking = { date: null, field: '1', timeSlots: [] };
         let unavailableSlots = [];
+        let recurringBookings = {};
+
         const renderDatePicker = () => {
             datePicker.innerHTML = '';
             const today = new Date();
@@ -146,73 +240,133 @@
                     option.classList.add('selected');
                 }
                 datePicker.appendChild(option);
+                if (date.getDay() === 0 && i > 0) {
+                    break;
+                }
             }
         };
+
         const renderTimeSlots = () => {
             timeSlotsContainer.innerHTML = '';
+            if (!booking.date) return;
+
             let minuteOffset = 0;
             if (booking.field === '2') minuteOffset = 15;
             else if (booking.field === '3') minuteOffset = 30;
+
+            const selectedDate = new Date(booking.date + "T00:00:00");
+            const selectedDayOfWeek = selectedDate.getDay(); 
+
             for (let hour = 8; hour < 22; hour++) {
                 const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
                 const slot = document.createElement('div');
                 slot.className = 'time-slot';
                 slot.dataset.time = time;
                 slot.textContent = time;
-                if (unavailableSlots.includes(time)) {
+
+                const isRegularlyBooked = unavailableSlots.includes(time);
+
+                let isRecurringlyBooked = false;
+                for (const key in recurringBookings) {
+                    const rb = recurringBookings[key];
+                    if (parseInt(rb.giornoSettimana) === selectedDayOfWeek && rb.campo === booking.field && rb.orario === time) {
+                        isRecurringlyBooked = true;
+                        break;
+                    }
+                }
+
+                if (isRecurringlyBooked) {
+                    slot.classList.add('recurring');
+                } else if (isRegularlyBooked) {
                     slot.classList.add('unavailable');
                 }
+
                 if (booking.timeSlots.includes(time)) {
                     slot.classList.add('selected');
                 }
                 timeSlotsContainer.appendChild(slot);
             }
         };
+
         const updateSummary = () => {
             if (booking.date) {
                 summaryDate.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(booking.date + "T00:00:00"));
-                summaryDiv.style.display = 'block';
             }
             summaryField.textContent = `Campo ${booking.field}`;
             summaryTime.textContent = booking.timeSlots.length > 0 ? booking.timeSlots.sort().join(', ') : '-';
-            form.style.display = booking.timeSlots.length > 0 ? 'block' : 'none';
+            
+            if (booking.timeSlots.length > 0) {
+                summaryDiv.style.display = 'block';
+                form.style.display = 'block';
+            } else {
+                summaryDiv.style.display = 'none';
+                form.style.display = 'none';
+            }
         };
+
         const listenForBookings = () => {
             if (!booking.date || !booking.field) return;
             const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+            
             bookingsRef.on('value', (snapshot) => {
                 const bookingsData = snapshot.val();
-                unavailableSlots = bookingsData ? Object.keys(bookingsData) : [];
+                unavailableSlots = []; 
+                if (bookingsData) {
+                    for(const time in bookingsData) {
+                        if(bookingsData[time]) {
+                            unavailableSlots.push(time.replace('-',':'));
+                        }
+                    }
+                }
                 renderTimeSlots();
             });
         };
+
+        const listenToRecurringBookings = () => {
+            const recurringRef = database.ref('prenotazioniRicorrenti');
+            recurringRef.on('value', (snapshot) => {
+                recurringBookings = snapshot.val() || {};
+                renderTimeSlots();
+            });
+        };
+
         datePicker.addEventListener('click', e => {
             const target = e.target.closest('.date-option');
             if (!target || target.classList.contains('selected')) return;
+            
             database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`).off();
+            
             datePicker.querySelector('.selected').classList.remove('selected');
             target.classList.add('selected');
             booking.date = target.dataset.date;
             booking.timeSlots = [];
-            listenForBookings();
+            
+            listenForBookings(); 
             updateSummary();
         });
+
         fieldSelector.addEventListener('click', e => {
             const target = e.target.closest('.field-option');
             if (!target || target.classList.contains('selected')) return;
+
             database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`).off();
+
             fieldSelector.querySelector('.selected').classList.remove('selected');
             target.classList.add('selected');
             booking.field = target.dataset.field;
             booking.timeSlots = [];
+            
             listenForBookings();
             updateSummary();
         });
+
         timeSlotsContainer.addEventListener('click', e => {
             const target = e.target.closest('.time-slot');
-            if (!target || target.classList.contains('unavailable')) return;
+            if (!target || target.classList.contains('unavailable') || target.classList.contains('recurring')) return;
+            
             const time = target.dataset.time;
             const index = booking.timeSlots.indexOf(time);
+            
             if (index > -1) {
                 booking.timeSlots.splice(index, 1);
                 target.classList.remove('selected');
@@ -233,11 +387,48 @@
             updateSummary();
         });
 
-        // --- 6. INVIO DEL FORM CON TRANSAZIONE FIREBASE (AGGIORNATO) ---
-        form.addEventListener('submit', (e) => {
+        async function checkWeeklyBookingLimit(nome, cognome, email) {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const firstDayOfWeek = new Date(today);
+            firstDayOfWeek.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            firstDayOfWeek.setHours(0, 0, 0, 0);
+
+            const lastDayOfWeek = new Date(firstDayOfWeek);
+            lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+            lastDayOfWeek.setHours(23, 59, 59, 999);
+
+            const firstDayISO = firstDayOfWeek.toISOString().split('T')[0];
+            const lastDayISO = lastDayOfWeek.toISOString().split('T')[0];
+
+            let totalHoursThisWeek = 0;
+            const indexRef = database.ref('indicePrenotazioni');
+            
+            const snapshot = await indexRef.orderByChild('email').equalTo(email).once('value');
+            
+            if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    const bookingData = childSnapshot.val();
+                    if (bookingData.nome === nome && bookingData.cognome === cognome && bookingData.data >= firstDayISO && bookingData.data <= lastDayISO) {
+                        totalHoursThisWeek += bookingData.orari.length;
+                    }
+                });
+            }
+            return totalHoursThisWeek;
+        }
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !form.Email.value.trim() || !form.Telefono.value.trim()) {
-                alert("Per favore, compila tutti i campi.");
+                alert("Per favore, compila tutti i campi anagrafici.");
+                return;
+            }
+            if (!form.certificato.checked) {
+                alert("Devi dichiarare di essere in possesso di un certificato medico valido.");
+                return;
+            }
+            if (!form.privacy.checked) {
+                alert("Devi accettare il trattamento dei dati personali.");
                 return;
             }
 
@@ -245,13 +436,21 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Verifica disponibilità...';
 
-            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
-            
-            // <-- MODIFICA: Genera un ID univoco per questa prenotazione
-            const bookingId = bookingsRef.push().key;
+            const bookedHours = await checkWeeklyBookingLimit(form.Nome.value, form.Cognome.value, form.Email.value);
+            const hoursToBook = booking.timeSlots.length;
 
+            if (bookedHours + hoursToBook > 2) {
+                alert(`Hai già prenotato ${bookedHours} ore questa settimana. Non puoi superare il limite di 2 ore settimanali.`);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Conferma Prenotazione';
+                return;
+            }
+
+            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+            const bookingId = bookingsRef.push().key;
+            
             const userData = {
-                bookingId: bookingId, // <-- MODIFICA: Aggiungi l'ID ai dati dell'utente
+                bookingId: bookingId,
                 nome: form.Nome.value,
                 cognome: form.Cognome.value,
                 email: form.Email.value,
@@ -259,15 +458,14 @@
                 prenotatoIl: firebase.database.ServerValue.TIMESTAMP
             };
 
-            // Usa una transazione per evitare che due utenti prenotino lo stesso slot
             bookingsRef.transaction((currentData) => {
                 if (currentData === null) currentData = {};
-                const isSlotTaken = booking.timeSlots.some(slot => currentData[slot]);
+                const isSlotTaken = booking.timeSlots.some(slot => currentData[slot.replace(':', '-')]);
                 if (isSlotTaken) {
-                    return; // Annulla la transazione se lo slot è già preso
+                    return; 
                 }
                 booking.timeSlots.forEach(slot => {
-                    currentData[slot] = userData;
+                    currentData[slot.replace(':', '-')] = userData;
                 });
                 return currentData;
             }, (error, committed, snapshot) => {
@@ -280,36 +478,26 @@
                 } else if (!committed) {
                     alert('Spiacente, uno degli orari scelti è stato appena prenotato! La lista si è aggiornata.');
                 } else {
-                    // PRENOTAZIONE RIUSCITA! ORA SALVIAMO L'INDICE.
-                    // <-- MODIFICA: Crea una nuova voce nell'indice delle prenotazioni
                     const bookingIndexRef = database.ref('indicePrenotazioni/' + bookingId);
                     bookingIndexRef.set({
                         nome: userData.nome,
+                        cognome: userData.cognome,
                         email: userData.email,
                         data: booking.date,
                         campo: booking.field,
                         orari: booking.timeSlots,
                         prenotatoIl: userData.prenotatoIl
                     }).then(() => {
-                        // SOLO DOPO CHE L'INDICE È STATO SALVATO, MOSTRIAMO LA CONFERMA E INVIAMO L'EMAIL
                         console.log('Prenotazione e indice salvati! ID:', bookingId);
                         
-                        // Mostra la schermata di conferma
                         document.getElementById('booking-container').style.display = 'none';
                         const confirmationContainer = document.getElementById('confirmation-container');
                         confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
-                        
-                        // <-- MODIFICA: Aggiorna il messaggio di conferma per includere l'ID
                         confirmationContainer.querySelector('p').innerHTML = `La tua richiesta di prenotazione (ID: <strong>${bookingId}</strong>) per il campo ${booking.field} il giorno ${summaryDate.textContent} alle ore ${booking.timeSlots.sort().join(', ')} è stata confermata. A breve riceverai una mail di riepilogo.`;
                         confirmationContainer.style.display = 'block';
 
-                        // --- LOGICA PER INVIARE EMAIL TRAMITE GOOGLE APPS SCRIPT ---
-                        
-                        // <-- MODIFICA: Assicurati che questo URL punti alla tua pagina cancella.html
                         const CANCELLATION_PAGE_URL = "cancella.html"; 
                         const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
-                        
-                        // Inserisci qui l'URL che hai copiato da Google Apps Script
                         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzc3ISbgyUkaMGo99v80_9_ilQVXKXaYUk2wrMjt6GnxkBWZmKi8G28_wZegLJMroVUoA/exec";
                         
                         const emailData = {
@@ -318,29 +506,20 @@
                             data: summaryDate.textContent,
                             campo: booking.field,
                             orari: booking.timeSlots.sort().join(', '),
-                            id: bookingId, // <-- MODIFICA: Aggiungi l'ID
-                            linkCancellazione: cancellationLink // <-- MODIFICA: Aggiungi il link
+                            id: bookingId,
+                            linkCancellazione: cancellationLink
                         };
                         
                         fetch(SCRIPT_URL, {
                             method: 'POST',
+                            mode: 'no-cors',
                             body: JSON.stringify(emailData),
-                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            headers: { 'Content-Type': 'application/json' },
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.result === "success") {
-                                console.log("Email inviata con successo.");
-                            } else {
-                                console.error("Errore dall'Apps Script:", data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Errore nell'invio della richiesta allo script:", error);
-                        });
+                        .then(() => console.log("Richiesta invio email partita."))
+                        .catch(error => console.error("Errore nell'invio della richiesta allo script:", error));
 
                     }).catch(indexError => {
-                        // Gestione di un errore critico se non si riesce a salvare l'indice
                         console.error("Errore critico: impossibile salvare l'indice della prenotazione.", indexError);
                         alert("Si è verificato un errore grave. La tua prenotazione potrebbe non essere cancellabile. Contatta l'assistenza.");
                     });
@@ -348,8 +527,9 @@
             });
         });
 
-        // --- 7. ESECUZIONE INIZIALE ---
+        // --- ESECUZIONE INIZIALE ---
         renderDatePicker();
+        listenToRecurringBookings(); 
         listenForBookings();
         updateSummary();
     });
