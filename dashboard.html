@@ -505,55 +505,61 @@
             }
         });
 
-        manualBookingForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = manualBookingForm.querySelector('.submit-btn');
-            submitBtn.disabled = true;
+ manualBookingForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = manualBookingForm.querySelector('.submit-btn');
+        submitBtn.disabled = true;
 
-            const field = document.getElementById('manual-field').value;
-            const time = document.getElementById('manual-time').value;
-            const dateString = currentDate.toISOString().split('T')[0];
-            
-            const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
-            const bookingId = bookingRef.push().key;
+        const field = document.getElementById('manual-field').value;
+        const time = document.getElementById('manual-time').value;
+        const dateString = currentDate.toISOString().split('T')[0];
+        
+        const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
+        const bookingId = bookingRef.push().key;
 
-            const bookingData = {
-                bookingId: bookingId,
-                nome: document.getElementById('manual-name').value,
-                cognome: document.getElementById('manual-surname').value,
-                email: document.getElementById('manual-email').value,
-                telefono: document.getElementById('manual-phone').value,
-                prenotatoIl: firebase.database.ServerValue.TIMESTAMP
-            };
+        // --- START OF MODIFICATION ---
 
-            const timeKey = time.replace(':', '-');
-            const bookingPath = `prenotazioni/${dateString}/campo-${field}/${timeKey}`;
-            const indexPath = `indicePrenotazioni/${bookingId}`;
-            
-            const updates = {};
-            updates[bookingPath] = bookingData;
-            updates[indexPath] = {
-                data: dateString,
-                campo: field,
-                orari: [time],
-                nome: bookingData.nome,
-                email: bookingData.email,
-                prenotatoIl: bookingData.prenotatoIl
-            };
+        // FIX 1: Trim whitespace from all input fields
+        const bookingData = {
+            bookingId: bookingId,
+            nome: document.getElementById('manual-name').value.trim(),
+            cognome: document.getElementById('manual-surname').value.trim(),
+            email: document.getElementById('manual-email').value.trim(),
+            telefono: document.getElementById('manual-phone').value.trim(),
+            prenotatoIl: firebase.database.ServerValue.TIMESTAMP
+        };
 
-            try {
-                await database.ref().update(updates);
-                alert('Prenotazione salvata con successo!');
-                bookingModal.style.display = 'none';
-            } catch (error) {
-                alert('Errore nel salvataggio: ' + error.message);
-            } finally {
-                submitBtn.disabled = false;
-            }
-        });
+        const timeKey = time.replace(':', '-');
+        const bookingPath = `prenotazioni/${dateString}/campo-${field}/${timeKey}`;
+        const indexPath = `indicePrenotazioni/${bookingId}`;
+        
+        const updates = {};
+        updates[bookingPath] = bookingData;
+        updates[indexPath] = {
+            data: dateString,
+            campo: field,
+            orari: [time],
+            nome: bookingData.nome,
+            cognome: bookingData.cognome, // FIX 2: Add the missing 'cognome' field
+            email: bookingData.email,
+            prenotatoIl: bookingData.prenotatoIl
+        };
 
-        listenToRecurringBookings();
+        // --- END OF MODIFICATION ---
+
+        try {
+            await database.ref().update(updates);
+            alert('Prenotazione salvata con successo!');
+            bookingModal.style.display = 'none';
+        } catch (error) {
+            alert('Errore nel salvataggio: ' + error.message);
+        } finally {
+            submitBtn.disabled = false;
+        }
     });
-    </script>
+
+    listenToRecurringBookings();
+});
+</script>
 </body>
 </html>
