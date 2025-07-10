@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="it" class="scroll-smooth">
+<!-- The 'dark' class is added here to set the default theme to dark -->
+<html lang="it" class="scroll-smooth dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,25 +9,76 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+        // Configure Tailwind CSS to use a class-based dark mode
+        tailwind.config = {
+          darkMode: 'class',
+        }
+    </script>
     <style>
+        /* Base styles for body */
         body {
             font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative; /* Needed for stacking context */
+            isolation: isolate; /* Keeps pseudo-elements behind body content */
+        }
+
+        /* Light Theme base styles */
+        body {
+            background-color: #F5F5F5; /* Light gray background */
+            color: #1f2937; /* Dark gray text */
+        }
+
+        /* Dark Theme styles */
+        .dark body {
             background-color: #141414;
             color: #F0F0F0;
-            
-            /* Sfondo con solo il pattern a palline */
+            /* Static background pattern */
             background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
             background-size: 20px 20px;
         }
+        
+        /* Dynamic background glow for dark mode */
+        @keyframes move-glow {
+            0% {
+                transform: translate(10vw, -20vh) scale(1.5);
+                background-color: #B3544C; /* Terra */
+            }
+            50% {
+                transform: translate(60vw, 80vh) scale(2);
+                background-color: #C4D831; /* Verde */
+            }
+            100% {
+                transform: translate(10vw, -20vh) scale(1.5);
+                background-color: #B3544C; /* Terra */
+            }
+        }
+
+        /* Pseudo-element for the animated glow */
+        .dark body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50vmax;
+            height: 50vmax;
+            border-radius: 50%;
+            background-color: #B3544C;
+            opacity: 0.1;
+            filter: blur(120px);
+            z-index: -1; /* Places the glow behind all content */
+            animation: move-glow 25s linear infinite;
+            will-change: transform; /* Performance optimization */
+        }
 
         #hero {
-            /* Sfondo a più livelli per la sola sezione Hero */
-            background-image: 
-                /* 1. Overlay scuro per leggibilità */
+            background-image:
+                /* 1. Overlay for text legibility */
                 linear-gradient(rgba(20, 20, 20, 0.75), rgba(20, 20, 20, 0.75)),
-                /* 2. Immagine di sfondo */
+                /* 2. Background image */
                 url('campo.png');
-            
             background-size: cover;
             background-position: center;
         }
@@ -40,40 +92,68 @@
             font-family: 'Roboto Mono', monospace;
         }
         
-        /* Colori Personalizzati */
-        .bg-terra { background-color: #B3544C; }
-        .text-terra { color: #B3544C; }
-        .border-terra { border-color: #B3544C; }
-        
-        .bg-verde { background-color: #C4D831; }
-        .text-verde { color: #C4D831; }
-        .border-verde { border-color: #C4D831; }
+        /* --- Colori Personalizzati --- */
 
-        /* Animazione Fade In */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            opacity: 0;
-            animation: fadeIn 0.6s ease-out forwards;
-        }
+        /* Light Theme colors */
+        .bg-terra-light { background-color: #D95D51; }
+        .text-terra-light { color: #B9473B; }
+        .border-terra-light { border-color: #B9473B; }
+        .bg-verde-light { background-color: #AEC521; }
+        .text-verde-light { color: #88A009; }
+        .border-verde-light { border-color: #88A009; }
+
+        /* This color is for the Hero title and is now consistent across themes */
+        .text-verde { color: #C4D831; }
+
+        /* Dark Theme colors */
+        .dark .bg-terra { background-color: #B3544C; }
+        .dark .text-terra { color: #B3544C; }
+        .dark .border-terra { border-color: #B3544C; }
+        .dark .bg-verde { background-color: #C4D831; }
+        .dark .border-verde { border-color: #C4D831; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+        .animate-on-scroll { opacity: 0; transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        .fade-in-left { animation: fadeInLeft 0.6s ease-out forwards; }
+        .fade-in-right { animation: fadeInRight 0.6s ease-out forwards; }
+
+        /* Utility for scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
     </style>
 </head>
 <body class="antialiased">
+    
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed bottom-5 right-5 z-50 bg-gray-500/20 dark:bg-zinc-700/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-500/40 dark:hover:bg-zinc-600/60 transition-colors">
+        <!-- Sun Icon (shown in dark mode) -->
+        <svg id="theme-toggle-sun" class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <!-- Moon Icon (shown in light mode) -->
+        <svg id="theme-toggle-moon" class="w-6 h-6 text-slate-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+
 
     <!-- Header Fisso -->
-    <header class="fixed top-0 left-0 right-0 z-50 p-4">
-        <div class="container mx-auto flex justify-between items-center bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/10">
+    <header class="fixed top-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/20 dark:border-white/10 text-zinc-800 dark:text-white">
             <div class="font-mono text-lg font-bold">C.T. TRICASE</div>
             <nav class="hidden md:flex items-center space-x-6 font-mono text-sm">
-                <a href="#about-us" class="hover:text-verde transition-colors">Chi Siamo</a>
-                <a href="#maestri" class="hover:text-verde transition-colors">Maestri</a>
-                <a href="#corsi" class="hover:text-verde transition-colors">Corsi</a>
-                <a href="#clubhouse" class="hover:text-verde transition-colors">Club House</a>
-                <a href="#gallery" class="hover:text-verde transition-colors">Gallery</a>
+                <a href="#about-us" class="hover:text-verde-light dark:hover:text-verde transition-colors">Chi Siamo</a>
+                <a href="#maestri" class="hover:text-verde-light dark:hover:text-verde transition-colors">Maestri</a>
+                <a href="#corsi" class="hover:text-verde-light dark:hover:text-verde transition-colors">Corsi</a>
+                <a href="#tesseramento" class="hover:text-verde-light dark:hover:text-verde transition-colors">Tesseramento</a>
+                <a href="#clubhouse" class="hover:text-verde-light dark:hover:text-verde transition-colors">Club House</a>
+                <a href="#merch" class="hover:text-verde-light dark:hover:text-verde transition-colors">Merch</a>
+                <a href="#notizie" class="hover:text-verde-light dark:hover:text-verde transition-colors">Notizie</a>
+                <a href="#gallery" class="hover:text-verde-light dark:hover:text-verde transition-colors">Gallery</a>
             </nav>
-            <a href="#contatti" class="bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-white transition-colors">CONTATTACI</a>
+            <a href="#contatti" class="bg-verde-light dark:bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">CONTATTACI</a>
         </div>
     </header>
 
@@ -88,8 +168,8 @@
                 La tua casa per il tennis nel cuore del Salento. Passione, agonismo e divertimento dal 1980.
             </p>
             <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-                <a href="#corsi" class="bg-white text-black font-bold py-3 px-8 rounded-xl hover:bg-verde transition-colors">I NOSTRI CORSI</a>
-                <a href="#contatti" class="bg-terra text-white font-bold py-3 px-8 rounded-xl hover:bg-opacity-80 transition-colors">PRENOTA UN CAMPO</a>
+                <a href="#corsi" class="bg-white text-black font-bold py-3 px-8 rounded-xl hover:bg-verde-light dark:hover:bg-verde transition-colors">I NOSTRI CORSI</a>
+                <a href="#contatti" class="bg-terra-light dark:bg-terra text-white font-bold py-3 px-8 rounded-xl hover:bg-opacity-80 transition-colors">PRENOTA UN CAMPO</a>
             </div>
         </div>
     </section>
@@ -99,95 +179,180 @@
         <div class="space-y-24 md:space-y-32">
             
             <!-- Sezione: About Us -->
-            <section id="about-us" class="fade-in">
+            <section id="about-us" class="animate-on-scroll">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-                    <div>
-                        <img src="https://placehold.co/600x500/1f1f1f/ffffff?text=Il+Nostro+Club" alt="Immagine del club" class="rounded-2xl shadow-lg w-full h-auto">
+                    <div class="animate-on-scroll" data-animation="fade-in-left">
+                        <img src="club.png" alt="Immagine del club" class="rounded-2xl shadow-lg w-full h-auto">
                     </div>
-                    <div class="text-left">
-                        <h2 class="font-display text-4xl md:text-5xl mb-2 text-white">La Nostra Storia</h2>
-                        <p class="font-mono text-verde mb-6">Passione per il tennis dal 1980.</p>
-                        <p class="mb-4 text-gray-300">Fondato da un gruppo di amici appassionati, il Circolo Tennis Tricase è diventato un punto di riferimento per gli amanti di questo sport in tutto il Salento. La nostra missione è promuovere il tennis a tutti i livelli, dall'amatore all'agonista, in un ambiente accogliente e professionale.</p>
-                        <p class="text-gray-300">Offriamo campi in terra rossa di alta qualità, una scuola tennis riconosciuta dalla FITP e uno staff di maestri pronti a seguirti nel tuo percorso di crescita.</p>
+                    <div class="text-left animate-on-scroll" data-animation="fade-in-right">
+                        <h2 class="font-display text-4xl md:text-5xl mb-2 text-zinc-900 dark:text-white">La Nostra Storia</h2>
+                        <p class="font-mono text-verde-light dark:text-verde mb-6">Passione per il tennis dal 1980.</p>
+                        <p class="mb-4 text-gray-700 dark:text-gray-300">Fondato da un gruppo di amici appassionati, il Circolo Tennis Tricase è diventato un punto di riferimento per gli amanti di questo sport in tutto il Salento. La nostra missione è promuovere il tennis a tutti i livelli, dall'amatore all'agonista, in un ambiente accogliente e professionale.</p>
+                        <p class="text-gray-700 dark:text-gray-300">Offriamo campi in terra rossa di alta qualità, una scuola tennis riconosciuta dalla FITP e uno staff di maestri pronti a seguirti nel tuo percorso di crescita.</p>
                     </div>
                 </div>
             </section>
 
             <!-- Sezione: I Nostri Maestri -->
-            <section id="maestri" class="fade-in">
-                <h2 class="font-display text-4xl md:text-5xl mb-2 text-terra">I Nostri Maestri</h2>
-                <p class="font-mono text-gray-400 mb-12">Professionisti qualificati pronti a migliorare il tuo gioco.</p>
+            <section id="maestri" class="animate-on-scroll" data-animation="fade-in">
+                <h2 class="font-display text-4xl md:text-5xl mb-2 text-terra-light dark:text-terra">I Nostri Maestri</h2>
+                <p class="font-mono text-gray-500 dark:text-gray-400 mb-12">Professionisti qualificati pronti a migliorare il tuo gioco.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Maestro 1 -->
-                    <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center hover:border-terra transition-colors group">
-                        <img src="https://placehold.co/300x300/141414/B3544C?text=Maestro" alt="Foto del Maestro 1" class="w-40 h-40 rounded-full mx-auto mb-4 border-4 border-zinc-700 group-hover:border-terra transition-colors">
-                        <h3 class="font-mono text-2xl mb-1 text-white">MARIO ROSSI</h3>
-                        <p class="text-terra mb-2 font-bold">Maestro Nazionale FITP</p>
-                        <p class="text-sm text-gray-400">Esperto in tecnica e strategia di gioco per agonisti e amatori. Anni di esperienza nel circuito.</p>
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 text-center hover:border-terra-light dark:hover:border-terra transition-colors group animate-on-scroll" data-animation="fade-in" style="animation-delay: 100ms;">
+                        <img src="m1.png" alt="Foto del Maestro 1" class="w-40 h-40 rounded-full mx-auto mb-4 border-4 border-gray-300 dark:border-zinc-700 group-hover:border-terra-light dark:group-hover:border-terra transition-colors">
+                        <h3 class="font-mono text-2xl mb-1 text-zinc-900 dark:text-white">MARIO ROSSI</h3>
+                        <p class="text-terra-light dark:text-terra mb-2 font-bold">Maestro Nazionale FITP</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Esperto in tecnica e strategia di gioco per agonisti e amatori. Anni di esperienza nel circuito.</p>
                     </div>
                     <!-- Maestro 2 -->
-                    <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center hover:border-terra transition-colors group">
-                        <img src="https://placehold.co/300x300/141414/B3544C?text=Maestra" alt="Foto della Maestra 2" class="w-40 h-40 rounded-full mx-auto mb-4 border-4 border-zinc-700 group-hover:border-terra transition-colors">
-                        <h3 class="font-mono text-2xl mb-1 text-white">GIULIA BIANCHI</h3>
-                        <p class="text-terra mb-2 font-bold">Istruttrice 2° Livello</p>
-                        <p class="text-sm text-gray-400">Specializzata nell'insegnamento ai bambini e ragazzi, con un approccio ludico e formativo.</p>
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 text-center hover:border-terra-light dark:hover:border-terra transition-colors group animate-on-scroll" data-animation="fade-in" style="animation-delay: 200ms;">
+                        <img src="m2.png" alt="Foto della Maestra 2" class="w-40 h-40 rounded-full mx-auto mb-4 border-4 border-gray-300 dark:border-zinc-700 group-hover:border-terra-light dark:group-hover:border-terra transition-colors">
+                        <h3 class="font-mono text-2xl mb-1 text-zinc-900 dark:text-white">GIULIA BIANCHI</h3>
+                        <p class="text-terra-light dark:text-terra mb-2 font-bold">Istruttrice 2° Livello</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Specializzata nell'insegnamento ai bambini e ragazzi, con un approccio ludico e formativo.</p>
                     </div>
                     <!-- Maestro 3 -->
-                    <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center hover:border-terra transition-colors group">
-                        <img src="https://placehold.co/300x300/141414/B3544C?text=Maestro" alt="Foto del Maestro 3" class="w-40 h-40 rounded-full mx-auto mb-4 border-4 border-zinc-700 group-hover:border-terra transition-colors">
-                        <h3 class="font-mono text-2xl mb-1 text-white">LUCA VERDI</h3>
-                        <p class="text-terra mb-2 font-bold">Preparatore Atletico</p>
-                        <p class="text-sm text-gray-400">Laureato in Scienze Motorie, cura la preparazione fisica degli atleti per massimizzare la performance.</p>
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 text-center hover:border-terra-light dark:hover:border-terra transition-colors group animate-on-scroll" data-animation="fade-in" style="animation-delay: 300ms;">
+                        <img src="m1.png" alt="Foto del Maestro 3" class="w-40 h-40 rounded-full mx-auto mb-4 border-4 border-gray-300 dark:border-zinc-700 group-hover:border-terra-light dark:group-hover:border-terra transition-colors">
+                        <h3 class="font-mono text-2xl mb-1 text-zinc-900 dark:text-white">LUCA VERDI</h3>
+                        <p class="text-terra-light dark:text-terra mb-2 font-bold">Preparatore Atletico</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Laureato in Scienze Motorie, cura la preparazione fisica degli atleti per massimizzare la performance.</p>
                     </div>
                 </div>
             </section>
 
             <!-- Sezione: I Nostri Corsi -->
-            <section id="corsi" class="fade-in">
-                <h2 class="font-display text-4xl md:text-5xl mb-2 text-verde">I Nostri Corsi</h2>
-                <p class="font-mono text-gray-400 mb-12">Per ogni età e livello, la soluzione giusta per te.</p>
+            <section id="corsi" class="animate-on-scroll" data-animation="fade-in">
+                <h2 class="font-display text-4xl md:text-5xl mb-2 text-verde-light dark:text-verde">I Nostri Corsi</h2>
+                <p class="font-mono text-gray-500 dark:text-gray-400 mb-12">Per ogni età e livello, la soluzione giusta per te.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 hover:border-verde transition-colors">
-                        <h3 class="font-mono text-2xl text-verde mb-3">SCUOLA TENNIS</h3>
-                        <p class="text-gray-400">Corsi collettivi per bambini e ragazzi dai 5 ai 18 anni, divisi per età e livello. Un percorso di crescita sportiva e divertimento.</p>
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 hover:border-verde-light dark:hover:border-verde transition-colors animate-on-scroll" data-animation="fade-in-left">
+                        <svg class="w-8 h-8 mb-4 text-verde-light dark:text-verde" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75s.168-.75.375-.75.375.336.375.75Zm4.5 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Z" /></svg>
+                        <h3 class="font-mono text-2xl text-verde-light dark:text-verde mb-3">SCUOLA TENNIS</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Corsi collettivi per bambini e ragazzi dai 5 ai 18 anni, divisi per età e livello. Un percorso di crescita sportiva e divertimento.</p>
                     </div>
-                    <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 hover:border-verde transition-colors">
-                        <h3 class="font-mono text-2xl text-verde mb-3">AGONISTICA</h3>
-                        <p class="text-gray-400">Programmi intensivi per atleti che partecipano a tornei. Allenamenti personalizzati, preparazione fisica e mentale.</p>
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 hover:border-verde-light dark:hover:border-verde transition-colors animate-on-scroll" data-animation="fade-in" style="animation-delay: 150ms;">
+                        <svg class="w-8 h-8 mb-4 text-verde-light dark:text-verde" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9a9 9 0 1 0 9 0Zm-4.5-4.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6-3a9 9 0 1 0-18 0 9 9 0 0 0 18 0Z" /></svg>
+                        <h3 class="font-mono text-2xl text-verde-light dark:text-verde mb-3">AGONISTICA</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Programmi intensivi per atleti che partecipano a tornei. Allenamenti personalizzati, preparazione fisica e mentale.</p>
                     </div>
-                    <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 hover:border-verde transition-colors">
-                        <h3 class="font-mono text-2xl text-verde mb-3">CORSI ADULTI</h3>
-                        <p class="text-gray-400">Corsi di gruppo per tutti i livelli, dal principiante all'avanzato. Per imparare, migliorare e stare in forma.</p>
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 hover:border-verde-light dark:hover:border-verde transition-colors animate-on-scroll" data-animation="fade-in-right">
+                        <svg class="w-8 h-8 mb-4 text-verde-light dark:text-verde" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.962a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Zm-7.5 0a3.75 3.75 0 1 0 7.5 0 3.75 3.75 0 0 0-7.5 0Zm15 4.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" /></svg>
+                        <h3 class="font-mono text-2xl text-verde-light dark:text-verde mb-3">CORSI ADULTI</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Corsi di gruppo per tutti i livelli, dal principiante all'avanzato. Per imparare, migliorare e stare in forma.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione: Vantaggi del Tesseramento -->
+            <section id="tesseramento" class="animate-on-scroll" data-animation="fade-in">
+                <h2 class="font-display text-4xl md:text-5xl mb-2 text-terra-light dark:text-terra">Vantaggi del Tesseramento</h2>
+                <p class="font-mono text-gray-500 dark:text-gray-400 mb-12">Entra a far parte della nostra famiglia.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 hover:border-terra-light dark:hover:border-terra transition-colors animate-on-scroll" data-animation="fade-in-left">
+                        <svg class="w-8 h-8 mb-4 text-terra-light dark:text-terra" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" /></svg>
+                        <h3 class="font-mono text-2xl text-terra-light dark:text-terra mb-3">SCONTI CAMPI</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Tariffe agevolate per la prenotazione dei campi da tennis durante tutto l'anno.</p>
+                    </div>
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 hover:border-terra-light dark:hover:border-terra transition-colors animate-on-scroll" data-animation="fade-in" style="animation-delay: 150ms;">
+                        <svg class="w-8 h-8 mb-4 text-terra-light dark:text-terra" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9a9 9 0 1 0 9 0Zm-4.5-4.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6-3a9 9 0 1 0-18 0 9 9 0 0 0 18 0Z" /></svg>
+                        <h3 class="font-mono text-2xl text-terra-light dark:text-terra mb-3">TORNEI SOCIALI</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Accesso esclusivo ai tornei interni e agli eventi sociali organizzati dal circolo.</p>
+                    </div>
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 hover:border-terra-light dark:hover:border-terra transition-colors animate-on-scroll" data-animation="fade-in-right">
+                        <svg class="w-8 h-8 mb-4 text-terra-light dark:text-terra" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 20.25h-13.5A2.25 2.25 0 0 1 3 18V6a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 6v12a2.25 2.25 0 0 1-2.25 2.25Z" /></svg>
+                        <h3 class="font-mono text-2xl text-terra-light dark:text-terra mb-3">COMUNITÀ</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Entra in una comunità di appassionati, trova nuovi partner di gioco e partecipa alla vita del club.</p>
                     </div>
                 </div>
             </section>
 
             <!-- Sezione: Club House -->
-            <section id="clubhouse" class="fade-in">
-                <div class="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-                    <div class="p-8 md:p-12">
-                        <h2 class="font-display text-4xl md:text-5xl mb-2 text-white">Club House</h2>
-                        <p class="font-mono text-gray-400 mb-6">Il cuore pulsante del nostro circolo.</p>
-                        <p class="mb-4 text-gray-300">Un luogo per rilassarsi prima o dopo una partita, bere un caffè in compagnia o guardare i match più importanti in TV. Offriamo servizio bar, area relax e una terrazza con vista sui campi.</p>
-                        <button class="font-mono bg-terra text-white px-6 py-3 rounded-lg hover:bg-opacity-80 transition-colors mt-4">SCOPRI DI PIÙ</button>
+            <section id="clubhouse" class="animate-on-scroll">
+                <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+                    <div class="p-8 md:p-12 animate-on-scroll" data-animation="fade-in-left">
+                        <h2 class="font-display text-4xl md:text-5xl mb-2 text-zinc-900 dark:text-white">Club House</h2>
+                        <p class="font-mono text-gray-500 dark:text-gray-400 mb-6">Il cuore pulsante del nostro circolo.</p>
+                        <p class="mb-4 text-gray-700 dark:text-gray-300">Un luogo per rilassarsi prima o dopo una partita, bere un caffè in compagnia o guardare i match più importanti in TV. Offriamo servizio bar, area relax e una terrazza con vista sui campi.</p>
+                        <button class="font-mono bg-terra-light dark:bg-terra text-white px-6 py-3 rounded-lg hover:bg-opacity-80 transition-colors mt-4">SCOPRI DI PIÙ</button>
                     </div>
-                    <div class="h-64 md:h-auto">
-                        <img src="https://placehold.co/600x500/141414/B3544C?text=Club+House" alt="Immagine della Club House" class="w-full h-full object-cover">
+                    <div class="h-64 md:h-auto animate-on-scroll" data-animation="fade-in-right">
+                        <img src="club.png" alt="Immagine della Club House" class="w-full h-full object-cover">
                     </div>
                 </div>
             </section>
             
+            <!-- Sezione: Merch -->
+            <section id="merch" class="animate-on-scroll" data-animation="fade-in">
+                <h2 class="font-display text-4xl md:text-5xl mb-2 text-verde-light dark:text-verde">Il Nostro Merch</h2>
+                <p class="font-mono text-gray-500 dark:text-gray-400 mb-12">Vesti la passione per il C.T. Tricase.</p>
+                <div class="flex overflow-x-auto gap-8 pb-4 no-scrollbar">
+                    <!-- Articolo 1 -->
+                    <div class="flex-shrink-0 w-4/5 sm:w-2/5 lg:w-1/3 bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 text-center hover:border-verde-light dark:hover:border-verde transition-colors group animate-on-scroll" data-animation="fade-in" style="animation-delay: 100ms;">
+                        <img src="maglietta.jpg" alt="T-Shirt ufficiale" class="w-full h-auto rounded-lg mx-auto mb-4 border-4 border-gray-300 dark:border-zinc-700 group-hover:border-verde-light dark:group-hover:border-verde transition-colors">
+                        <h3 class="font-mono text-2xl mb-1 text-zinc-900 dark:text-white">T-SHIRT UFFICIALE</h3>
+                        <p class="text-verde-light dark:text-verde mb-2 font-bold">€ 25,00</p>
+                    </div>
+                    <!-- Articolo 2 -->
+                    <div class="flex-shrink-0 w-4/5 sm:w-2/5 lg:w-1/3 bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 text-center hover:border-verde-light dark:hover:border-verde transition-colors group animate-on-scroll" data-animation="fade-in" style="animation-delay: 200ms;">
+                        <img src="maglietta.jpg" alt="Cappellino ufficiale" class="w-full h-auto rounded-lg mx-auto mb-4 border-4 border-gray-300 dark:border-zinc-700 group-hover:border-verde-light dark:group-hover:border-verde transition-colors">
+                        <h3 class="font-mono text-2xl mb-1 text-zinc-900 dark:text-white">CAPPELLINO</h3>
+                        <p class="text-verde-light dark:text-verde mb-2 font-bold">€ 18,00</p>
+                    </div>
+                    <!-- Articolo 3 -->
+                    <div class="flex-shrink-0 w-4/5 sm:w-2/5 lg:w-1/3 bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 text-center hover:border-verde-light dark:hover:border-verde transition-colors group animate-on-scroll" data-animation="fade-in" style="animation-delay: 300ms;">
+                        <img src="maglietta.jpg" alt="Polsini ufficiali" class="w-full h-auto rounded-lg mx-auto mb-4 border-4 border-gray-300 dark:border-zinc-700 group-hover:border-verde-light dark:group-hover:border-verde transition-colors">
+                        <h3 class="font-mono text-2xl mb-1 text-zinc-900 dark:text-white">POLSINI</h3>
+                        <p class="text-verde-light dark:text-verde mb-2 font-bold">€ 12,00</p>
+                    </div>
+                     <!-- Articolo 4 -->
+                    <div class="flex-shrink-0 w-4/5 sm:w-2/5 lg:w-1/3 bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 text-center hover:border-verde-light dark:hover:border-verde transition-colors group animate-on-scroll" data-animation="fade-in" style="animation-delay: 400ms;">
+                        <img src="maglietta.jpg" alt="Borsa da tennis" class="w-full h-auto rounded-lg mx-auto mb-4 border-4 border-gray-300 dark:border-zinc-700 group-hover:border-verde-light dark:group-hover:border-verde transition-colors">
+                        <h3 class="font-mono text-2xl mb-1 text-zinc-900 dark:text-white">BORSA DA TENNIS</h3>
+                        <p class="text-verde-light dark:text-verde mb-2 font-bold">€ 75,00</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione: Notizie -->
+            <section id="notizie" class="animate-on-scroll" data-animation="fade-in">
+                <h2 class="font-display text-4xl md:text-5xl mb-2 text-verde-light dark:text-verde">Ultime Notizie</h2>
+                <p class="font-mono text-gray-500 dark:text-gray-400 mb-12">Rimani aggiornato su tornei, eventi e novità del circolo.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Notizia 1 -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden group hover:border-verde-light dark:hover:border-verde transition-colors animate-on-scroll" data-animation="fade-in" style="animation-delay: 100ms;">
+                        <img src="vallonea.png" alt="Torneo Sociale" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <p class="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">10 LUGLIO 2025</p>
+                            <h3 class="font-mono text-xl mb-3 text-zinc-900 dark:text-white group-hover:text-verde-light dark:group-hover:text-verde transition-colors">TORNEO LA VALLONEA</h3>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Sono aperte le iscrizioni per il nostro annuale torneo sociale estivo. Categorie singolo maschile, femminile e doppio misto.</p>
+                            <a href="#" class="font-mono text-verde-light dark:text-verde font-bold text-sm">LEGGI DI PIÙ &rarr;</a>
+                        </div>
+                    </div>
+                    <!-- Notizia 2 -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden group hover:border-verde-light dark:hover:border-verde transition-colors animate-on-scroll" data-animation="fade-in" style="animation-delay: 200ms;">
+                        <img src="https://placehold.co/800x600/333333/FFFFFF?text=Corsi" alt="Nuovi corsi" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <p class="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">01 LUGLIO 2025</p>
+                            <h3 class="font-mono text-xl mb-3 text-zinc-900 dark:text-white group-hover:text-verde-light dark:group-hover:text-verde transition-colors">NUOVI CORSI PER PRINCIPIANTI</h3>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">A settembre partono i nuovi corsi per adulti principianti. Un'occasione perfetta per iniziare a giocare a tennis.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Sezione: Gallery -->
-            <section id="gallery" class="fade-in">
-                 <h2 class="font-display text-4xl md:text-5xl mb-2 text-terra">Gallery</h2>
-                <p class="font-mono text-gray-400 mb-12">I momenti più belli vissuti sui nostri campi.</p>
+            <section id="gallery" class="animate-on-scroll" data-animation="fade-in">
+                 <h2 class="font-display text-4xl md:text-5xl mb-2 text-terra-light dark:text-terra">Gallery</h2>
+                <p class="font-mono text-gray-500 dark:text-gray-400 mb-12">I momenti più belli vissuti sui nostri campi.</p>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <img src="https://placehold.co/400x400/1f1f1f/C4D831?text=Match" alt="Foto di una partita di tennis" class="rounded-lg aspect-square object-cover w-full h-auto">
-                    <img src="https://placehold.co/400x400/1f1f1f/B3544C?text=Campo" alt="Foto del campo da tennis" class="rounded-lg aspect-square object-cover w-full h-auto">
-                    <img src="https://placehold.co/400x400/1f1f1f/ffffff?text=Gruppo" alt="Foto della scuola tennis" class="rounded-lg aspect-square object-cover w-full h-auto">
-                    <img src="https://placehold.co/400x400/1f1f1f/C4D831?text=Dettaglio" alt="Dettaglio di una racchetta" class="rounded-lg aspect-square object-cover w-full h-auto">
-                    <img src="https://placehold.co/400x400/1f1f1f/B3544C?text=Premiazione" alt="Foto di una premiazione" class="rounded-lg aspect-square object-cover w-full h-auto col-span-2">
-                    <img src="https://placehold.co/400x400/1f1f1f/ffffff?text=Club" alt="Foto esterna del club" class="rounded-lg aspect-square object-cover w-full h-auto col-span-2">
+                    <img src="campi.png" alt="Foto di una partita di tennis" class="rounded-lg aspect-square object-cover w-full h-auto animate-on-scroll" data-animation="fade-in">
+                    <img src="campo.png" alt="Foto del campo da tennis" class="rounded-lg aspect-square object-cover w-full h-auto animate-on-scroll" data-animation="fade-in" style="animation-delay: 100ms;">
+                    <img src="club.png" alt="Foto della scuola tennis" class="rounded-lg aspect-square object-cover w-full h-auto animate-on-scroll" data-animation="fade-in" style="animation-delay: 200ms;">
+                    <img src="campo.png" alt="Dettaglio di una racchetta" class="rounded-lg aspect-square object-cover w-full h-auto animate-on-scroll" data-animation="fade-in" style="animation-delay: 300ms;">
+                    <img src="campi.png" alt="Foto di una premiazione" class="rounded-lg aspect-square object-cover w-full h-auto col-span-2 animate-on-scroll" data-animation="fade-in-left">
+                    <img src="club.png" alt="Foto esterna del club" class="rounded-lg aspect-square object-cover w-full h-auto col-span-2 animate-on-scroll" data-animation="fade-in-right">
                 </div>
             </section>
 
@@ -195,44 +360,84 @@
     </main>
 
     <!-- Footer e Contatti -->
-    <footer id="contatti" class="bg-zinc-900/50 border-t border-zinc-800 mt-24 py-16">
+    <footer id="contatti" class="bg-white dark:bg-zinc-900/50 border-t border-gray-200 dark:border-zinc-800 mt-24 py-16 animate-on-scroll" data-animation="fade-in">
         <div class="container mx-auto px-4 text-center">
-            <h2 class="font-display text-4xl md:text-5xl mb-2 text-verde">Contattaci</h2>
-            <p class="font-mono text-gray-400 mb-8">Siamo a tua disposizione per qualsiasi informazione.</p>
+            <h2 class="font-display text-4xl md:text-5xl mb-2 text-verde-light dark:text-verde">Contattaci</h2>
+            <p class="font-mono text-gray-500 dark:text-gray-400 mb-8">Siamo a tua disposizione per qualsiasi informazione.</p>
             <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 font-mono">
                 <div class="text-center">
-                    <h3 class="text-lg font-bold text-white mb-2">INDIRIZZO</h3>
-                    <p class="text-gray-400">Via dei Campi, 1<br>73039 Tricase (LE)</p>
+                    <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-2">INDIRIZZO</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Via dei Campi, 1<br>73039 Tricase (LE)</p>
                 </div>
                 <div class="text-center">
-                    <h3 class="text-lg font-bold text-white mb-2">TELEFONO</h3>
-                    <p class="text-gray-400">0833 123456</p>
+                    <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-2">TELEFONO</h3>
+                    <p class="text-gray-600 dark:text-gray-400">0833 123456</p>
                 </div>
                 <div class="text-center">
-                    <h3 class="text-lg font-bold text-white mb-2">EMAIL</h3>
-                    <p class="text-gray-400">info@cttricase.it</p>
+                    <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-2">EMAIL</h3>
+                    <p class="text-gray-600 dark:text-gray-400">info@cttricase.it</p>
                 </div>
             </div>
-            <div class="mt-16 pt-8 border-t border-zinc-800">
-                 <p class="text-xs text-gray-500">© 2025 Circolo Tennis Tricase. Tutti i diritti riservati.</p>
+            <div class="mt-16 pt-8 border-t border-gray-200 dark:border-zinc-800">
+                 <p class="text-xs text-gray-600 dark:text-gray-500">© 2025 Circolo Tennis Tricase. Tutti i diritti riservati.</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // --- THEME TOGGLE SCRIPT ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-toggle-sun');
+        const moonIcon = document.getElementById('theme-toggle-moon');
+        const htmlEl = document.documentElement;
+
+        // Function to toggle icons
+        function toggleIcons() {
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+        }
+        
+        // On page load, check for saved theme and apply it
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'light') {
+                htmlEl.classList.remove('dark');
+                toggleIcons();
+            } else {
+                // Default is dark, so no class change needed, just ensure icons are correct
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+
+        // Add click listener for the toggle button
+        themeToggleBtn.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            toggleIcons();
+            
+            // Save the user's preference to localStorage
+            if (htmlEl.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // --- SCROLL ANIMATION SCRIPT ---
         document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry, index) => {
+                entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.style.animationDelay = `${index * 150}ms`;
-                        entry.target.classList.add('fade-in');
+                        const animationType = entry.target.dataset.animation || 'fade-in';
+                        entry.target.classList.add(animationType);
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('section, footer > div').forEach(section => {
-                observer.observe(section);
+            }, {
+                threshold: 0.1 
+            });
+            animatedElements.forEach(el => {
+                observer.observe(el);
             });
         });
     </script>

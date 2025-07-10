@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancella Prenotazione - C.T. Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>
+        // Configure Tailwind CSS to use a class-based dark mode
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-green': '#C4D831',
+                        'brand-red': '#B3544C',
+                        'brand-yellow': '#f59e0b',
+                        'brand-green-light': '#AEC521',
+                        'brand-red-light': '#D95D51',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base styles for body */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            isolation: isolate;
+        }
+
+        /* Light Theme base styles */
+        body {
+            background-color: #F5F5F5;
+            color: #1f2937;
+        }
+
+        /* Dark Theme styles */
+        .dark body {
+            background-color: #141414;
+            color: #F0F0F0;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Dynamic background glow for dark mode */
+        @keyframes move-glow {
+            0% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+            50% { transform: translate(60vw, 80vh) scale(2); background-color: #C4D831; }
+            100% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+        }
+
+        .dark body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50vmax;
+            height: 50vmax;
+            border-radius: 50%;
+            background-color: #B3544C;
+            opacity: 0.1;
+            filter: blur(120px);
+            z-index: -1;
+            animation: move-glow 25s linear infinite;
+            will-change: transform;
+        }
+
+        .font-display { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: -0.05em; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+    </style>
+</head>
+<body class="antialiased flex items-center justify-center min-h-screen p-4">
+    
+    <div class="w-full max-w-lg">
+        <div class="cancellation-panel bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 text-center">
+            <div id="icon-wrapper" class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center">
+                <!-- Icon will be inserted by JS -->
+            </div>
+            <h1 id="status-title" class="font-display text-4xl text-zinc-800 dark:text-white mb-4">Verifica Prenotazione</h1>
+            <p id="status-message" class="font-mono text-gray-600 dark:text-gray-400 mb-6">Stiamo cercando i dettagli della tua prenotazione. Attendere prego...</p>
+            
+            <div id="booking-details" class="hidden text-left bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-lg p-4 mb-6 space-y-2 font-mono">
+                <!-- Details will be inserted by JS -->
+            </div>
+
+            <div class="space-y-3">
+                <button id="confirm-cancellation-btn" class="w-full bg-brand-red-light dark:bg-brand-red text-white font-bold py-3 px-4 rounded-lg hover:opacity-80 transition-opacity disabled:bg-zinc-500 dark:disabled:bg-zinc-600 disabled:cursor-wait flex items-center justify-center hidden">
+                    Sì, Conferma Cancellazione
+                </button>
+                <a id="back-home-btn" href="index.html" class="w-full bg-gray-200 dark:bg-zinc-700 text-zinc-800 dark:text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-zinc-600 transition-colors hidden text-center">
+                    Torna alla Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+            authDomain: "ct-tricase.firebaseapp.com",
+            databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ct-tricase",
+            storageBucket: "ct-tricase.appspot.com",
+            messagingSenderId: "931504527474",
+            appId: "1:931504527474:web:165880ec30f3785ff54aeb"
+        };
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // --- THEME TOGGLE SCRIPT ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-toggle-sun');
+        const moonIcon = document.getElementById('theme-toggle-moon');
+        const htmlEl = document.documentElement;
+
+        function updateIcons() {
+            if (htmlEl.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'light') {
+                htmlEl.classList.remove('dark');
+            }
+            updateIcons();
+        });
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+            updateIcons();
+        });
+
+        // --- CANCELLATION SCRIPT ---
+        const iconWrapper = document.getElementById('icon-wrapper');
+        const statusTitle = document.getElementById('status-title');
+        const statusMessage = document.getElementById('status-message');
+        const detailsDiv = document.getElementById('booking-details');
+        const confirmBtn = document.getElementById('confirm-cancellation-btn');
+        const backHomeBtn = document.getElementById('back-home-btn');
+
+        const icons = {
+            loading: `<span class="material-icons text-4xl text-blue-500 animate-spin">sync</span>`,
+            success: `<span class="material-icons text-4xl text-brand-green-light dark:text-brand-green">check_circle</span>`,
+            error: `<span class="material-icons text-4xl text-brand-red-light dark:text-brand-red">error</span>`,
+            question: `<span class="material-icons text-4xl text-brand-yellow">help</span>`
+        };
+
+        const iconBgs = {
+            loading: 'bg-blue-500/10',
+            success: 'bg-brand-green/10',
+            error: 'bg-brand-red/10',
+            question: 'bg-brand-yellow/10'
+        }
+
+        function setStatus(status, title, message) {
+            iconWrapper.innerHTML = icons[status] || icons.error;
+            iconWrapper.className = `w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${iconBgs[status]}`;
+            statusTitle.textContent = title;
+            statusMessage.textContent = message;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            setStatus('loading', 'Verifica Prenotazione', 'Stiamo cercando i dettagli della tua prenotazione...');
+            
+            const params = new URLSearchParams(window.location.search);
+            const bookingId = params.get('id');
+
+            if (!bookingId) {
+                setStatus('error', 'Errore', 'ID prenotazione non trovato. Assicurati di usare il link corretto.');
+                backHomeBtn.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const indexRef = ref(database, 'indicePrenotazioni/' + bookingId);
+                const snapshot = await get(indexRef);
+
+                if (!snapshot.exists()) {
+                    setStatus('error', 'Non Trovata', 'Questa prenotazione non esiste o è già stata cancellata.');
+                    backHomeBtn.classList.remove('hidden');
+                    return;
+                }
+
+                const bookingData = snapshot.val();
+                
+                const now = new Date();
+                const firstSlotTime = bookingData.orari.sort()[0];
+                const bookingDateTime = new Date(`${bookingData.data}T${firstSlotTime}`);
+                const cancellationDeadline = new Date(bookingDateTime.getTime() - 2 * 60 * 60 * 1000);
+
+                if (now > cancellationDeadline) {
+                    setStatus('error', 'Troppo Tardi', 'Il termine per la cancellazione (2 ore prima) è scaduto.');
+                    backHomeBtn.classList.remove('hidden');
+                    return;
+                }
+                
+                setStatus('question', 'Conferma Cancellazione', `Ciao ${bookingData.nome}, sei sicuro di voler cancellare?`);
+                detailsDiv.innerHTML = `
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">Data:</span> <strong>${new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(bookingData.data+"T00:00:00"))}</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">Campo:</span> <strong>${bookingData.campo}</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-500 dark:text-gray-400">Orari:</span> <strong>${bookingData.orari.join(', ')}</strong></div>
+                `;
+                detailsDiv.classList.remove('hidden');
+                confirmBtn.classList.remove('hidden');
+                backHomeBtn.classList.remove('hidden');
+
+                confirmBtn.addEventListener('click', async () => {
+                    confirmBtn.disabled = true;
+                    confirmBtn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Cancellazione...`;
+                    
+                    const updates = {};
+                    updates[`/indicePrenotazioni/${bookingId}`] = null;
+                    bookingData.orari.forEach(time => {
+                        const timeKey = time.replace(':', '-');
+                        updates[`/prenotazioni/${bookingData.data}/campo-${bookingData.campo}/${timeKey}`] = null;
+                    });
+
+                    try {
+                        await update(ref(database), updates);
+                        setStatus('success', 'Cancellazione Avvenuta!', 'La tua prenotazione è stata cancellata con successo.');
+                        detailsDiv.classList.add('hidden');
+                        confirmBtn.classList.add('hidden');
+                    } catch (cancellationError) {
+                        setStatus('error', 'Errore Inaspettato', 'Non è stato possibile completare la cancellazione. Riprova o contatta il circolo.');
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = 'Sì, Conferma Cancellazione';
+                        console.error("Errore durante la cancellazione:", cancellationError);
+                    }
+                });
+
+            } catch (error) {
+                setStatus('error', 'Errore Tecnico', 'Si è verificato un problema di connessione. Controlla la tua rete e riprova.');
+                backHomeBtn.classList.remove('hidden');
+                console.error("Errore nel recuperare la prenotazione:", error);
+            }
+        });
+    </script>
+</body>
+</html>
