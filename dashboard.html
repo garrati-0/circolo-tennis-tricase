@@ -120,7 +120,6 @@
         <div id="no-bookings">Nessuna prenotazione per questa data.</div>
     </div>
 
-    <!-- NUOVA SEZIONE: Pannello Gestione Ricorrenti -->
     <div class="container">
         <div class="recurring-bookings-panel">
             <h2>Gestione Prenotazioni Ricorrenti</h2>
@@ -167,7 +166,6 @@
         </div>
     </div>
 
-    <!-- NUOVA SEZIONE: Modale Prenotazione Manuale -->
     <div id="booking-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -191,6 +189,10 @@
                     <label for="manual-phone">Telefono</label>
                     <input type="tel" id="manual-phone" required>
                 </div>
+                
+                <button type="button" id="fill-placeholder-data" style="width: 100%; background-color: var(--colore-testo-secondario); color: white; padding: 8px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; margin-bottom: 15px;">
+                    <i class="fa-solid fa-user-check"></i> Usa dati generici (cliente senza email)
+                </button>
                 <button type="submit" class="submit-btn" style="width: 100%; background-color: var(--colore-successo); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;">Salva Prenotazione</button>
             </form>
         </div>
@@ -230,6 +232,10 @@
         const modalCloseBtn = bookingModal.querySelector('.close-btn');
         const manualBookingForm = document.getElementById('manual-booking-form');
         const modalTitle = document.getElementById('modal-title');
+        
+        // INIZIO MODIFICA: Riferimento al nuovo pulsante
+        const fillPlaceholderDataBtn = document.getElementById('fill-placeholder-data');
+        // FINE MODIFICA
 
         let currentDate = new Date();
         let currentBookingsListener = null;
@@ -303,7 +309,6 @@
                             deleteButtonHTML = `<button class="delete-btn" data-field="${fieldId}" data-time="${time.replace(':', '-')}" data-booking-id="${booking.bookingId || ''}" title="Cancella prenotazione"><i class="fa-solid fa-trash-can"></i></button>`;
                         }
 
-                        // <-- MODIFICA: Aggiunto campo email alla card -->
                         card.innerHTML = `
                             ${deleteButtonHTML}
                             <div class="booking-card-content">
@@ -353,9 +358,6 @@
 
         const listenToRecurringBookings = () => {
             const recurringRef = database.ref('prenotazioniRicorrenti');
-            // NOTA: Per rendere le prenotazioni ricorrenti effettivamente bloccanti per gli utenti,
-            // la stessa logica di lettura da 'prenotazioniRicorrenti' e blocco degli slot
-            // deve essere implementata anche nella pagina di prenotazione utente.
             recurringRef.on('value', (snapshot) => {
                 recurringBookings = snapshot.val() || {};
                 renderRecurringList();
@@ -386,66 +388,63 @@
         };
 
          calendarGrid.addEventListener('click', async (e) => {
-            const deleteBtn = e.target.closest('.delete-btn');
-            if (deleteBtn) {
-                const { field, time, bookingId } = deleteBtn.dataset;
-                const card = deleteBtn.closest('.booking-card');
-                const bookingName = card.querySelector('strong').textContent;
-                const timeToDeleteFormatted = time.replace('-', ':'); // Formato "HH:MM"
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                const { field, time, bookingId } = deleteBtn.dataset;
+                const card = deleteBtn.closest('.booking-card');
+                const bookingName = card.querySelector('strong').textContent;
+                const timeToDeleteFormatted = time.replace('-', ':');
 
-                if (confirm(`Sei sicuro di voler cancellare la prenotazione di ${bookingName} (${timeToDeleteFormatted})?`)) {
-                    card.style.opacity = '0.5';
-                    const dateString = currentDate.toISOString().split('T')[0];
-                    const bookingPath = `prenotazioni/${dateString}/${field}/${time}`; // Path dello slot specifico
-                    const indexPath = `indicePrenotazioni/${bookingId}`;
-                    const indexRef = database.ref(indexPath);
+                if (confirm(`Sei sicuro di voler cancellare la prenotazione di ${bookingName} (${timeToDeleteFormatted})?`)) {
+                    card.style.opacity = '0.5';
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
+                    const indexPath = `indicePrenotazioni/${bookingId}`;
+                    const indexRef = database.ref(indexPath);
 
-                    try {
-                        const indexSnapshot = await indexRef.once('value');
-                        const indexData = indexSnapshot.val();
-                        
-                        const updates = {};
-                        // Rimuove sempre lo slot orario specifico dalla vista del calendario
-                        updates[bookingPath] = null;
+                    try {
+                        const indexSnapshot = await indexRef.once('value');
+                        const indexData = indexSnapshot.val();
+                        
+                        const updates = {};
+                        updates[bookingPath] = null;
 
-                        if (indexData && indexData.orari && indexData.orari.length > 1) {
-                            // Caso 1: Prenotazione multi-ora. Rimuove solo un'ora dall'indice.
-                            const newOrari = indexData.orari.filter(t => t !== timeToDeleteFormatted);
-                            updates[`${indexPath}/orari`] = newOrari;
-                        } else {
-                            // Caso 2: Prenotazione singola o indice non trovato. Rimuove l'intera voce dell'indice.
-                            updates[indexPath] = null;
-                        }
+                        if (indexData && indexData.orari && indexData.orari.length > 1) {
+                            const newOrari = indexData.orari.filter(t => t !== timeToDeleteFormatted);
+                            updates[`${indexPath}/orari`] = newOrari;
+                        } else {
+                            updates[indexPath] = null;
+                        }
 
-                        await database.ref().update(updates);
-                        console.log('Cancellazione completata con successo.');
+                        await database.ref().update(updates);
+                        console.log('Cancellazione completata con successo.');
 
-                    } catch (error) {
-                        alert(`Errore durante la cancellazione: ${error.message}`);
-                        card.style.opacity = '1';
-                    }
-                }
-            }
+                    } catch (error) {
+                        alert(`Errore durante la cancellazione: ${error.message}`);
+                        card.style.opacity = '1';
+                    }
+                }
+            }
 
-            const emptySlot = e.target.closest('.time-slot.empty');
-            if (emptySlot) {
-                const { hour, field } = emptySlot.dataset;
-                
-                let minutes = '00';
-                if (field === '2') {
-                    minutes = '15';
-                } else if (field === '3') {
-                    minutes = '30';
-                }
-                const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
+            const emptySlot = e.target.closest('.time-slot.empty');
+            if (emptySlot) {
+                const { hour, field } = emptySlot.dataset;
+                
+                let minutes = '00';
+                if (field === '2') {
+                    minutes = '15';
+                } else if (field === '3') {
+                    minutes = '30';
+                }
+                const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
 
-                modalTitle.textContent = `Aggiungi Prenotazione - Campo ${field} ore ${timeString}`;
-                manualBookingForm.reset();
-                document.getElementById('manual-field').value = field;
-                document.getElementById('manual-time').value = timeString;
-                bookingModal.style.display = 'flex';
-            }
-        });
+                modalTitle.textContent = `Aggiungi Prenotazione - Campo ${field} ore ${timeString}`;
+                manualBookingForm.reset();
+                document.getElementById('manual-field').value = field;
+                document.getElementById('manual-time').value = timeString;
+                bookingModal.style.display = 'flex';
+            }
+        });
         
         prevDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() - 1); listenToBookingsForDate(); });
         nextDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() + 1); listenToBookingsForDate(); });
@@ -470,7 +469,6 @@
                 return;
             }
 
-            // <-- MODIFICA: Aggiunti dati fittizi per email e telefono -->
             const newRecurringBooking = {
                 giornoSettimana: document.getElementById('recurring-day').value,
                 orario: timeValue,
@@ -504,8 +502,15 @@
                 bookingModal.style.display = 'none';
             }
         });
+        
+        // INIZIO MODIFICA: Event listener per il nuovo pulsante
+        fillPlaceholderDataBtn.addEventListener('click', () => {
+            document.getElementById('manual-email').value = 'cliente@interno.it';
+            document.getElementById('manual-phone').value = '0000000000';
+        });
+        // FINE MODIFICA
 
- manualBookingForm.addEventListener('submit', async (e) => {
+    manualBookingForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = manualBookingForm.querySelector('.submit-btn');
         submitBtn.disabled = true;
@@ -517,9 +522,6 @@
         const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
         const bookingId = bookingRef.push().key;
 
-        // --- START OF MODIFICATION ---
-
-        // FIX 1: Trim whitespace from all input fields
         const bookingData = {
             bookingId: bookingId,
             nome: document.getElementById('manual-name').value.trim(),
@@ -540,12 +542,10 @@
             campo: field,
             orari: [time],
             nome: bookingData.nome,
-            cognome: bookingData.cognome, // FIX 2: Add the missing 'cognome' field
+            cognome: bookingData.cognome,
             email: bookingData.email,
             prenotatoIl: bookingData.prenotatoIl
         };
-
-        // --- END OF MODIFICATION ---
 
         try {
             await database.ref().update(updates);
