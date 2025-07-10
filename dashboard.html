@@ -385,53 +385,67 @@
             recurringListDiv.appendChild(ul);
         };
 
-        calendarGrid.addEventListener('click', async (e) => {
-            const deleteBtn = e.target.closest('.delete-btn');
-            if (deleteBtn) {
-                const { field, time, bookingId } = deleteBtn.dataset;
-                const card = deleteBtn.closest('.booking-card');
-                const bookingName = card.querySelector('strong').textContent;
+         calendarGrid.addEventListener('click', async (e) => {
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                const { field, time, bookingId } = deleteBtn.dataset;
+                const card = deleteBtn.closest('.booking-card');
+                const bookingName = card.querySelector('strong').textContent;
+                const timeToDeleteFormatted = time.replace('-', ':'); // Formato "HH:MM"
 
-                if (confirm(`Sei sicuro di voler cancellare la prenotazione di ${bookingName} (${time.replace('-',':')})?`)) {
-                    const dateString = currentDate.toISOString().split('T')[0];
-                    const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
-                    const indexPath = `indicePrenotazioni/${bookingId}`;
-                    
-                    try {
-                        card.style.opacity = '0.5';
-                        const updates = {};
-                        updates[bookingPath] = null;
-                        if (bookingId) { 
-                           updates[indexPath] = null;
-                        }
-                        await database.ref().update(updates);
-                        console.log(`Prenotazione e indice cancellati.`);
-                    } catch (error) {
-                        alert(`Errore durante la cancellazione: ${error.message}`);
-                        card.style.opacity = '1';
-                    }
-                }
-            }
+                if (confirm(`Sei sicuro di voler cancellare la prenotazione di ${bookingName} (${timeToDeleteFormatted})?`)) {
+                    card.style.opacity = '0.5';
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    const bookingPath = `prenotazioni/${dateString}/${field}/${time}`; // Path dello slot specifico
+                    const indexPath = `indicePrenotazioni/${bookingId}`;
+                    const indexRef = database.ref(indexPath);
 
-            const emptySlot = e.target.closest('.time-slot.empty');
-            if (emptySlot) {
-                const { hour, field } = emptySlot.dataset;
-                
-                let minutes = '00';
-                if (field === '2') {
-                    minutes = '15';
-                } else if (field === '3') {
-                    minutes = '30';
-                }
-                const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
+                    try {
+                        const indexSnapshot = await indexRef.once('value');
+                        const indexData = indexSnapshot.val();
+                        
+                        const updates = {};
+                        // Rimuove sempre lo slot orario specifico dalla vista del calendario
+                        updates[bookingPath] = null;
 
-                modalTitle.textContent = `Aggiungi Prenotazione - Campo ${field} ore ${timeString}`;
-                manualBookingForm.reset();
-                document.getElementById('manual-field').value = field;
-                document.getElementById('manual-time').value = timeString;
-                bookingModal.style.display = 'flex';
-            }
-        });
+                        if (indexData && indexData.orari && indexData.orari.length > 1) {
+                            // Caso 1: Prenotazione multi-ora. Rimuove solo un'ora dall'indice.
+                            const newOrari = indexData.orari.filter(t => t !== timeToDeleteFormatted);
+                            updates[`${indexPath}/orari`] = newOrari;
+                        } else {
+                            // Caso 2: Prenotazione singola o indice non trovato. Rimuove l'intera voce dell'indice.
+                            updates[indexPath] = null;
+                        }
+
+                        await database.ref().update(updates);
+                        console.log('Cancellazione completata con successo.');
+
+                    } catch (error) {
+                        alert(`Errore durante la cancellazione: ${error.message}`);
+                        card.style.opacity = '1';
+                    }
+                }
+            }
+
+            const emptySlot = e.target.closest('.time-slot.empty');
+            if (emptySlot) {
+                const { hour, field } = emptySlot.dataset;
+                
+                let minutes = '00';
+                if (field === '2') {
+                    minutes = '15';
+                } else if (field === '3') {
+                    minutes = '30';
+                }
+                const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
+
+                modalTitle.textContent = `Aggiungi Prenotazione - Campo ${field} ore ${timeString}`;
+                manualBookingForm.reset();
+                document.getElementById('manual-field').value = field;
+                document.getElementById('manual-time').value = timeString;
+                bookingModal.style.display = 'flex';
+            }
+        });
         
         prevDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() - 1); listenToBookingsForDate(); });
         nextDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() + 1); listenToBookingsForDate(); });

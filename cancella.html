@@ -110,7 +110,6 @@
     
     <script>
         // --- 1. CONFIGURAZIONE DI FIREBASE ---
-        // IMPORTANTE: Usa la stessa configurazione della pagina di prenotazione.
         const firebaseConfig = {
             apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
             authDomain: "ct-tricase.firebaseapp.com",
@@ -188,6 +187,7 @@
                 confirmBtn.style.display = 'block';
                 backHomeBtn.style.display = 'block';
 
+                // ### BLOCCO DI CODICE CORRETTO ###
                 confirmBtn.addEventListener('click', async () => {
                     confirmBtn.disabled = true;
                     confirmBtn.textContent = 'Cancellazione in corso...';
@@ -195,9 +195,11 @@
                     // Prepara un'unica operazione per cancellare da entrambi i posti (atomica)
                     const updates = {};
                     updates[`/indicePrenotazioni/${bookingId}`] = null; // Rimuovi dall'indice
+
                     bookingData.orari.forEach(time => {
-                        const timeKey = time.replace(':', '-'); // Firebase non ama i ':' nelle chiavi, anche se qui li abbiamo usati.
-                        updates[`/prenotazioni/${bookingData.data}/campo-${bookingData.campo}/${time}`] = null;
+                        const timeKey = time.replace(':', '-'); // Es: "09-00"
+                        // Usa `timeKey` per costruire il percorso corretto nel database.
+                        updates[`/prenotazioni/${bookingData.data}/campo-${bookingData.campo}/${timeKey}`] = null;
                     });
 
                     try {
