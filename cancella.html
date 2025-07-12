@@ -109,110 +109,94 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
     <script>
-        // --- 1. CONFIGURAZIONE DI FIREBASE ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
-            authDomain: "ct-tricase.firebaseapp.com",
-            databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "ct-tricase",
-            storageBucket: "ct-tricase.firebasestorage.app",
-            messagingSenderId: "931504527474",
-            appId: "1:931504527474:web:165880ec30f3785ff54aeb",
-            measurementId: "G-7M4D22L352"
-        };
+    // --- 1. CONFIGURAZIONE DI FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+        authDomain: "ct-tricase.firebaseapp.com",
+        databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "ct-tricase",
+        storageBucket: "ct-tricase.firebasestorage.app",
+        messagingSenderId: "931504527474",
+        appId: "1:931504527474:web:165880ec30f3785ff54aeb",
+        measurementId: "G-7M4D22L352"
+    };
 
-        // --- 2. INIZIALIZZAZIONE DI FIREBASE ---
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+    // --- 2. INIZIALIZZAZIONE DI FIREBASE ---
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-        // --- 3. RIFERIMENTI AL DOM ---
-        const iconWrapper = document.getElementById('icon-wrapper');
-        const statusTitle = document.getElementById('status-title');
-        const statusMessage = document.getElementById('status-message');
-        const detailsDiv = document.getElementById('booking-details');
-        const confirmBtn = document.getElementById('confirm-cancellation-btn');
-        const backHomeBtn = document.getElementById('back-home-btn');
+    // --- 3. RIFERIMENTI AL DOM ---
+    const iconWrapper = document.getElementById('icon-wrapper');
+    const statusTitle = document.getElementById('status-title');
+    const statusMessage = document.getElementById('status-message');
+    const detailsDiv = document.getElementById('booking-details');
+    const confirmBtn = document.getElementById('confirm-cancellation-btn');
+    const backHomeBtn = document.getElementById('back-home-btn');
 
-        // --- 4. FUNZIONE PER CAMBIARE STATO INTERFACCIA ---
-        function setStatus(status, title, message, iconClass) {
-            iconWrapper.className = `icon-wrapper ${status}`;
-            iconWrapper.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
-            statusTitle.textContent = title;
-            statusMessage.textContent = message;
+    // --- 4. FUNZIONE PER CAMBIARE STATO INTERFACCIA ---
+    function setStatus(status, title, message, iconClass) {
+        iconWrapper.className = `icon-wrapper ${status}`;
+        iconWrapper.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+        statusTitle.textContent = title;
+        statusMessage.textContent = message;
+    }
+
+    // --- 5. LOGICA PRINCIPALE ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        const params = new URLSearchParams(window.location.search);
+        const bookingId = params.get('id');
+
+        if (!bookingId) {
+            setStatus('error', 'Errore', 'ID prenotazione non trovato. Assicurati di usare il link corretto.', 'fa-xmark');
+            backHomeBtn.style.display = 'block';
+            return;
         }
 
-        // --- 5. LOGICA PRINCIPALE ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            const params = new URLSearchParams(window.location.search);
-            const bookingId = params.get('id');
+        try {
+            const indexRef = database.ref('indicePrenotazioni/' + bookingId);
+            const snapshot = await indexRef.once('value');
 
-            if (!bookingId) {
-                setStatus('error', 'Errore', 'ID prenotazione non trovato. Assicurati di usare il link corretto.', 'fa-xmark');
+            if (!snapshot.exists()) {
+                setStatus('error', 'Non Trovata', 'Questa prenotazione non esiste o è già stata cancellata.', 'fa-magnifying-glass');
                 backHomeBtn.style.display = 'block';
                 return;
             }
 
-            try {
-                const indexRef = database.ref('indicePrenotazioni/' + bookingId);
-                const snapshot = await indexRef.once('value');
+            const bookingData = snapshot.val();
+            
+            // Aggiunta dell'email ai dati recuperati per poterla usare dopo
+            bookingData.email = snapshot.val().email; 
 
-                if (!snapshot.exists()) {
-                    setStatus('error', 'Non Trovata', 'Questa prenotazione non esiste o è già stata cancellata.', 'fa-magnifying-glass');
-                    backHomeBtn.style.display = 'block';
-                    return;
-                }
+            const now = new Date();
+            const firstSlotTime = bookingData.orari.sort()[0];
+            const bookingDateTime = new Date(`${bookingData.data}T${firstSlotTime}`);
+            const cancellationDeadline = new Date(bookingDateTime.getTime() - 2 * 60 * 60 * 1000);
 
-                const bookingData = snapshot.val();
-                
-                // Verifica se la prenotazione è ancora cancellabile (fino a 2 ore prima)
-                const now = new Date();
-                const firstSlotTime = bookingData.orari.sort()[0]; // Prende il primo orario
-                const bookingDateTime = new Date(`${bookingData.data}T${firstSlotTime}`);
-                const cancellationDeadline = new Date(bookingDateTime.getTime() - 2 * 60 * 60 * 1000); // 2 ore prima
-
-                if (now > cancellationDeadline) {
-                    setStatus('error', 'Troppo Tardi', 'Il termine per la cancellazione (2 ore prima della partita) è scaduto. Non è più possibile cancellare questa prenotazione.', 'fa-clock');
-                    backHomeBtn.style.display = 'block';
-                    return;
-                }
-                
-                // Se la prenotazione è valida, mostra i dettagli e chiedi conferma
-                setStatus('loading', 'Conferma Cancellazione', `Ciao ${bookingData.nome}, sei sicuro di voler cancellare la seguente prenotazione?`, 'fa-trash-can');
-                detailsDiv.innerHTML = `
-                    <div><span>Data:</span> <strong>${new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(bookingData.data+"T00:00:00"))}</strong></div>
-                    <div><span>Campo:</span> <strong>${bookingData.campo}</strong></div>
-                    <div><span>Orari:</span> <strong>${bookingData.orari.join(', ')}</strong></div>
-                `;
-                detailsDiv.style.display = 'block';
-                confirmBtn.style.display = 'block';
+            if (now > cancellationDeadline) {
+                setStatus('error', 'Troppo Tardi', 'Il termine per la cancellazione (2 ore prima della partita) è scaduto.', 'fa-clock');
                 backHomeBtn.style.display = 'block';
+                return;
+            }
+            
+            setStatus('loading', 'Conferma Cancellazione', `Ciao ${bookingData.nome}, sei sicuro di voler cancellare la seguente prenotazione?`, 'fa-trash-can');
+            detailsDiv.innerHTML = `
+                <div><span>Data:</span> <strong>${new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(bookingData.data+"T00:00:00"))}</strong></div>
+                <div><span>Campo:</span> <strong>${bookingData.campo}</strong></div>
+                <div><span>Orari:</span> <strong>${bookingData.orari.join(', ')}</strong></div>
+            `;
+            detailsDiv.style.display = 'block';
+            confirmBtn.style.display = 'block';
+            backHomeBtn.style.display = 'block';
 
-                // ### BLOCCO DI CODICE CORRETTO ###
-                confirmBtn.addEventListener('click', async () => {
-                    confirmBtn.disabled = true;
-                    confirmBtn.textContent = 'Cancellazione in corso...';
-                    
-                    // Prepara un'unica operazione per cancellare da entrambi i posti (atomica)
-                    const updates = {};
-                    updates[`/indicePrenotazioni/${bookingId}`] = null; // Rimuovi dall'indice
-
-                    bookingData.orari.forEach(time => {
-                        const timeKey = time.replace(':', '-'); // Es: "09-00"
-                        // Usa `timeKey` per costruire il percorso corretto nel database.
-                        updates[`/prenotazioni/${bookingData.data}/campo-${bookingData.campo}/${timeKey}`] = null;
-                    });
-
-                    try {
-                        await database.ref().update(updates);
-                        setStatus('success', 'Cancellazione Avvenuta!', 'La tua prenotazione è stata cancellata con successo.', 'fa-circle-check');
-                        detailsDiv.style.display = 'none';
-                        confirmBtn.style.display = 'none';
-                    } catch (cancellationError) {
-                        setStatus('error', 'Errore Inaspettato', 'Non è stato possibile completare la cancellazione. Riprova o contatta il circolo.', 'fa-triangle-exclamation');
-                        confirmBtn.disabled = false;
-                        confirmBtn.textContent = 'Sì, Conferma Cancellazione';
-                        console.error("Errore durante la cancellazione:", cancellationError);
-                    }
+            confirmBtn.addEventListener('click', async () => {
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Cancellazione in corso...';
+                
+                const updates = {};
+                updates[`/indicePrenotazioni/${bookingId}`] = null;
+                bookingData.orari.forEach(time => {
+                    const timeKey = time.replace(':', '-');
+                    updates[`/prenotazioni/${bookingData.data}/campo-${bookingData.campo}/${timeKey}`] = null;
                 });
 
                 try {
@@ -222,7 +206,7 @@
                     // ### INIZIO BLOCCO AGGIUNTO PER INVIO EMAIL ###
                     
                     // 2. INVIO EMAIL DI CONFERMA CANCELLAZIONE
-                    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxF1kTnRp_sQCb_eqtpp6dO6IL7GoHLqVAtXzWGX8vDh9Ixg8fP2l42YlPJ13AeJUNb/exec"; // Usa lo stesso URL script
+                    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkWfsEKvYnIiZ0DF3E5q6rDMEGpBPi-7kgbT3Noj0tphkoSDJAA7DiFgMX752cvHVzFg/exec"; // Usa lo stesso URL script
                     const emailData = {
                         type: 'cancellation', // Aggiungi un tipo per distinguerla nello script
                         nome: bookingData.nome,
@@ -240,13 +224,28 @@
                     })
                     .then(() => console.log("Richiesta email di cancellazione inviata."))
                     .catch(err => console.error("Errore invio email:", err));
+                    
+                    // ### FINE BLOCCO AGGIUNTO ###
 
-            } catch (error) {
-                setStatus('error', 'Errore Tecnico', 'Si è verificato un problema di connessione. Controlla la tua rete e riprova.', 'fa-wifi');
-                backHomeBtn.style.display = 'block';
-                console.error("Errore nel recuperare la prenotazione:", error);
-            }
-        });
-    </script>
+                    // 3. AGGIORNAMENTO INTERFACCIA UTENTE
+                    setStatus('success', 'Cancellazione Avvenuta!', 'La prenotazione è stata cancellata. A breve riceverai un\'email di conferma.', 'fa-circle-check');
+                    detailsDiv.style.display = 'none';
+                    confirmBtn.style.display = 'none';
+
+                } catch (cancellationError) {
+                    setStatus('error', 'Errore Inaspettato', 'Non è stato possibile completare la cancellazione. Riprova o contatta il circolo.', 'fa-triangle-exclamation');
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Sì, Conferma Cancellazione';
+                    console.error("Errore durante la cancellazione:", cancellationError);
+                }
+            });
+
+        } catch (error) {
+            setStatus('error', 'Errore Tecnico', 'Si è verificato un problema di connessione. Controlla la tua rete e riprova.', 'fa-wifi');
+            backHomeBtn.style.display = 'block';
+            console.error("Errore nel recuperare la prenotazione:", error);
+        }
+    });
+</script>
 </body>
 </html>
