@@ -1,5 +1,6 @@
 # circolo-tennis-tricase
 
-manda email
-cancellare ora tramite id max 2 ore prima
-script per prenotare in automatico delle ore in determinati giorn
+manda mail dopo cancellazione
+manda mail anche dalla dashboard
+dashboard tramite password
+togliere ore 13 e 14

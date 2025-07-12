@@ -510,53 +510,88 @@
         });
         // FINE MODIFICA
 
-    manualBookingForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitBtn = manualBookingForm.querySelector('.submit-btn');
-        submitBtn.disabled = true;
+  manualBookingForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = manualBookingForm.querySelector('.submit-btn');
+    submitBtn.disabled = true;
 
-        const field = document.getElementById('manual-field').value;
-        const time = document.getElementById('manual-time').value;
-        const dateString = currentDate.toISOString().split('T')[0];
+    // Dati dal form manuale
+    const field = document.getElementById('manual-field').value;
+    const time = document.getElementById('manual-time').value;
+    const dateString = currentDate.toISOString().split('T')[0];
+    
+    // Creazione ID unico e dati di prenotazione
+    const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
+    const bookingId = bookingRef.push().key;
+
+    const bookingData = {
+        bookingId: bookingId,
+        nome: document.getElementById('manual-name').value.trim(),
+        cognome: document.getElementById('manual-surname').value.trim(),
+        email: document.getElementById('manual-email').value.trim(),
+        telefono: document.getElementById('manual-phone').value.trim(),
+        prenotatoIl: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    // Preparazione per l'aggiornamento atomico del database
+    const timeKey = time.replace(':', '-');
+    const bookingPath = `prenotazioni/${dateString}/campo-${field}/${timeKey}`;
+    const indexPath = `indicePrenotazioni/${bookingId}`;
+    
+    const updates = {};
+    updates[bookingPath] = bookingData;
+    updates[indexPath] = {
+        data: dateString,
+        campo: field,
+        orari: [time], // Mantenuto come array per coerenza con l'indice
+        nome: bookingData.nome,
+        cognome: bookingData.cognome,
+        email: bookingData.email,
+        prenotatoIl: bookingData.prenotatoIl
+    };
+
+    try {
+        // 1. Salvataggio della prenotazione nel database
+        await database.ref().update(updates);
         
-        const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
-        const bookingId = bookingRef.push().key;
+        // --- INIZIO BLOCCO AGGIUNTO PER INVIO EMAIL ---
 
-        const bookingData = {
-            bookingId: bookingId,
-            nome: document.getElementById('manual-name').value.trim(),
-            cognome: document.getElementById('manual-surname').value.trim(),
-            email: document.getElementById('manual-email').value.trim(),
-            telefono: document.getElementById('manual-phone').value.trim(),
-            prenotatoIl: firebase.database.ServerValue.TIMESTAMP
-        };
-
-        const timeKey = time.replace(':', '-');
-        const bookingPath = `prenotazioni/${dateString}/campo-${field}/${timeKey}`;
-        const indexPath = `indicePrenotazioni/${bookingId}`;
+        // 2. Preparazione e invio dell'email di conferma
+        const CANCELLATION_PAGE_URL = "cancella.html"; 
+        const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkWfsEKvYnIiZ0DF3E5q6rDMEGpBPi-7kgbT3Noj0tphkoSDJAA7DiFgMX752cvHVzFg/exec";
         
-        const updates = {};
-        updates[bookingPath] = bookingData;
-        updates[indexPath] = {
-            data: dateString,
-            campo: field,
-            orari: [time],
+        const emailData = {
             nome: bookingData.nome,
-            cognome: bookingData.cognome,
             email: bookingData.email,
-            prenotatoIl: bookingData.prenotatoIl
+            data: new Date(dateString).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }), // Formatta la data per l'email
+            campo: field,
+            orari: time, // Nella prenotazione manuale c'è un solo orario
+            id: bookingId,
+            linkCancellazione: cancellationLink
         };
+        
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Importante per evitare problemi CORS con Google Scripts
+            body: JSON.stringify(emailData),
+            headers: { 'Content-Type': 'application/json' },
+        })
+        .then(() => console.log("Richiesta di invio email per la prenotazione manuale partita con successo."))
+        .catch(error => console.error("Errore nell'invio della richiesta allo script:", error));
 
-        try {
-            await database.ref().update(updates);
-            alert('Prenotazione salvata con successo!');
-            bookingModal.style.display = 'none';
-        } catch (error) {
-            alert('Errore nel salvataggio: ' + error.message);
-        } finally {
-            submitBtn.disabled = false;
-        }
-    });
+        // --- FINE BLOCCO AGGIUNTO ---
+
+        // 3. Feedback all'utente
+        alert('Prenotazione salvata con successo e email di conferma inviata!');
+        bookingModal.style.display = 'none';
+
+    } catch (error) {
+        alert('Errore nel salvataggio: ' + error.message);
+    } finally {
+        submitBtn.disabled = false;
+    }
+});
 
     listenToRecurringBookings();
 });

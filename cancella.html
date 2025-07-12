@@ -215,6 +215,32 @@
                     }
                 });
 
+                try {
+                    // 1. CANCELLAZIONE DAL DATABASE
+                    await database.ref().update(updates);
+                    
+                    // ### INIZIO BLOCCO AGGIUNTO PER INVIO EMAIL ###
+                    
+                    // 2. INVIO EMAIL DI CONFERMA CANCELLAZIONE
+                    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxF1kTnRp_sQCb_eqtpp6dO6IL7GoHLqVAtXzWGX8vDh9Ixg8fP2l42YlPJ13AeJUNb/exec"; // Usa lo stesso URL script
+                    const emailData = {
+                        type: 'cancellation', // Aggiungi un tipo per distinguerla nello script
+                        nome: bookingData.nome,
+                        email: bookingData.email, // Usa l'email recuperata
+                        data: new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(bookingData.data+"T00:00:00")),
+                        campo: bookingData.campo,
+                        orari: bookingData.orari.join(', ')
+                    };
+
+                    fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify(emailData),
+                        headers: { 'Content-Type': 'application/json' },
+                    })
+                    .then(() => console.log("Richiesta email di cancellazione inviata."))
+                    .catch(err => console.error("Errore invio email:", err));
+
             } catch (error) {
                 setStatus('error', 'Errore Tecnico', 'Si è verificato un problema di connessione. Controlla la tua rete e riprova.', 'fa-wifi');
                 backHomeBtn.style.display = 'block';
