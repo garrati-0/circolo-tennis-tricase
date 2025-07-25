@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<!-- The 'dark' class is added here to set the default theme to dark -->
+<html lang="it" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prenotazione Campo - C.T. Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        // Configure Tailwind CSS for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        /* Base styles for body */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            isolation: isolate;
+        }
+
+        /* Light Theme base styles */
+        body {
+            background-color: #F5F5F5; /* Light gray background */
+            color: #1f2937; /* Dark gray text */
+        }
+
+        /* Dark Theme styles */
+        .dark body {
+            background-color: #141414;
+            color: #F0F0F0;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Animated background glow for dark mode */
+        @keyframes move-glow {
+            0% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+            50% { transform: translate(60vw, 80vh) scale(2); background-color: #C4D831; }
+            100% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+        }
+
+        .dark body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 50vmax; height: 50vmax;
+            border-radius: 50%;
+            background-color: #B3544C;
+            opacity: 0.1;
+            filter: blur(120px);
+            z-index: -1;
+            animation: move-glow 25s linear infinite;
+            will-change: transform;
+        }
+
+        .font-display { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: -0.05em; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+
+        /* Custom Color Classes */
+        .bg-terra-light { background-color: #D95D51; }
+        .text-terra-light { color: #B9473B; }
+        .border-terra-light { border-color: #B9473B; }
+        .bg-verde-light { background-color: #AEC521; }
+        .text-verde-light { color: #88A009; }
+        .border-verde-light { border-color: #88A009; }
+        .text-verde { color: #C4D831; }
+        .dark .bg-terra { background-color: #B3544C; }
+        .dark .text-terra { color: #B3544C; }
+        .dark .border-terra { border-color: #B3544C; }
+        .dark .bg-verde { background-color: #C4D831; }
+        .dark .border-verde { border-color: #C4D831; }
+
+        /* Styles for dynamic booking elements */
+        .time-slot.selected, .date-option.selected, .field-option.selected {
+            background-color: #AEC521; /* verde-light */
+            border-color: #88A009; /* border-verde-light */
+            color: #141414;
+            transform: scale(1.05);
+        }
+        .dark .time-slot.selected, .dark .date-option.selected, .dark .field-option.selected {
+            background-color: #C4D831; /* verde */
+            border-color: #C4D831; /* border-verde */
+            color: #141414;
+        }
+        .time-slot.unavailable {
+            background-color: #D95D51 !important; /* terra-light */
+            border-color: #B9473B !important; /* border-terra-light */
+            color: white !important;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        .dark .time-slot.unavailable {
+            background-color: #B3544C !important; /* terra */
+            border-color: #B3544C !important; /* border-terra */
+        }
+        .time-slot.recurring {
+            background-color: #f59e0b !important; /* amber-500 */
+            border-color: #d97706 !important; /* amber-600 */
+            color: #141414 !important;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header Fisso -->
+    <header class="fixed top-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/20 dark:border-white/10 text-zinc-800 dark:text-white">
+            <a href="index.html" class="font-mono text-lg font-bold">C.T. TRICASE</a>
+            <a href="index.html" class="bg-verde-light dark:bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">TORNA ALLA HOME</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pt-28 pb-12">
+        <div id="booking-container">
+            <div class="text-center mb-12">
+                <h1 class="font-display text-5xl sm:text-6xl text-zinc-900 dark:text-white">Effettua una <span class="text-verde-light dark:text-verde">Prenotazione</span></h1>
+                <p class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400">
+                    Seleziona data, campo e orario. La disponibilità è aggiornata in tempo reale.
+                </p>
+                 <p class="font-mono text-xs max-w-2xl mx-auto mt-2 text-terra-light dark:text-terra">
+                    Limite massimo di 2 ore prenotabili a settimana per utente.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <!-- Selection Panel -->
+                <div class="lg:col-span-2 bg-white/30 dark:bg-black/30 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-white/20 dark:border-white/10">
+                    <!-- Step 1: Date -->
+                    <div class="mb-8">
+                        <h2 class="font-mono text-2xl font-bold mb-4 border-b border-gray-300 dark:border-zinc-700 pb-2">1. Seleziona la Data</h2>
+                        <div class="flex flex-wrap gap-3" id="date-picker">
+                            <!-- Date options will be generated by JS -->
+                        </div>
+                    </div>
+                    <!-- Step 2: Field -->
+                    <div class="mb-8">
+                        <h2 class="font-mono text-2xl font-bold mb-4 border-b border-gray-300 dark:border-zinc-700 pb-2">2. Seleziona il Campo</h2>
+                        <div class="grid grid-cols-3 gap-3" id="field-selector">
+                            <div class="field-option text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent" data-field="1">Campo 1</div>
+                            <div class="field-option text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent" data-field="2">Campo 2</div>
+                            <div class="field-option text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent" data-field="3">Campo 3</div>
+                        </div>
+                    </div>
+                    <!-- Step 3: Time -->
+                    <div>
+                        <h2 class="font-mono text-2xl font-bold mb-4 border-b border-gray-300 dark:border-zinc-700 pb-2">3. Seleziona l'Orario</h2>
+                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-3" id="time-slots">
+                            <!-- Time slots will be generated by JS -->
+                        </div>
+                        <div class="flex flex-wrap gap-x-6 gap-y-2 mt-6 pt-4 border-t border-gray-300 dark:border-zinc-700 text-sm text-gray-600 dark:text-gray-400">
+                            <div class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-terra-light dark:bg-terra"></span> Prenotato</div>
+                            <div class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-amber-500"></span> Corsi</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Panel -->
+                <div id="summary-panel" class="lg:col-span-1 bg-white/30 dark:bg-black/30 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-white/20 dark:border-white/10 sticky top-24">
+                    <h2 class="font-mono text-2xl font-bold mb-4">Riepilogo e Prezzi</h2>
+                    
+                    <!-- Price List -->
+                    <div class="mb-6">
+                        <h3 class="font-mono text-lg font-bold mb-3 text-verde-light dark:text-verde">Listino Prezzi Orari</h3>
+                        <table class="w-full text-sm text-left">
+                            <thead class="font-bold bg-gray-200 dark:bg-zinc-800">
+                                <tr>
+                                    <th class="p-2 rounded-tl-lg"></th>
+                                    <th class="p-2 text-center">Senza Luci</th>
+                                    <th class="p-2 text-center rounded-tr-lg">Con Luci</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-300 dark:border-zinc-700">
+                                    <td class="p-2 font-bold">Soci</td>
+                                    <td class="p-2 text-center">€10</td>
+                                    <td class="p-2 text-center">€15</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">Non Soci</td>
+                                    <td class="p-2 text-center">€15</td>
+                                    <td class="p-2 text-center">€20</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Booking Summary -->
+                    <div id="booking-summary" class="hidden font-mono space-y-2 text-sm">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-300 dark:border-zinc-700">
+                            <span class="text-gray-500 dark:text-gray-400">Data</span>
+                            <span class="font-bold" id="summary-date">-</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-300 dark:border-zinc-700">
+                            <span class="text-gray-500 dark:text-gray-400">Campo</span>
+                            <span class="font-bold" id="summary-field">-</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-gray-500 dark:text-gray-400">Orari</span>
+                            <span class="font-bold text-right" id="summary-time">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <form id="booking-form" novalidate class="hidden mt-6">
+                        <div class="space-y-4">
+                            <div class="relative"><i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="name" name="Nome" placeholder="Nome" required class="w-full bg-gray-200 dark:bg-zinc-800 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-verde-light dark:focus:border-verde transition"></div>
+                            <div class="relative"><i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="surname" name="Cognome" placeholder="Cognome" required class="w-full bg-gray-200 dark:bg-zinc-800 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-verde-light dark:focus:border-verde transition"></div>
+                            <div class="relative"><i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="email" id="email" name="Email" placeholder="Email" required class="w-full bg-gray-200 dark:bg-zinc-800 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-verde-light dark:focus:border-verde transition"></div>
+                            <div class="relative"><i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="tel" id="phone" name="Telefono" placeholder="Numero di Telefono" required class="w-full bg-gray-200 dark:bg-zinc-800 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-verde-light dark:focus:border-verde transition"></div>
+                            
+                            <div class="flex items-start space-x-3 text-xs text-gray-500 dark:text-gray-400">
+                                <input type="checkbox" id="certificato" name="certificato" required class="mt-1 accent-verde-light dark:accent-verde">
+                                <label for="certificato">Dichiaro di essere in possesso di un certificato medico valido per l'attività sportiva non agonistica.</label>
+                            </div>
+                            <div class="flex items-start space-x-3 text-xs text-gray-500 dark:text-gray-400">
+                                <input type="checkbox" id="privacy" name="privacy" required class="mt-1 accent-verde-light dark:accent-verde">
+                                <label for="privacy">Acconsento al trattamento dei dati personali secondo la <a href="/privacy.html" target="_blank" class="text-verde-light dark:text-verde hover:underline">privacy policy</a>.</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn w-full mt-6 bg-verde-light dark:bg-verde text-black font-bold py-3 px-8 rounded-xl hover:opacity-80 transition-opacity disabled:bg-gray-500 dark:disabled:bg-zinc-700 disabled:cursor-wait">Conferma Prenotazione</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Message -->
+        <div class="text-center py-20 hidden" id="confirmation-container">
+             <div class="bg-white/30 dark:bg-black/30 backdrop-blur-md p-10 rounded-2xl border border-white/20 dark:border-white/10 max-w-3xl mx-auto">
+                <div class="w-20 h-20 mx-auto mb-6 bg-verde-light/20 dark:bg-verde/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-circle-check text-4xl text-verde-light dark:text-verde"></i>
+                </div>
+                <h1 class="font-display text-4xl sm:text-5xl text-zinc-900 dark:text-white">Grazie!</h1>
+                <p id="confirmation-message" class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400"></p>
+             </div>
+        </div>
+    </main>
+
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed bottom-5 right-5 z-50 bg-gray-500/20 dark:bg-zinc-700/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-500/40 dark:hover:bg-zinc-600/60 transition-colors">
+        <svg id="theme-toggle-sun" class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg id="theme-toggle-moon" class="w-6 h-6 text-slate-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+    
+    <!-- Custom Modal for Alerts -->
+    <div id="alert-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <p id="alert-modal-message" class="mb-6 text-zinc-800 dark:text-zinc-200"></p>
+            <button id="alert-modal-close" class="bg-terra-light dark:bg-terra text-white font-bold py-2 px-6 rounded-lg hover:opacity-80 transition-opacity">Chiudi</button>
+        </div>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <script>
+    // --- THEME TOGGLE SCRIPT ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('theme-toggle-sun');
+    const moonIcon = document.getElementById('theme-toggle-moon');
+    const htmlEl = document.documentElement;
+
+    function toggleIcons() {
+        sunIcon.classList.toggle('hidden');
+        moonIcon.classList.toggle('hidden');
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('theme') === 'light') {
+            htmlEl.classList.remove('dark');
+            toggleIcons();
+        } else {
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+    });
+
+    themeToggleBtn.addEventListener('click', () => {
+        htmlEl.classList.toggle('dark');
+        toggleIcons();
+        localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // --- CUSTOM MODAL SCRIPT ---
+    const alertModal = document.getElementById('alert-modal');
+    const alertModalMessage = document.getElementById('alert-modal-message');
+    const alertModalClose = document.getElementById('alert-modal-close');
+
+    function showModal(message) {
+        alertModalMessage.textContent = message;
+        alertModal.classList.remove('hidden');
+    }
+
+    alertModalClose.addEventListener('click', () => {
+        alertModal.classList.add('hidden');
+    });
+    
+    // --- BOOKING FUNCTIONALITY SCRIPT ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+            authDomain: "ct-tricase.firebaseapp.com",
+            databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ct-tricase",
+            storageBucket: "ct-tricase.appspot.com",
+            messagingSenderId: "931504527474",
+            appId: "1:931504527474:web:165880ec30f3785ff54aeb",
+            measurementId: "G-7M4D22L352"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        const datePicker = document.getElementById('date-picker');
+        const fieldSelector = document.getElementById('field-selector');
+        const timeSlotsContainer = document.getElementById('time-slots');
+        const summaryDiv = document.getElementById('booking-summary');
+        const form = document.getElementById('booking-form');
+        const summaryPanel = document.getElementById('summary-panel');
+        const summaryDate = document.getElementById('summary-date');
+        const summaryField = document.getElementById('summary-field');
+        const summaryTime = document.getElementById('summary-time');
+        
+        const booking = { date: null, field: '1', timeSlots: [] };
+        let unavailableSlots = [];
+        let recurringBookings = {};
+
+        const renderDatePicker = () => {
+            datePicker.innerHTML = '';
+            const today = new Date();
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() + i);
+                const dateValue = date.toISOString().split('T')[0];
+                const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
+                const dayNum = date.getDate();
+                const option = document.createElement('div');
+                option.className = 'date-option flex-grow text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent';
+                option.dataset.date = dateValue;
+                option.innerHTML = `<div class="text-xs uppercase text-gray-500 dark:text-gray-400">${dayName}</div><div class="text-2xl">${dayNum}</div>`;
+                if (i === 0) {
+                    booking.date = dateValue;
+                    option.classList.add('selected');
+                }
+                datePicker.appendChild(option);
+                // If the current day is Sunday (getDay() === 0), stop adding more days.
+                if (date.getDay() === 0) {
+                    break;
+                }
+            }
+        };
+
+        const renderTimeSlots = () => {
+            timeSlotsContainer.innerHTML = '';
+            if (!booking.date) return;
+
+            let minuteOffset = 0;
+            if (booking.field === '2') minuteOffset = 15;
+            else if (booking.field === '3') minuteOffset = 30;
+
+            const selectedDate = new Date(booking.date + "T00:00:00");
+            const selectedDayOfWeek = selectedDate.getDay(); 
+
+            for (let hour = 8; hour < 22; hour++) {
+                const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
+                const slot = document.createElement('div');
+                slot.className = 'time-slot text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent';
+                slot.dataset.time = time;
+                slot.textContent = time;
+
+                const isRegularlyBooked = unavailableSlots.includes(time);
+
+                let isRecurringlyBooked = false;
+                for (const key in recurringBookings) {
+                    const rb = recurringBookings[key];
+                    if (parseInt(rb.giornoSettimana) === selectedDayOfWeek && rb.campo === booking.field && rb.orario === time) {
+                        isRecurringlyBooked = true;
+                        break;
+                    }
+                }
+
+                if (isRecurringlyBooked) {
+                    slot.classList.add('recurring');
+                } else if (isRegularlyBooked) {
+                    slot.classList.add('unavailable');
+                }
+
+                if (booking.timeSlots.includes(time)) {
+                    slot.classList.add('selected');
+                }
+                timeSlotsContainer.appendChild(slot);
+            }
+        };
+
+        const updateSummary = () => {
+            if (booking.date) {
+                summaryDate.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(booking.date + "T00:00:00"));
+            }
+            summaryField.textContent = `Campo ${booking.field}`;
+            summaryTime.textContent = booking.timeSlots.length > 0 ? booking.timeSlots.sort().join(', ') : '-';
+            
+            if (booking.timeSlots.length > 0) {
+                summaryDiv.classList.remove('hidden');
+                form.classList.remove('hidden');
+            } else {
+                summaryDiv.classList.add('hidden');
+                form.classList.add('hidden');
+            }
+        };
+
+        const listenForBookings = () => {
+            if (!booking.date || !booking.field) return;
+            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+            
+            bookingsRef.on('value', (snapshot) => {
+                const bookingsData = snapshot.val();
+                unavailableSlots = []; 
+                if (bookingsData) {
+                    for(const time in bookingsData) {
+                        if(bookingsData[time]) {
+                            unavailableSlots.push(time.replace('-',':'));
+                        }
+                    }
+                }
+                renderTimeSlots();
+            });
+        };
+
+        const listenToRecurringBookings = () => {
+            const recurringRef = database.ref('prenotazioniRicorrenti');
+            recurringRef.on('value', (snapshot) => {
+                recurringBookings = snapshot.val() || {};
+                renderTimeSlots();
+            });
+        };
+
+        datePicker.addEventListener('click', e => {
+            const target = e.target.closest('.date-option');
+            if (!target || target.classList.contains('selected')) return;
+            
+            database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`).off();
+            
+            datePicker.querySelector('.selected').classList.remove('selected');
+            target.classList.add('selected');
+            booking.date = target.dataset.date;
+            booking.timeSlots = [];
+            
+            listenForBookings(); 
+            updateSummary();
+        });
+
+        fieldSelector.addEventListener('click', e => {
+            const target = e.target.closest('.field-option');
+            if (!target || target.classList.contains('selected')) return;
+
+            database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`).off();
+
+            fieldSelector.querySelector('.selected').classList.remove('selected');
+            target.classList.add('selected');
+            booking.field = target.dataset.field;
+            booking.timeSlots = [];
+            
+            listenForBookings();
+            updateSummary();
+        });
+
+        timeSlotsContainer.addEventListener('click', e => {
+            const target = e.target.closest('.time-slot');
+            if (!target || target.classList.contains('unavailable') || target.classList.contains('recurring')) return;
+            
+            const time = target.dataset.time;
+            const index = booking.timeSlots.indexOf(time);
+            
+            if (index > -1) {
+                booking.timeSlots.splice(index, 1);
+                target.classList.remove('selected');
+            } else {
+                if (booking.timeSlots.length >= 2) {
+                    showModal("Puoi selezionare al massimo 2 ore.");
+                    return;
+                }
+                const isFirstSelection = booking.timeSlots.length === 0;
+                booking.timeSlots.push(time);
+                target.classList.add('selected');
+                if (isFirstSelection) {
+                    setTimeout(() => {
+                        summaryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                }
+            }
+            updateSummary();
+        });
+
+        async function checkWeeklyBookingLimit(email) {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const firstDayOfWeek = new Date(today);
+            firstDayOfWeek.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            firstDayOfWeek.setHours(0, 0, 0, 0);
+
+            const lastDayOfWeek = new Date(firstDayOfWeek);
+            lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+            lastDayOfWeek.setHours(23, 59, 59, 999);
+
+            const firstDayISO = firstDayOfWeek.toISOString().split('T')[0];
+            const lastDayISO = lastDayOfWeek.toISOString().split('T')[0];
+
+            let totalHoursThisWeek = 0;
+            const indexRef = database.ref('indicePrenotazioni');
+            
+            const snapshot = await indexRef.orderByChild('email').equalTo(email).once('value');
+            
+            if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    const bookingData = childSnapshot.val();
+                    if (bookingData.data >= firstDayISO && bookingData.data <= lastDayISO) {
+                        totalHoursThisWeek += bookingData.orari.length;
+                    }
+                });
+            }
+            return totalHoursThisWeek;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !form.Email.value.trim() || !form.Telefono.value.trim()) {
+                showModal("Per favore, compila tutti i campi anagrafici.");
+                return;
+            }
+            if (!form.certificato.checked) {
+                showModal("Devi dichiarare di essere in possesso di un certificato medico valido.");
+                return;
+            }
+            if (!form.privacy.checked) {
+                showModal("Devi accettare il trattamento dei dati personali.");
+                return;
+            }
+
+            const submitBtn = form.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verifica in corso...';
+
+            const bookedHours = await checkWeeklyBookingLimit(form.Email.value);
+            const hoursToBook = booking.timeSlots.length;
+
+            if (bookedHours + hoursToBook > 2) {
+                showModal(`Hai già prenotato ${bookedHours} ore questa settimana. Non puoi superare il limite di 2 ore settimanali.`);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Conferma Prenotazione';
+                return;
+            }
+
+            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+            const bookingId = database.ref().push().key;
+            
+            const userData = {
+                bookingId: bookingId,
+                nome: form.Nome.value,
+                cognome: form.Cognome.value,
+                email: form.Email.value,
+                telefono: form.Telefono.value,
+                prenotatoIl: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            bookingsRef.transaction((currentData) => {
+                if (currentData === null) currentData = {};
+                const isSlotTaken = booking.timeSlots.some(slot => currentData[slot.replace(':', '-')]);
+                if (isSlotTaken) {
+                    return; 
+                }
+                booking.timeSlots.forEach(slot => {
+                    currentData[slot.replace(':', '-')] = userData;
+                });
+                return currentData;
+            }, (error, committed, snapshot) => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Conferma Prenotazione';
+
+                if (error) {
+                    console.error('Transazione fallita:', error);
+                    showModal('Si è verificato un errore tecnico. Riprova.');
+                } else if (!committed) {
+                    showModal('Spiacente, uno degli orari scelti è stato appena prenotato! La lista si è aggiornata.');
+                } else {
+                    const bookingIndexRef = database.ref('indicePrenotazioni/' + bookingId);
+                    bookingIndexRef.set({
+                        nome: userData.nome,
+                        cognome: userData.cognome,
+                        email: userData.email,
+                        data: booking.date,
+                        campo: booking.field,
+                        orari: booking.timeSlots,
+                        prenotatoIl: userData.prenotatoIl
+                    }).then(() => {
+                        console.log('Prenotazione e indice salvati! ID:', bookingId);
+                        
+                        document.getElementById('booking-container').style.display = 'none';
+                        const confirmationContainer = document.getElementById('confirmation-container');
+                        confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
+                        document.getElementById('confirmation-message').innerHTML = `La tua richiesta di prenotazione (ID: <strong>${bookingId}</strong>) per il <strong>Campo ${booking.field}</strong> il giorno <strong>${summaryDate.textContent}</strong> alle ore <strong>${booking.timeSlots.sort().join(', ')}</strong> è stata confermata. A breve riceverai una mail di riepilogo.`;
+                        confirmationContainer.classList.remove('hidden');
+
+                        const CANCELLATION_PAGE_URL = "cancella.html"; 
+                        const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
+                        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkWfsEKvYnIiZ0DF3E5q6rDMEGpBPi-7kgbT3Noj0tphkoSDJAA7DiFgMX752cvHVzFg/exec";
+                        
+                        const emailData = {
+                            nome: form.Nome.value,
+                            email: form.Email.value,
+                            data: summaryDate.textContent,
+                            campo: booking.field,
+                            orari: booking.timeSlots.sort().join(', '),
+                            id: bookingId,
+                            linkCancellazione: cancellationLink
+                        };
+                        
+                        fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            body: JSON.stringify(emailData),
+                            headers: { 'Content-Type': 'application/json' },
+                        })
+                        .then(() => console.log("Richiesta invio email partita."))
+                        .catch(error => console.error("Errore nell'invio della richiesta allo script:", error));
+
+                    }).catch(indexError => {
+                        console.error("Errore critico: impossibile salvare l'indice della prenotazione.", indexError);
+                        showModal("Si è verificato un errore grave. La tua prenotazione potrebbe non essere cancellabile. Contatta l'assistenza.");
+                    });
+                }
+            });
+        });
+
+        // --- INITIAL EXECUTION ---
+        renderDatePicker();
+        fieldSelector.querySelector('.field-option[data-field="1"]').classList.add('selected');
+        listenToRecurringBookings(); 
+        listenForBookings();
+        updateSummary();
+    });
+    </script>
+</body>
+</html>
