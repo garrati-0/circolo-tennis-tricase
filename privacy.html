@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!-- The 'dark' class is added here to set the default theme to dark -->
+<html lang="it" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy e Regolamento - Circolo Tennis Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+        // Configure Tailwind CSS for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        /* Base styles are inherited for consistency */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            isolation: isolate;
+        }
+        body {
+            background-color: #F5F5F5;
+            color: #1f2937;
+            background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .dark body {
+            background-color: #141414;
+            color: #F0F0F0;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes move-glow {
+            0% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+            50% { transform: translate(60vw, 80vh) scale(2); background-color: #C4D831; }
+            100% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+        }
+        .dark body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 50vmax; height: 50vmax;
+            border-radius: 50%; background-color: #B3544C; opacity: 0.1; filter: blur(120px);
+            z-index: -1; animation: move-glow 25s linear infinite; will-change: transform;
+        }
+        .font-display { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: -0.05em; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .bg-terra-light { background-color: #D95D51; }
+        .text-terra-light { color: #B9473B; }
+        .bg-verde-light { background-color: #AEC521; }
+        .text-verde-light { color: #88A009; }
+        .text-verde { color: #C4D831; }
+        .dark .bg-terra { background-color: #B3544C; }
+        .dark .text-terra { color: #B3544C; }
+        .dark .bg-verde { background-color: #C4D831; }
+        
+        /* Styles for policy content */
+        .policy-content h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            font-size: 1.875rem; /* text-3xl */
+            margin-bottom: 1rem;
+        }
+        .policy-content h3 {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            font-size: 1.25rem; /* text-xl */
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid;
+        }
+        .dark .policy-content h3 {
+            border-color: #404040; /* zinc-700 */
+        }
+        .policy-content p, .policy-content li {
+            margin-bottom: 1rem;
+            line-height: 1.75;
+        }
+        .policy-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+        .policy-content a {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed bottom-5 right-5 z-50 bg-gray-500/20 dark:bg-zinc-700/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-500/40 dark:hover:bg-zinc-600/60 transition-colors">
+        <svg id="theme-toggle-sun" class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg id="theme-toggle-moon" class="w-6 h-6 text-slate-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/20 dark:border-white/10 text-zinc-800 dark:text-white">
+            <a href="index.html" class="font-mono text-lg font-bold hover:text-verde-light dark:hover:text-verde transition-colors">C.T. TRICASE</a>
+            <a href="index.html" class="bg-verde-light dark:bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">TORNA ALLA HOME</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pb-12 pt-24 md:pt-32">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h1 class="font-display text-4xl sm:text-5xl text-zinc-900 dark:text-white">Privacy Policy e Regolamento</h1>
+                <p class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400">
+                    La tua privacy e il rispetto delle regole sono importanti per noi.
+                </p>
+            </div>
+            
+            <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 md:p-12 shadow-lg policy-content text-gray-700 dark:text-gray-300">
+                <!-- Privacy Policy Section -->
+                <section id="privacy-policy">
+                    <h2 class="text-zinc-900 dark:text-white">Informativa sulla Privacy</h2>
+                    <p class="text-sm text-gray-500">Data di Ultimo Aggiornamento: 23 Luglio 2025</p>
+                    <p>Benvenuto nel sistema di prenotazione online del Circolo Tennis Tricase. La tua privacy è per noi di fondamentale importanza. Questa informativa descrive come raccogliamo, utilizziamo, proteggiamo e gestiamo i tuoi dati personali in relazione al servizio di prenotazione dei campi da tennis.</p>
+
+                    <h3 class="text-terra-light dark:text-terra border-terra-light dark:border-terra">1. Titolare del Trattamento dei Dati</h3>
+                    <p>Il Titolare del Trattamento dei tuoi dati personali è:<br>
+                    <strong>Circolo Tennis Tricase</strong><br>
+                    Via Olimpica, snc, 73039 Tricase (LE)<br>
+                    Email: info@cttricase.it<br>
+                    Telefono: +39 334 778 2612</p>
+                    <p>Per qualsiasi domanda o richiesta relativa al trattamento dei tuoi dati personali, puoi contattarci ai recapiti sopra indicati.</p>
+
+                    <h3 class="text-terra-light dark:text-terra border-terra-light dark:border-terra">2. Dati Raccolti e Finalità del Trattamento</h3>
+                    <p>Raccogliamo i dati personali che ci fornisci direttamente al momento della prenotazione.</p>
+                    <h4>2.1 Dati Personali Raccolti</h4>
+                    <p>Al momento della prenotazione, ti chiediamo di fornire i seguenti dati:</p>
+                    <ul>
+                        <li>Nome</li>
+                        <li>Cognome</li>
+                        <li>Indirizzo Email</li>
+                        <li>Numero di Telefono cellulare</li>
+                    </ul>
+                    <h4>2.2 Finalità del Trattamento</h4>
+                    <p>I dati personali raccolti sono trattati esclusivamente per le seguenti finalità:</p>
+                    <ul>
+                        <li><strong>Gestione delle Prenotazioni:</strong> Per consentire la corretta gestione delle prenotazioni dei campi da tennis, inclusa la conferma, la modifica e l'annullamento delle stesse.</li>
+                        <li><strong>Verifica dell'Identità:</strong> Per implementare meccanismi di verifica volti a garantire la veridicità dei dati forniti e a prevenire abusi o false identità.</li>
+                        <li><strong>Comunicazioni Relative al Servizio:</strong> Per inviarti comunicazioni strettamente necessarie (conferme, promemoria, notifiche di annullamento).</li>
+                        <li><strong>Gestione del Pagamento e Recupero Crediti:</strong> Per gestire eventuali pagamenti dovuti in caso di mancata cancellazione o no-show.</li>
+                        <li><strong>Adempimento di Obblighi Legali:</strong> Per adempiere a obblighi previsti da leggi o regolamenti.</li>
+                    </ul>
+                    
+                    <h3 class="text-terra-light dark:text-terra border-terra-light dark:border-terra">3. Modalità e Conservazione dei Dati</h3>
+                    <p>I tuoi dati personali sono trattati in formato elettronico e salvati in un database sicuro. Vengono conservati per il tempo strettamente necessario al conseguimento delle finalità per cui sono stati raccolti, nel rispetto degli obblighi di legge (generalmente non oltre 10 anni dall'ultima interazione).</p>
+
+                    <h3 class="text-terra-light dark:text-terra border-terra-light dark:border-terra">4. Comunicazione dei Dati</h3>
+                    <p>I tuoi dati non verranno venduti a terzi. Possono essere comunicati a personale autorizzato del Circolo, fornitori di servizi IT che agiscono come Responsabili del Trattamento, e autorità competenti, se richiesto dalla legge.</p>
+
+                    <h3 class="text-terra-light dark:text-terra border-terra-light dark:border-terra">5. Diritti dell'Interessato</h3>
+                    <p>In qualità di interessato, hai il diritto di accedere, rettificare, cancellare i tuoi dati, limitarne il trattamento, opporti al trattamento e richiederne la portabilità. Puoi esercitare i tuoi diritti contattandoci ai recapiti indicati. Hai anche il diritto di proporre reclamo all'Autorità Garante per la Protezione dei Dati Personali.</p>
+                </section>
+
+                <hr class="my-12 border-gray-300 dark:border-zinc-700">
+
+                <!-- Terms and Conditions Section -->
+                <section id="terms-conditions">
+                    <h2 class="text-zinc-900 dark:text-white">Termini e Condizioni di Prenotazione</h2>
+                    <p class="text-sm text-gray-500">Data di Ultimo Aggiornamento: 23 Luglio 2025</p>
+                    <p>Benvenuto nel sistema di prenotazione online del Circolo Tennis Tricase. L'utilizzo del servizio implica la piena accettazione del presente regolamento.</p>
+
+                    <h3 class="text-verde-light dark:text-verde border-verde-light dark:border-verde">1. Requisiti e Dati Personali</h3>
+                    <p>Per prenotare è necessario fornire dati veritieri e completi (Nome, Cognome, Email, Telefono). L'uso di dati falsi comporterà l'annullamento della prenotazione. Il Circolo si riserva di verificare l'identità dell'utente.</p>
+                    
+                    <h3 class="text-verde-light dark:text-verde border-verde-light dark:border-verde">2. Limitazioni alle Prenotazioni</h3>
+                    <p>Ogni utente può prenotare un massimo di <strong>due (2) ore di gioco per settimana</strong> (lunedì-domenica). Prenotazioni eccedenti il limite o ritenute fraudolente verranno annullate d'ufficio.</p>
+
+                    <h3 class="text-verde-light dark:text-verde border-verde-light dark:border-verde">3. Politica di Cancellazione</h3>
+                    <ul>
+                        <li><strong>Cancellazione Gratuita:</strong> È possibile annullare una prenotazione senza costi fino a <strong>due (2) ore prima</strong> dell'orario di inizio.</li>
+                        <li><strong>Mancata Cancellazione e "No-Show":</strong> In caso di cancellazione tardiva (meno di 2 ore prima) o di mancata presentazione, l'intero costo della prenotazione sarà comunque dovuto al Circolo.</li>
+                    </ul>
+
+                    <h3 class="text-verde-light dark:text-verde border-verde-light dark:border-verde">4. Pagamento e Morosità</h3>
+                    <p>Il pagamento è dovuto secondo le modalità indicate dal Circolo. In caso di mancato pagamento per no-show o cancellazione tardiva, l'utente sarà bloccato dal sistema di prenotazione fino al saldo del debito. Il Circolo si riserva il diritto di intraprendere azioni legali per il recupero del credito.</p>
+
+                    <h3 class="text-verde-light dark:text-verde border-verde-light dark:border-verde">5. Responsabilità e Condotta</h3>
+                    <p>Chi effettua la prenotazione è responsabile per l'utilizzo del campo e per il comportamento proprio e degli accompagnatori. È obbligatorio mantenere una condotta rispettosa e seguire il regolamento interno del Circolo.</p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-zinc-900/50 border-t border-gray-200 dark:border-zinc-800 mt-16 py-12">
+        <div class="container mx-auto px-4 text-center">
+             <p class="text-xs text-gray-600 dark:text-gray-500">© 2025 Circolo Tennis Tricase. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- THEME TOGGLE SCRIPT ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-toggle-sun');
+        const moonIcon = document.getElementById('theme-toggle-moon');
+        const htmlEl = document.documentElement;
+
+        function toggleIcons() {
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'light') {
+                htmlEl.classList.remove('dark');
+                toggleIcons();
+            } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            toggleIcons();
+            localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+        });
+    </script>
+
+</body>
+</html>

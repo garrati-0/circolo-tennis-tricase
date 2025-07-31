@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prenotazione Campo - C.T. Tricase</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -123,7 +124,29 @@
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 pt-28 pb-12">
-        <div id="booking-container">
+        
+        <!-- Sezione Avviso Blocco Prenotazioni -->
+        <section id="avviso-blocco">
+             <div class="bg-white dark:bg-zinc-900/50 border-2 border-terra-light dark:border-terra rounded-2xl p-8 md:p-12 text-center shadow-lg max-w-4xl mx-auto">
+                <svg class="w-16 h-16 mx-auto mb-6 text-terra-light dark:text-terra" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+                <h1 class="font-display text-3xl md:text-4xl mb-4 text-zinc-900 dark:text-white">Prenotazioni Sospese</h1>
+                <p class="font-mono text-gray-600 dark:text-gray-400 mb-6">
+                    A causa dello svolgimento del <strong>Torneo Open "La Vallonea"</strong>, il sistema di prenotazione online dei campi è temporaneamente sospeso.
+                </p>
+                <p class="text-gray-700 dark:text-gray-300 mb-8">
+                    Tutti i campi sono riservati allo svolgimento degli incontri del torneo. Le prenotazioni riapriranno regolarmente a partire da <strong>lunedì 19 Agosto 2025</strong>.
+                    <br>Ci scusiamo per il disagio e vi invitiamo a venire al circolo per godervi lo spettacolo del grande tennis!
+                </p>
+                <a href="torneo-vallonea.html" class="inline-block bg-terra-light dark:bg-terra text-white font-bold py-3 px-8 rounded-xl hover:bg-opacity-80 transition-colors">
+                    SEGUI IL TORNEO
+                </a>
+            </div>
+        </section>
+
+        <!-- Booking Interface (Hidden) -->
+        <div id="booking-container" class="hidden">
             <div class="text-center mb-12">
                 <h1 class="font-display text-5xl sm:text-6xl text-zinc-900 dark:text-white">Effettua una <span class="text-verde-light dark:text-verde">Prenotazione</span></h1>
                 <p class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400">
@@ -309,6 +332,12 @@
     
     // --- BOOKING FUNCTIONALITY SCRIPT ---
     document.addEventListener('DOMContentLoaded', () => {
+        // NOTE: The booking functionality is currently hidden due to the tournament.
+        // This script can be re-enabled after the event.
+        const isBookingActive = false; 
+        
+        if (!isBookingActive) return;
+
         const firebaseConfig = {
             apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
             authDomain: "ct-tricase.firebaseapp.com",
@@ -354,7 +383,6 @@
                     option.classList.add('selected');
                 }
                 datePicker.appendChild(option);
-                // If the current day is Sunday (getDay() === 0), stop adding more days.
                 if (date.getDay() === 0) {
                     break;
                 }

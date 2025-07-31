@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<!-- The 'dark' class is added here to set the default theme to dark -->
+<html lang="it" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Nostri Corsi - Circolo Tennis Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+        // Configure Tailwind CSS to use a class-based dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        /* Base styles are inherited for consistency */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            isolation: isolate;
+        }
+        body {
+            background-color: #F5F5F5;
+            color: #1f2937;
+            background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .dark body {
+            background-color: #141414;
+            color: #F0F0F0;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes move-glow {
+            0% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+            50% { transform: translate(60vw, 80vh) scale(2); background-color: #C4D831; }
+            100% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+        }
+        .dark body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 50vmax; height: 50vmax;
+            border-radius: 50%; background-color: #B3544C; opacity: 0.1; filter: blur(120px);
+            z-index: -1; animation: move-glow 25s linear infinite; will-change: transform;
+        }
+        #hero-corsi {
+            background-image:
+                linear-gradient(rgba(20, 20, 20, 0.7), rgba(20, 20, 20, 0.7)),
+                url('campi.png');
+            background-size: cover;
+            background-position: center;
+        }
+        .font-display { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: -0.05em; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .bg-terra-light { background-color: #D95D51; }
+        .text-terra-light { color: #B9473B; }
+        .border-terra-light { border-color: #B9473B; }
+        .bg-verde-light { background-color: #AEC521; }
+        .text-verde-light { color: #88A009; }
+        .border-verde-light { border-color: #88A009; }
+        .text-verde { color: #C4D831; }
+        .dark .bg-terra { background-color: #B3544C; }
+        .dark .text-terra { color: #B3544C; }
+        .dark .border-terra { border-color: #B3544C; }
+        .dark .bg-verde { background-color: #C4D831; }
+        .dark .border-verde { border-color: #C4D831; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-on-scroll { opacity: 0; }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    </style>
+</head>
+<body class="antialiased">
+    
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed bottom-5 right-5 z-50 bg-gray-500/20 dark:bg-zinc-700/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-500/40 dark:hover:bg-zinc-600/60 transition-colors">
+        <svg id="theme-toggle-sun" class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg id="theme-toggle-moon" class="w-6 h-6 text-slate-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/20 dark:border-white/10 text-zinc-800 dark:text-white">
+            <a href="index.html" class="font-mono text-lg font-bold hover:text-verde-light dark:hover:text-verde transition-colors">C.T. TRICASE</a>
+            <a href="index.html" class="bg-verde-light dark:bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">TORNA ALLA HOME</a>
+        </div>
+    </header>
+
+    <!-- Sezione Hero Corsi -->
+    <section id="hero-corsi" class="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <div class="text-center z-10 p-4">
+            <h1 class="font-display text-5xl sm:text-6xl md:text-8xl text-white">
+                I Nostri Corsi
+            </h1>
+            <p class="font-mono max-w-2xl mx-auto mt-6 text-base md:text-lg text-gray-300">
+                Trova il percorso perfetto per te, dal principiante all'agonista.
+            </p>
+        </div>
+    </section>
+    
+    <!-- Contenuto Principale -->
+    <main class="container mx-auto px-4 pb-12 pt-24 md:pt-32">
+        <div class="space-y-24 md:space-y-32">
+            
+            <!-- Sezione Intro -->
+            <section id="intro-corsi" class="animate-on-scroll">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="font-display text-4xl md:text-5xl mb-4 text-zinc-900 dark:text-white">La Nostra Filosofia</h2>
+                    <p class="font-mono text-verde-light dark:text-verde mb-8">Crescita, Passione, Divertimento.</p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Al Circolo Tennis Tricase crediamo che il tennis sia più di uno sport: è una scuola di vita. La nostra missione è trasmettere la passione per questa disciplina in un ambiente sano, professionale e accogliente. I nostri programmi, basati sul metodo della Federazione Italiana Tennis e Padel (FITP), sono studiati per accompagnare ogni allievo in un percorso di crescita tecnica, fisica e personale, nel pieno rispetto dei suoi tempi e delle sue ambizioni.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Sezione Dettaglio Corsi -->
+            <section id="dettaglio-corsi" class="animate-on-scroll">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Card Scuola Tennis -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 flex flex-col items-start shadow-lg hover:border-verde-light dark:hover:border-verde transition-all duration-300">
+                        <svg class="w-10 h-10 mb-4 text-verde-light dark:text-verde" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75s.168-.75.375-.75.375.336.375.75Zm4.5 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Z" /></svg>
+                        <h3 class="font-display text-3xl text-zinc-900 dark:text-white mb-2">Scuola Tennis</h3>
+                        <p class="font-mono text-verde-light dark:text-verde mb-4">Dai 5 ai 18 anni</p>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Corsi collettivi per bambini e ragazzi, divisi per età e livello. Un percorso di crescita sportiva e divertimento per imparare le basi del tennis giocando.</p>
+                        <a href="#contatti" class="mt-auto bg-verde-light dark:bg-verde text-black font-bold py-2 px-6 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">CHIEDI INFO</a>
+                    </div>
+                    <!-- Card Agonistica -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 flex flex-col items-start shadow-lg hover:border-verde-light dark:hover:border-verde transition-all duration-300">
+                        <svg class="w-10 h-10 mb-4 text-verde-light dark:text-verde" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9a9 9 0 1 0 9 0Zm-4.5-4.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6-3a9 9 0 1 0-18 0 9 9 0 0 0 18 0Z" /></svg>
+                        <h3 class="font-display text-3xl text-zinc-900 dark:text-white mb-2">Agonistica</h3>
+                        <p class="font-mono text-verde-light dark:text-verde mb-4">Per atleti e futuri campioni</p>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Programmi intensivi per atleti che partecipano a tornei. Allenamenti personalizzati, preparazione fisica e mentale per raggiungere il massimo potenziale.</p>
+                        <a href="#contatti" class="mt-auto bg-verde-light dark:bg-verde text-black font-bold py-2 px-6 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">CHIEDI INFO</a>
+                    </div>
+                     <!-- Card Corsi Adulti -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 flex flex-col items-start shadow-lg hover:border-terra-light dark:hover:border-terra transition-all duration-300">
+                        <svg class="w-10 h-10 mb-4 text-terra-light dark:text-terra" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.962a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Zm-7.5 0a3.75 3.75 0 1 0 7.5 0 3.75 3.75 0 0 0-7.5 0Zm15 4.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" /></svg>
+                        <h3 class="font-display text-3xl text-zinc-900 dark:text-white mb-2">Corsi Adulti</h3>
+                        <p class="font-mono text-terra-light dark:text-terra mb-4">Per tutti i livelli</p>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Corsi di gruppo per tutti i livelli, dal principiante all'avanzato. Un modo perfetto per imparare, migliorare la tecnica, tenersi in forma e socializzare.</p>
+                        <a href="#contatti" class="mt-auto bg-terra-light dark:bg-terra text-white font-bold py-2 px-6 rounded-lg text-sm hover:bg-opacity-80 transition-colors">CHIEDI INFO</a>
+                    </div>
+                     <!-- Card Lezioni Private -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 flex flex-col items-start shadow-lg hover:border-terra-light dark:hover:border-terra transition-all duration-300">
+                        <svg class="w-10 h-10 mb-4 text-terra-light dark:text-terra" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-2.305M15 19.128v-3.86a2.25 2.25 0 0 1 2.25-2.25h.008a2.25 2.25 0 0 1 2.25 2.25v3.86M15 19.128a9.37 9.37 0 0 0-2.625.372 9.337 9.337 0 0 0-4.121-2.305M15 19.128v-3.86a2.25 2.25 0 0 0-2.25-2.25h-.008a2.25 2.25 0 0 0-2.25 2.25v3.86m0 0a9.37 9.37 0 0 0-2.625-.372 9.337 9.337 0 0 0-4.121 2.305M9 19.128v-3.86a2.25 2.25 0 0 1 2.25-2.25h.008a2.25 2.25 0 0 1 2.25 2.25v3.86" /></svg>
+                        <h3 class="font-display text-3xl text-zinc-900 dark:text-white mb-2">Lezioni Private</h3>
+                        <p class="font-mono text-terra-light dark:text-terra mb-4">Allenamento 1-a-1</p>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">Lezioni individuali con un maestro dedicato per un percorso di apprendimento personalizzato e mirato al raggiungimento dei tuoi obiettivi specifici.</p>
+                        <a href="#contatti" class="mt-auto bg-terra-light dark:bg-terra text-white font-bold py-2 px-6 rounded-lg text-sm hover:bg-opacity-80 transition-colors">CHIEDI INFO</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione Perchè Sceglierci -->
+            <section id="perche-sceglierci" class="animate-on-scroll">
+                <div class="text-center max-w-4xl mx-auto">
+                    <h2 class="font-display text-4xl md:text-5xl mb-12 text-zinc-900 dark:text-white">Perché Scegliere la Nostra Scuola</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 text-left">
+                        <div class="flex items-start gap-4">
+                            <svg class="w-8 h-8 text-verde-light dark:text-verde flex-shrink-0 mt-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                            <div>
+                                <h4 class="font-mono text-lg text-zinc-900 dark:text-white mb-1">Maestri Qualificati</h4>
+                                <p class="text-gray-600 dark:text-gray-400">Il nostro staff è composto da professionisti certificati FITP con anni di esperienza.</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start gap-4">
+                            <svg class="w-8 h-8 text-verde-light dark:text-verde flex-shrink-0 mt-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                            <div>
+                                <h4 class="font-mono text-lg text-zinc-900 dark:text-white mb-1">Metodo FITP</h4>
+                                <p class="text-gray-600 dark:text-gray-400">Seguiamo le linee guida federali per garantire un insegnamento moderno ed efficace.</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start gap-4">
+                            <svg class="w-8 h-8 text-verde-light dark:text-verde flex-shrink-0 mt-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                            <div>
+                                <h4 class="font-mono text-lg text-zinc-900 dark:text-white mb-1">Strutture di Qualità</h4>
+                                <p class="text-gray-600 dark:text-gray-400">Campi in terra rossa curati e attrezzature all'avanguardia per la migliore esperienza di gioco.</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start gap-4">
+                            <svg class="w-8 h-8 text-verde-light dark:text-verde flex-shrink-0 mt-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                            <div>
+                                <h4 class="font-mono text-lg text-zinc-900 dark:text-white mb-1">Comunità Accogliente</h4>
+                                <p class="text-gray-600 dark:text-gray-400">Un ambiente amichevole e stimolante dove crescere e condividere la propria passione.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione CTA -->
+            <section id="contatti" class="animate-on-scroll">
+                 <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 md:p-12 text-center shadow-lg">
+                    <h2 class="font-display text-3xl md:text-4xl mb-2 text-zinc-900 dark:text-white">Pronto a Scendere in Campo?</h2>
+                    <p class="font-mono text-gray-500 dark:text-gray-400 mb-8">Contattaci per una lezione di prova gratuita!</p>
+                    <a href="tel:+393347782612" class="inline-block bg-terra-light dark:bg-terra text-white font-bold py-4 px-8 rounded-xl hover:bg-opacity-80 transition-colors">
+                        CHIAMA ORA
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-zinc-900/50 border-t border-gray-200 dark:border-zinc-800 mt-24 py-16">
+        <div class="container mx-auto px-4 text-center">
+             <p class="text-xs text-gray-600 dark:text-gray-500">© 2025 Circolo Tennis Tricase. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- THEME TOGGLE SCRIPT ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-toggle-sun');
+        const moonIcon = document.getElementById('theme-toggle-moon');
+        const htmlEl = document.documentElement;
+
+        function toggleIcons() {
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'light') {
+                htmlEl.classList.remove('dark');
+                toggleIcons();
+            } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            toggleIcons();
+            
+            if (htmlEl.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // --- SCROLL ANIMATION SCRIPT ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1 
+            });
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+
+</body>
+</html>

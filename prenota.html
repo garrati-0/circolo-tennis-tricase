@@ -1,212 +1,327 @@
 <!DOCTYPE html>
-<html lang="it">
+<!-- The 'dark' class is added here to set the default theme to dark -->
+<html lang="it" class="scroll-smooth dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prenotazione Campo - C.T. Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+    <script>
+        // Configure Tailwind CSS for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <style>
-        /* --- CSS MODIFICATO --- */
-        :root {
-            --primary-color: #007BFF; --primary-color-hover: #0056b3; --background-primary: #FFFFFF; --background-secondary: #F4F7FC; --surface-color: #FFFFFF; --border-color: #DEE2E6; --text-primary: #212529; --text-secondary: #6C757D; --text-inverted: #FFFFFF; --accent-color: #e9ecef; --shadow-color: rgba(0,0,0,0.05); --danger-color: #dc3545;
-            --warning-color: #ffc107; 
-            --text-on-warning: #212529;
+        /* Base styles for body */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            isolation: isolate;
         }
-        .dark-theme {
-            --primary-color: #007BFF; --primary-color-hover: #2196f3; --background-primary: #1a202c; --background-secondary: #121822; --surface-color: #1a202c; --border-color: #2d3748; --text-primary: #e2e8f0; --text-secondary: #a0aec0; --text-inverted: #FFFFFF; --accent-color: #2d3748; --shadow-color: rgba(0,0,0,0.2); --danger-color: #e53e3e;
-            --warning-color: #ffc107;
-            --text-on-warning: #212529;
+
+        /* Light Theme base styles */
+        body {
+            background-color: #F5F5F5; /* Light gray background */
+            color: #1f2937; /* Dark gray text */
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Noto Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--background-secondary); color: var(--text-primary); transition: background-color 0.3s, color 0.3s; }
-        .navbar { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 30px; z-index: 10; display: flex; align-items: center; gap: 1rem; }
-        .nav-button { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 50%; color: var(--text-primary); text-decoration: none; font-size: 1.2rem; transition: all 0.2s; box-shadow: 0 2px 8px var(--shadow-color); cursor: pointer; }
-        .nav-button:hover { transform: scale(1.1); background-color: var(--primary-color); color: var(--text-inverted); border-color: var(--primary-color); }
-        .nav-button .material-icons { font-size: 24px; }
-        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 80px 20px 40px; }
-        .booking-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: flex-start; }
-        .selection-panel, .summary-panel { background-color: var(--surface-color); border-radius: 16px; padding: 32px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px var(--shadow-color); }
-        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-primary); font-weight: 800; }
-        h1 { font-size: 2.2rem; margin-bottom: 8px; }
-        .selection-panel > p { font-size: 1rem; margin-bottom: 32px; color: var(--text-secondary); }
-        h2 { font-size: 1.5rem; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
-        .step { margin-bottom: 32px; }
-        .date-picker, .field-selector, .time-slots { display: flex; flex-wrap: wrap; gap: 12px; }
-        .date-option, .field-option, .time-slot { background-color: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; text-align: center; font-weight: 500; color: var(--text-primary); }
-        .date-option { display: flex; flex-direction: column; align-items: center; min-width: 70px; }
-        .date-option .day-name { font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); }
-        .date-option .day-num { font-size: 1.2rem; font-weight: 700; }
-        .field-option { flex-grow: 1; }
-        .date-option:hover, .field-option:hover, .time-slot:hover { border-color: var(--primary-color); color: var(--primary-color); }
-        .date-option.selected, .field-option.selected, .time-slot.selected { background-color: var(--primary-color); border-color: var(--primary-color); color: var(--text-inverted); transform: scale(1.05); }
-        .date-option.selected .day-name, .date-option.selected .day-num { color: var(--text-inverted); }
+
+        /* Dark Theme styles */
+        .dark body {
+            background-color: #141414;
+            color: #F0F0F0;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
         
-        .time-slot.unavailable { background-color: var(--danger-color); border-color: var(--danger-color); color: var(--text-inverted); cursor: not-allowed; text-decoration: line-through; }
-        .time-slot.unavailable:hover { color: var(--text-inverted); transform: none; }
-        .time-slot.recurring { background-color: var(--warning-color); border-color: var(--warning-color); color: var(--text-on-warning); cursor: not-allowed; text-decoration: line-through; }
-        .time-slot.recurring:hover { color: var(--text-on-warning); transform: none; }
+        /* Animated background glow for dark mode */
+        @keyframes move-glow {
+            0% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+            50% { transform: translate(60vw, 80vh) scale(2); background-color: #C4D831; }
+            100% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+        }
 
-        /* <-- NUOVO: Stili per la legenda --> */
-        .legend { display: flex; gap: 20px; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color); }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-secondary); }
-        .legend-item .color-box { width: 18px; height: 18px; border-radius: 4px; }
-        .legend-item .color-box.unavailable { background-color: var(--danger-color); }
-        .legend-item .color-box.recurring { background-color: var(--warning-color); }
+        .dark body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 50vmax; height: 50vmax;
+            border-radius: 50%;
+            background-color: #B3544C;
+            opacity: 0.1;
+            filter: blur(120px);
+            z-index: -1;
+            animation: move-glow 25s linear infinite;
+            will-change: transform;
+        }
 
-        #booking-summary { background-color: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-top: 24px; display: none; }
-        .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
-        .summary-item:last-child { border-bottom: none; }
-        .summary-item .value { font-weight: 700; }
+        .font-display { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: -0.05em; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
 
-        /* <-- NUOVO: Stili per il listino prezzi --> */
-        .price-list { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color); }
-        .price-list h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; }
-        .price-list table { width: 100%; border-collapse: collapse; text-align: center; }
-        .price-list th, .price-list td { padding: 12px; border: 1px solid var(--border-color); font-size: 0.95rem; }
-        .price-list th { background-color: var(--background-secondary); font-weight: 700; }
-        .price-list td:first-child { text-align: left; font-weight: 700; }
+        /* Custom Color Classes */
+        .bg-terra-light { background-color: #D95D51; }
+        .text-terra-light { color: #B9473B; }
+        .border-terra-light { border-color: #B9473B; }
+        .bg-verde-light { background-color: #AEC521; }
+        .text-verde-light { color: #88A009; }
+        .border-verde-light { border-color: #88A009; }
+        .text-verde { color: #C4D831; }
+        .dark .bg-terra { background-color: #B3544C; }
+        .dark .text-terra { color: #B3544C; }
+        .dark .border-terra { border-color: #B3544C; }
+        .dark .bg-verde { background-color: #C4D831; }
+        .dark .border-verde { border-color: #C4D831; }
 
-        #booking-form { margin-top: 24px; display: none; }
-        .form-group { position: relative; margin-bottom: 20px; }
-        .form-group i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
-        .form-group input { width: 100%; background-color: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 14px 14px 48px; color: var(--text-primary); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
-        .form-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); }
-        
-        .form-check-group { margin-bottom: 20px; display: flex; align-items: flex-start; }
-        .form-check-group input { margin-right: 12px; margin-top: 5px; width: 16px; height: 16px; }
-        .form-check-group label { font-size: 0.9rem; color: var(--text-secondary); }
-        .form-check-group label a { color: var(--primary-color); text-decoration: none; }
-        .form-check-group label a:hover { text-decoration: underline; }
-
-        .submit-btn { width: 100%; background-color: var(--primary-color); border: none; border-radius: 8px; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text-inverted); cursor: pointer; transition: all 0.2s; }
-        .submit-btn:hover { background-color: var(--primary-color-hover); }
-        .submit-btn:disabled { background-color: #6c757d; cursor: wait; }
-        #confirmation-message { text-align: center; padding: 80px 40px; }
-        #confirmation-message .icon-wrapper { width: 80px; height: 80px; margin: 0 auto 24px; background-color: rgba(0,123,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        #confirmation-message i { color: var(--primary-color); font-size: 2.5rem; }
-        #confirmation-message h1 { font-size: 2rem; margin-bottom: 12px; }
-        @media (max-width: 992px) { .booking-layout { grid-template-columns: 1fr; } h1 { font-size: 2rem; } }
+        /* Styles for dynamic booking elements */
+        .time-slot.selected, .date-option.selected, .field-option.selected {
+            background-color: #AEC521; /* verde-light */
+            border-color: #88A009; /* border-verde-light */
+            color: #141414;
+            transform: scale(1.05);
+        }
+        .dark .time-slot.selected, .dark .date-option.selected, .dark .field-option.selected {
+            background-color: #C4D831; /* verde */
+            border-color: #C4D831; /* border-verde */
+            color: #141414;
+        }
+        .time-slot.unavailable {
+            background-color: #D95D51 !important; /* terra-light */
+            border-color: #B9473B !important; /* border-terra-light */
+            color: white !important;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        .dark .time-slot.unavailable {
+            background-color: #B3544C !important; /* terra */
+            border-color: #B3544C !important; /* border-terra */
+        }
+        .time-slot.recurring {
+            background-color: #f59e0b !important; /* amber-500 */
+            border-color: #d97706 !important; /* amber-600 */
+            color: #141414 !important;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
     </style>
 </head>
-<body>
-    <header class="navbar">
-        <a href="index.html" class="nav-button" aria-label="Torna alla Home"><i class="fa-solid fa-arrow-left"></i></a>
-        <button class="nav-button" id="theme-toggle" title="Toggle theme">
-            <span class="material-icons" id="theme-icon">light_mode</span>
-        </button>
+<body class="antialiased">
+
+    <!-- Header Fisso -->
+    <header class="fixed top-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/20 dark:border-white/10 text-zinc-800 dark:text-white">
+            <a href="index.html" class="font-mono text-lg font-bold">C.T. TRICASE</a>
+            <a href="index.html" class="bg-verde-light dark:bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">TORNA ALLA HOME</a>
+        </div>
     </header>
-    
-    <div class="container" id="booking-container">
-        <div class="booking-layout">
-            <div class="selection-panel">
-                <h1>Effettua una Prenotazione</h1>
-                <p>Seleziona data, campo e orario. La disponibilità è aggiornata in tempo reale. Puoi prenotare un massimo di 2 ore a settimana.</p>
-                <div class="step"><h2>1. Seleziona la Data</h2><div class="date-picker" id="date-picker"></div></div>
-                <div class="step"><h2>2. Seleziona il Campo</h2><div class="field-selector" id="field-selector"><div class="field-option selected" data-field="1">Campo 1</div><div class="field-option" data-field="2">Campo 2</div><div class="field-option" data-field="3">Campo 3</div></div></div>
-                <div class="step">
-                    <h2>3. Seleziona l'Orario</h2>
-                    <div class="time-slots" id="time-slots"></div>
-                    <div class="legend">
-                        <div class="legend-item"><span class="color-box unavailable"></span> Prenotato</div>
-                        <div class="legend-item"><span class="color-box recurring"></span> Corsi</div>
-                    </div>
-                </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pt-28 pb-12">
+        <div id="booking-container">
+            <div class="text-center mb-12">
+                <h1 class="font-display text-5xl sm:text-6xl text-zinc-900 dark:text-white">Effettua una <span class="text-verde-light dark:text-verde">Prenotazione</span></h1>
+                <p class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400">
+                    Seleziona data, campo e orario. La disponibilità è aggiornata in tempo reale.
+                </p>
+                 <p class="font-mono text-xs max-w-2xl mx-auto mt-2 text-terra-light dark:text-terra">
+                    Limite massimo di 2 ore prenotabili a settimana per utente.
+                </p>
             </div>
-            <div class="summary-panel" id="summary-panel">
-                <h2>Riepilogo e Prezzi</h2>
-                
-                <div class="price-list">
-                    <h3>Listino Prezzi Orari</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Senza Luci</th>
-                                <th>Con Luci</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Soci</td>
-                                <td>€10</td>
-                                <td>€15</td>
-                            </tr>
-                            <tr>
-                                <td>Non Soci</td>
-                                <td>€15</td>
-                                <td>€20</td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <!-- Selection Panel -->
+                <div class="lg:col-span-2 bg-white/30 dark:bg-black/30 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-white/20 dark:border-white/10">
+                    <!-- Step 1: Date -->
+                    <div class="mb-8">
+                        <h2 class="font-mono text-2xl font-bold mb-4 border-b border-gray-300 dark:border-zinc-700 pb-2">1. Seleziona la Data</h2>
+                        <div class="flex flex-wrap gap-3" id="date-picker">
+                            <!-- Date options will be generated by JS -->
+                        </div>
+                    </div>
+                    <!-- Step 2: Field -->
+                    <div class="mb-8">
+                        <h2 class="font-mono text-2xl font-bold mb-4 border-b border-gray-300 dark:border-zinc-700 pb-2">2. Seleziona il Campo</h2>
+                        <div class="grid grid-cols-3 gap-3" id="field-selector">
+                            <div class="field-option text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent" data-field="1">Campo 1</div>
+                            <div class="field-option text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent" data-field="2">Campo 2</div>
+                            <div class="field-option text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent" data-field="3">Campo 3</div>
+                        </div>
+                    </div>
+                    <!-- Step 3: Time -->
+                    <div>
+                        <h2 class="font-mono text-2xl font-bold mb-4 border-b border-gray-300 dark:border-zinc-700 pb-2">3. Seleziona l'Orario</h2>
+                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-3" id="time-slots">
+                            <!-- Time slots will be generated by JS -->
+                        </div>
+                        <div class="flex flex-wrap gap-x-6 gap-y-2 mt-6 pt-4 border-t border-gray-300 dark:border-zinc-700 text-sm text-gray-600 dark:text-gray-400">
+                            <div class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-terra-light dark:bg-terra"></span> Prenotato</div>
+                            <div class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-amber-500"></span> Corsi</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="booking-summary">
-                    <div class="summary-item"><span>Data</span><span class="value" id="summary-date">-</span></div>
-                    <div class="summary-item"><span>Campo</span><span class="value" id="summary-field">-</span></div>
-                    <div class="summary-item"><span>Orari</span><span class="value" id="summary-time">-</span></div>
-                </div>
-
-                <form id="booking-form" novalidate>
-                    <div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="name" name="Nome" placeholder="Nome" required></div>
-                    <div class="form-group"><i class="fa-solid fa-user"></i><input type="text" id="surname" name="Cognome" placeholder="Cognome" required></div>
-                    <div class="form-group"><i class="fa-solid fa-envelope"></i><input type="email" id="email" name="Email" placeholder="Email" required></div>
-                    <div class="form-group"><i class="fa-solid fa-phone"></i><input type="tel" id="phone" name="Telefono" placeholder="Numero di Telefono" required></div>
+                <!-- Summary Panel -->
+                <div id="summary-panel" class="lg:col-span-1 bg-white/30 dark:bg-black/30 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-white/20 dark:border-white/10 sticky top-24">
+                    <h2 class="font-mono text-2xl font-bold mb-4">Riepilogo e Prezzi</h2>
                     
-                    <div class="form-check-group">
-                        <input type="checkbox" id="certificato" name="certificato" required>
-                        <label for="certificato">Dichiaro di essere in possesso di un certificato medico valido per l'attività sportiva non agonistica.</label>
-                    </div>
-                    <div class="form-check-group">
-                        <input type="checkbox" id="privacy" name="privacy" required>
-                        <label for="privacy">Acconsento al trattamento dei dati personali secondo la <a href="/privacy.html" target="_blank">privacy policy</a>.</label>
+                    <!-- Price List -->
+                    <div class="mb-6">
+                        <h3 class="font-mono text-lg font-bold mb-3 text-verde-light dark:text-verde">Listino Prezzi Orari</h3>
+                        <table class="w-full text-sm text-left">
+                            <thead class="font-bold bg-gray-200 dark:bg-zinc-800">
+                                <tr>
+                                    <th class="p-2 rounded-tl-lg"></th>
+                                    <th class="p-2 text-center">Senza Luci</th>
+                                    <th class="p-2 text-center rounded-tr-lg">Con Luci</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-300 dark:border-zinc-700">
+                                    <td class="p-2 font-bold">Soci</td>
+                                    <td class="p-2 text-center">€10</td>
+                                    <td class="p-2 text-center">€15</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">Non Soci</td>
+                                    <td class="p-2 text-center">€15</td>
+                                    <td class="p-2 text-center">€20</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <button type="submit" class="submit-btn">Conferma Prenotazione</button>
-                </form>
+                    <!-- Booking Summary -->
+                    <div id="booking-summary" class="hidden font-mono space-y-2 text-sm">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-300 dark:border-zinc-700">
+                            <span class="text-gray-500 dark:text-gray-400">Data</span>
+                            <span class="font-bold" id="summary-date">-</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-300 dark:border-zinc-700">
+                            <span class="text-gray-500 dark:text-gray-400">Campo</span>
+                            <span class="font-bold" id="summary-field">-</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-gray-500 dark:text-gray-400">Orari</span>
+                            <span class="font-bold text-right" id="summary-time">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <form id="booking-form" novalidate class="hidden mt-6">
+                        <div class="space-y-4">
+                            <div class="relative"><i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="name" name="Nome" placeholder="Nome" required class="w-full bg-gray-200 dark:bg-zinc-800 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-verde-light dark:focus:border-verde transition"></div>
+                            <div class="relative"><i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="surname" name="Cognome" placeholder="Cognome" required class="w-full bg-gray-200 dark:bg-zinc-800 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-verde-light dark:focus:border-verde transition"></div>
+                            <div class="relative"><i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="email" id="email" name="Email" placeholder="Email" required class="w-full bg-gray-200 dark:bg-zinc-800 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-verde-light dark:focus:border-verde transition"></div>
+                            <div class="relative"><i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="tel" id="phone" name="Telefono" placeholder="Numero di Telefono" required class="w-full bg-gray-200 dark:bg-zinc-800 border-2 border-transparent rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-verde-light dark:focus:border-verde transition"></div>
+                            
+                            <div class="flex items-start space-x-3 text-xs text-gray-500 dark:text-gray-400">
+                                <input type="checkbox" id="certificato" name="certificato" required class="mt-1 accent-verde-light dark:accent-verde">
+                                <label for="certificato">Dichiaro di essere in possesso di un certificato medico valido per l'attività sportiva non agonistica.</label>
+                            </div>
+                            <div class="flex items-start space-x-3 text-xs text-gray-500 dark:text-gray-400">
+                                <input type="checkbox" id="privacy" name="privacy" required class="mt-1 accent-verde-light dark:accent-verde">
+                                <label for="privacy">Acconsento al trattamento dei dati personali e al regolamento secondo la <a href="privacy.html" target="_blank" class="text-verde-light dark:text-verde hover:underline">privacy policy e regolamento</a>.</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn w-full mt-6 bg-verde-light dark:bg-verde text-black font-bold py-3 px-8 rounded-xl hover:opacity-80 transition-opacity disabled:bg-gray-500 dark:disabled:bg-zinc-700 disabled:cursor-wait">Conferma Prenotazione</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- Confirmation Message -->
+        <div class="text-center py-20 hidden" id="confirmation-container">
+             <div class="bg-white/30 dark:bg-black/30 backdrop-blur-md p-10 rounded-2xl border border-white/20 dark:border-white/10 max-w-3xl mx-auto">
+                <div class="w-20 h-20 mx-auto mb-6 bg-verde-light/20 dark:bg-verde/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-circle-check text-4xl text-verde-light dark:text-verde"></i>
+                </div>
+                <h1 class="font-display text-4xl sm:text-5xl text-zinc-900 dark:text-white">Grazie!</h1>
+                <p id="confirmation-message" class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400"></p>
+             </div>
+        </div>
+    </main>
+
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed bottom-5 right-5 z-50 bg-gray-500/20 dark:bg-zinc-700/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-500/40 dark:hover:bg-zinc-600/60 transition-colors">
+        <svg id="theme-toggle-sun" class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg id="theme-toggle-moon" class="w-6 h-6 text-slate-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
     
-    <div class="container" id="confirmation-container" style="display: none;"><div id="confirmation-message"><div class="icon-wrapper"><i class="fa-solid fa-circle-check"></i></div><h1>Grazie!</h1><p>La tua richiesta di prenotazione è stata inviata con successo. Riceverai una mail di conferma non appena verrà approvata dal nostro staff.</p></div></div>
+    <!-- Custom Modal for Alerts -->
+    <div id="alert-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <p id="alert-modal-message" class="mb-6 text-zinc-800 dark:text-zinc-200"></p>
+            <button id="alert-modal-close" class="bg-terra-light dark:bg-terra text-white font-bold py-2 px-6 rounded-lg hover:opacity-80 transition-opacity">Chiudi</button>
+        </div>
+    </div>
+
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
     <script>
-    // --- NESSUNA MODIFICA AL JAVASCRIPT ---
+    // --- THEME TOGGLE SCRIPT ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('theme-toggle-sun');
+    const moonIcon = document.getElementById('theme-toggle-moon');
+    const htmlEl = document.documentElement;
+
+    function toggleIcons() {
+        sunIcon.classList.toggle('hidden');
+        moonIcon.classList.toggle('hidden');
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('theme') === 'light') {
+            htmlEl.classList.remove('dark');
+            toggleIcons();
+        } else {
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+    });
+
+    themeToggleBtn.addEventListener('click', () => {
+        htmlEl.classList.toggle('dark');
+        toggleIcons();
+        localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // --- CUSTOM MODAL SCRIPT ---
+    const alertModal = document.getElementById('alert-modal');
+    const alertModalMessage = document.getElementById('alert-modal-message');
+    const alertModalClose = document.getElementById('alert-modal-close');
+
+    function showModal(message) {
+        alertModalMessage.textContent = message;
+        alertModal.classList.remove('hidden');
+    }
+
+    alertModalClose.addEventListener('click', () => {
+        alertModal.classList.add('hidden');
+    });
+    
+    // --- BOOKING FUNCTIONALITY SCRIPT ---
     document.addEventListener('DOMContentLoaded', () => {
         const firebaseConfig = {
             apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
             authDomain: "ct-tricase.firebaseapp.com",
             databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "ct-tricase",
-            storageBucket: "ct-tricase.firebasestorage.app",
+            storageBucket: "ct-tricase.appspot.com",
             messagingSenderId: "931504527474",
             appId: "1:931504527474:web:165880ec30f3785ff54aeb",
             measurementId: "G-7M4D22L352"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        
-        const themeToggleButton = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'dark') {
-            document.body.classList.add('dark-theme');
-            themeIcon.textContent = 'dark_mode';
-        } else {
-            themeIcon.textContent = 'light_mode';
-        }
-        themeToggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            let theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
-            themeIcon.textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
-            localStorage.setItem('theme', theme);
-        });
         
         const datePicker = document.getElementById('date-picker');
         const fieldSelector = document.getElementById('field-selector');
@@ -232,15 +347,16 @@
                 const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
                 const dayNum = date.getDate();
                 const option = document.createElement('div');
-                option.className = 'date-option';
+                option.className = 'date-option flex-grow text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent';
                 option.dataset.date = dateValue;
-                option.innerHTML = `<span class="day-name">${dayName}</span><span class="day-num">${dayNum}</span>`;
+                option.innerHTML = `<div class="text-xs uppercase text-gray-500 dark:text-gray-400">${dayName}</div><div class="text-2xl">${dayNum}</div>`;
                 if (i === 0) {
                     booking.date = dateValue;
                     option.classList.add('selected');
                 }
                 datePicker.appendChild(option);
-                if (date.getDay() === 0 && i > 0) {
+                // If the current day is Sunday (getDay() === 0), stop adding more days.
+                if (date.getDay() === 0) {
                     break;
                 }
             }
@@ -260,7 +376,7 @@
             for (let hour = 8; hour < 22; hour++) {
                 const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
                 const slot = document.createElement('div');
-                slot.className = 'time-slot';
+                slot.className = 'time-slot text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent';
                 slot.dataset.time = time;
                 slot.textContent = time;
 
@@ -296,11 +412,11 @@
             summaryTime.textContent = booking.timeSlots.length > 0 ? booking.timeSlots.sort().join(', ') : '-';
             
             if (booking.timeSlots.length > 0) {
-                summaryDiv.style.display = 'block';
-                form.style.display = 'block';
+                summaryDiv.classList.remove('hidden');
+                form.classList.remove('hidden');
             } else {
-                summaryDiv.style.display = 'none';
-                form.style.display = 'none';
+                summaryDiv.classList.add('hidden');
+                form.classList.add('hidden');
             }
         };
 
@@ -372,7 +488,7 @@
                 target.classList.remove('selected');
             } else {
                 if (booking.timeSlots.length >= 2) {
-                    alert("Puoi selezionare al massimo 2 ore.");
+                    showModal("Puoi selezionare al massimo 2 ore.");
                     return;
                 }
                 const isFirstSelection = booking.timeSlots.length === 0;
@@ -387,7 +503,7 @@
             updateSummary();
         });
 
-        async function checkWeeklyBookingLimit(nome, cognome, email) {
+        async function checkWeeklyBookingLimit(email) {
             const today = new Date();
             const dayOfWeek = today.getDay();
             const firstDayOfWeek = new Date(today);
@@ -409,7 +525,7 @@
             if (snapshot.exists()) {
                 snapshot.forEach(childSnapshot => {
                     const bookingData = childSnapshot.val();
-                    if (bookingData.nome === nome && bookingData.cognome === cognome && bookingData.data >= firstDayISO && bookingData.data <= lastDayISO) {
+                    if (bookingData.data >= firstDayISO && bookingData.data <= lastDayISO) {
                         totalHoursThisWeek += bookingData.orari.length;
                     }
                 });
@@ -420,34 +536,34 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !form.Email.value.trim() || !form.Telefono.value.trim()) {
-                alert("Per favore, compila tutti i campi anagrafici.");
+                showModal("Per favore, compila tutti i campi anagrafici.");
                 return;
             }
             if (!form.certificato.checked) {
-                alert("Devi dichiarare di essere in possesso di un certificato medico valido.");
+                showModal("Devi dichiarare di essere in possesso di un certificato medico valido.");
                 return;
             }
             if (!form.privacy.checked) {
-                alert("Devi accettare il trattamento dei dati personali.");
+                showModal("Devi accettare il trattamento dei dati personali.");
                 return;
             }
 
             const submitBtn = form.querySelector('.submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Verifica disponibilità...';
+            submitBtn.textContent = 'Verifica in corso...';
 
-            const bookedHours = await checkWeeklyBookingLimit(form.Nome.value, form.Cognome.value, form.Email.value);
+            const bookedHours = await checkWeeklyBookingLimit(form.Email.value);
             const hoursToBook = booking.timeSlots.length;
 
             if (bookedHours + hoursToBook > 2) {
-                alert(`Hai già prenotato ${bookedHours} ore questa settimana. Non puoi superare il limite di 2 ore settimanali.`);
+                showModal(`Hai già prenotato ${bookedHours} ore questa settimana. Non puoi superare il limite di 2 ore settimanali.`);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Conferma Prenotazione';
                 return;
             }
 
             const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
-            const bookingId = bookingsRef.push().key;
+            const bookingId = database.ref().push().key;
             
             const userData = {
                 bookingId: bookingId,
@@ -474,9 +590,9 @@
 
                 if (error) {
                     console.error('Transazione fallita:', error);
-                    alert('Si è verificato un errore tecnico. Riprova.');
+                    showModal('Si è verificato un errore tecnico. Riprova.');
                 } else if (!committed) {
-                    alert('Spiacente, uno degli orari scelti è stato appena prenotato! La lista si è aggiornata.');
+                    showModal('Spiacente, uno degli orari scelti è stato appena prenotato! La lista si è aggiornata.');
                 } else {
                     const bookingIndexRef = database.ref('indicePrenotazioni/' + bookingId);
                     bookingIndexRef.set({
@@ -493,8 +609,8 @@
                         document.getElementById('booking-container').style.display = 'none';
                         const confirmationContainer = document.getElementById('confirmation-container');
                         confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
-                        confirmationContainer.querySelector('p').innerHTML = `La tua richiesta di prenotazione (ID: <strong>${bookingId}</strong>) per il campo ${booking.field} il giorno ${summaryDate.textContent} alle ore ${booking.timeSlots.sort().join(', ')} è stata confermata. A breve riceverai una mail di riepilogo.`;
-                        confirmationContainer.style.display = 'block';
+                        document.getElementById('confirmation-message').innerHTML = `La tua richiesta di prenotazione (ID: <strong>${bookingId}</strong>) per il <strong>Campo ${booking.field}</strong> il giorno <strong>${summaryDate.textContent}</strong> alle ore <strong>${booking.timeSlots.sort().join(', ')}</strong> è stata confermata. A breve riceverai una mail di riepilogo.`;
+                        confirmationContainer.classList.remove('hidden');
 
                         const CANCELLATION_PAGE_URL = "cancella.html"; 
                         const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
@@ -521,14 +637,15 @@
 
                     }).catch(indexError => {
                         console.error("Errore critico: impossibile salvare l'indice della prenotazione.", indexError);
-                        alert("Si è verificato un errore grave. La tua prenotazione potrebbe non essere cancellabile. Contatta l'assistenza.");
+                        showModal("Si è verificato un errore grave. La tua prenotazione potrebbe non essere cancellabile. Contatta l'assistenza.");
                     });
                 }
             });
         });
 
-        // --- ESECUZIONE INIZIALE ---
+        // --- INITIAL EXECUTION ---
         renderDatePicker();
+        fieldSelector.querySelector('.field-option[data-field="1"]').classList.add('selected');
         listenToRecurringBookings(); 
         listenForBookings();
         updateSummary();

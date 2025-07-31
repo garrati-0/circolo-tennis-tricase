@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<!-- The 'dark' class is added here to set the default theme to dark -->
+<html lang="it" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneo La Vallonea - Circolo Tennis Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+        // Configure Tailwind CSS to use a class-based dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        /* All the styles from the main page are included here for consistency */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            isolation: isolate;
+        }
+        body {
+            background-color: #F5F5F5;
+            color: #1f2937;
+            background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .dark body {
+            background-color: #141414;
+            color: #F0F0F0;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes noise-animation {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-5%,-5%); }
+            20% { transform: translate(-10%,5%); }
+            30% { transform: translate(5%,-10%); }
+            40% { transform: translate(-5%,15%); }
+            50% { transform: translate(-10%,5%); }
+            60% { transform: translate(15%,0); }
+            70% { transform: translate(0,10%); }
+            80% { transform: translate(-15%,0); }
+            90% { transform: translate(10%,5%); }
+            100% { transform: translate(5%,0); }
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: -2;
+            pointer-events: none;
+            background-image: url('data:image/svg+xml,...'); /* Placeholder for noise SVG */
+            background-repeat: repeat;
+            opacity: 0.02;
+            animation: noise-animation .5s infinite linear alternate;
+        }
+        @keyframes move-glow {
+            0% {
+                transform: translate(10vw, -20vh) scale(1.5);
+                background-color: #B3544C;
+            }
+            50% {
+                transform: translate(60vw, 80vh) scale(2);
+                background-color: #C4D831;
+            }
+            100% {
+                transform: translate(10vw, -20vh) scale(1.5);
+                background-color: #B3544C;
+            }
+        }
+        .dark body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50vmax;
+            height: 50vmax;
+            border-radius: 50%;
+            background-color: #B3544C;
+            opacity: 0.1;
+            filter: blur(120px);
+            z-index: -1;
+            animation: move-glow 25s linear infinite;
+            will-change: transform;
+        }
+        
+        /* New Hero Styles */
+        #hero-torneo-bg {
+            background-image: url('copertina_vallonea.jpg');
+            animation: ken-burns 20s infinite alternate;
+        }
+
+        @keyframes ken-burns {
+            0% {
+                transform: scale(1.05) translate(0, 0);
+            }
+            100% {
+                transform: scale(1.15) translate(-2%, 2%);
+            }
+        }
+
+        .text-shadow {
+             text-shadow: 0px 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .font-display {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .bg-terra-light { background-color: #D95D51; }
+        .text-terra-light { color: #B9473B; }
+        .border-terra-light { border-color: #B9473B; }
+        .bg-verde-light { background-color: #AEC521; }
+        .text-verde-light { color: #88A009; }
+        .border-verde-light { border-color: #88A009; }
+        .text-verde { color: #C4D831; }
+        .dark .bg-terra { background-color: #B3544C; }
+        .dark .text-terra { color: #B3544C; }
+        .dark .border-terra { border-color: #B3544C; }
+        .dark .bg-verde { background-color: #C4D831; }
+        .dark .border-verde { border-color: #C4D831; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-on-scroll { opacity: 0; }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    </style>
+</head>
+<body class="antialiased">
+    
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed bottom-5 right-5 z-50 bg-gray-500/20 dark:bg-zinc-700/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-500/40 dark:hover:bg-zinc-600/60 transition-colors">
+        <svg id="theme-toggle-sun" class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg id="theme-toggle-moon" class="w-6 h-6 text-slate-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/20 dark:border-white/10 text-zinc-800 dark:text-white">
+            <a href="index.html" class="font-mono text-lg font-bold hover:text-verde-light dark:hover:text-verde transition-colors">C.T. TRICASE</a>
+            <a href="index.html" class="bg-verde-light dark:bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">TORNA ALLA HOME</a>
+        </div>
+    </header>
+
+    <!-- Sezione Hero Torneo -->
+    <section id="hero-torneo" class="relative w-full h-[80vh] flex flex-col items-center justify-center text-white overflow-hidden">
+        <div id="hero-torneo-bg" class="absolute inset-0 bg-cover bg-center"></div>
+        <div class="absolute inset-0 bg-black/60"></div>
+        
+        <div class="relative z-10 text-center p-4 flex flex-col items-center">
+            <!-- Decorative Rackets SVG -->
+           
+
+            <h1 class="font-display text-5xl sm:text-7xl md:text-8xl text-shadow">
+                <span class="block">TORNEO OPEN</span>
+                <span class="text-verde">LA VALLONEA</span>
+            </h1>
+            
+            <div class="font-mono mt-8 flex flex-col sm:flex-row items-center sm:divide-x sm:divide-gray-400/50 gap-4 sm:gap-0 text-base md:text-lg">
+                <span class="sm:px-6">4 - 18 Agosto 2025</span>
+                <span class="sm:px-6">Montepremi €3.000</span>
+            </div>
+        </div>
+
+        <a href="#info-torneo" class="absolute bottom-8 z-10 animate-bounce">
+            <svg class="w-8 h-8 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </a>
+    </section>
+    
+    <!-- Contenuto Principale -->
+    <main class="container mx-auto px-4 pb-12 pt-24 md:pt-32">
+        <div class="space-y-24 md:space-y-32">
+            
+            <!-- Sezione Info Torneo -->
+            <section id="info-torneo" class="animate-on-scroll">
+                <div class="text-center max-w-4xl mx-auto">
+                    <h2 class="font-display text-4xl md:text-5xl mb-4 text-zinc-900 dark:text-white">Il Torneo</h2>
+                    <p class="font-mono text-terra-light dark:text-terra mb-8">L'appuntamento clou dell'estate tennistica salentina.</p>
+                    <div class="text-left space-y-4 text-gray-700 dark:text-gray-300">
+                        <p>Il <strong>Torneo Open "La Vallonea"</strong> è un evento di punta nel calendario della Federazione Italiana Tennis e Padel (FITP), capace di attrarre atleti di alto livello da tutta la regione e oltre. Con un montepremi di 3.000€, il torneo garantisce match di grande spessore tecnico e agonistico.</p>
+                        <p>Oltre alle competizioni di Singolare Maschile e Femminile Open, il torneo include tabelloni di Terza e Quarta categoria per dare a tutti i tesserati la possibilità di competere e vivere l'emozione di un grande evento. L'atmosfera che si respira al Circolo durante le due settimane di gara è unica: passione, amicizia e amore per il tennis si fondono, creando un'esperienza indimenticabile per giocatori e spettatori.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sezione Download -->
+            <section id="download" class="animate-on-scroll">
+                <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl p-8 md:p-12 text-center shadow-lg">
+                    <h2 class="font-display text-3xl md:text-4xl mb-2 text-zinc-900 dark:text-white">Tabelloni e Orari</h2>
+                    <p class="font-mono text-gray-500 dark:text-gray-400 mb-8">Scarica i file aggiornati per non perdere neanche un match.</p>
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
+                        <a href="tabelloni.pdf" download class="w-full sm:w-auto flex items-center justify-center gap-3 bg-verde-light dark:bg-verde text-black font-bold py-4 px-8 rounded-xl hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <span>TABELLONI</span>
+                        </a>
+                        <a href="orari.pdf" download class="w-full sm:w-auto flex items-center justify-center gap-3 bg-terra-light dark:bg-terra text-white font-bold py-4 px-8 rounded-xl hover:bg-opacity-80 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>ORARI DI GIOCO</span>
+                        </a>
+                    </div>
+                    <p class="font-mono text-xs text-gray-400 dark:text-gray-500 mt-6">Ultimo Aggiornamento: 31 Luglio 2025, ore 18:00</p>
+                </div>
+            </section>
+
+            <!-- Sezione Sponsor -->
+            <section id="sponsor" class="animate-on-scroll">
+                <div class="text-center">
+                    <h2 class="font-display text-4xl md:text-5xl mb-4 text-zinc-900 dark:text-white">Sponsor Ufficiali</h2>
+                    <p class="font-mono text-gray-500 dark:text-gray-400 mb-12">Un ringraziamento speciale a chi sostiene il nostro torneo.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-center">
+                        <!-- Placeholder for sponsors. Replace with actual logos. -->
+                        <div class="p-4 bg-white dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
+                            <img src="https://placehold.co/200x100/e2e8f0/4a5568?text=Sponsor+1" alt="Logo Sponsor 1" class="max-h-16">
+                        </div>
+                        <div class="p-4 bg-white dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
+                            <img src="https://placehold.co/200x100/e2e8f0/4a5568?text=Sponsor+2" alt="Logo Sponsor 2" class="max-h-16">
+                        </div>
+                        <div class="p-4 bg-white dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
+                            <img src="https://placehold.co/200x100/e2e8f0/4a5568?text=Sponsor+3" alt="Logo Sponsor 3" class="max-h-16">
+                        </div>
+                        <div class="p-4 bg-white dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
+                            <img src="https://placehold.co/200x100/e2e8f0/4a5568?text=Sponsor+4" alt="Logo Sponsor 4" class="max-h-16">
+                        </div>
+                         <div class="p-4 bg-white dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
+                            <img src="https://placehold.co/200x100/e2e8f0/4a5568?text=Sponsor+5" alt="Logo Sponsor 5" class="max-h-16">
+                        </div>
+                        <div class="p-4 bg-white dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
+                            <img src="https://placehold.co/200x100/e2e8f0/4a5568?text=Sponsor+6" alt="Logo Sponsor 6" class="max-h-16">
+                        </div>
+                        <div class="p-4 bg-white dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
+                            <img src="https://placehold.co/200x100/e2e8f0/4a5568?text=Sponsor+7" alt="Logo Sponsor 7" class="max-h-16">
+                        </div>
+                        <div class="p-4 bg-white dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
+                            <img src="https://placehold.co/200x100/e2e8f0/4a5568?text=Sponsor+8" alt="Logo Sponsor 8" class="max-h-16">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-zinc-900/50 border-t border-gray-200 dark:border-zinc-800 mt-24 py-16">
+        <div class="container mx-auto px-4 text-center">
+             <p class="text-xs text-gray-600 dark:text-gray-500">© 2025 Circolo Tennis Tricase. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- THEME TOGGLE SCRIPT ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-toggle-sun');
+        const moonIcon = document.getElementById('theme-toggle-moon');
+        const htmlEl = document.documentElement;
+
+        function toggleIcons() {
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'light') {
+                htmlEl.classList.remove('dark');
+                toggleIcons();
+            } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            toggleIcons();
+            
+            if (htmlEl.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // --- SCROLL ANIMATION SCRIPT ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1 
+            });
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+
+</body>
+</html>
