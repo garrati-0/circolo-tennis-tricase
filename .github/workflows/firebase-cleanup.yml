@@ -1,0 +1,31 @@
+# File: .github/workflows/firebase-cleanup.yml
+
+name: Pulizia Prenotazioni in Sospeso su Firebase
+
+on:
+  schedule:
+    # Si esegue ogni 5 minuti
+    - cron: '*/5 * * * *'
+  # Ti permette di eseguire questo workflow manualmente dalla scheda Actions
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout della repository
+        uses: actions/checkout@v4
+
+      - name: Configurazione di Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Usa una versione stabile di Node.js
+
+      - name: Installa Firebase Admin SDK
+        run: npm install firebase-admin
+
+      - name: Esegui lo Script di Pulizia
+        run: node .github/scripts/cleanup.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
