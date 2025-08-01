@@ -423,23 +423,25 @@
             }
         };
 
-        const listenForBookings = () => {
-            if (!booking.date || !booking.field) return;
-            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
-            
-            bookingsRef.on('value', (snapshot) => {
-                const bookingsData = snapshot.val();
-                unavailableSlots = []; 
-                if (bookingsData) {
-                    for(const time in bookingsData) {
-                        if(bookingsData[time]) {
-                            unavailableSlots.push(time.replace('-',':'));
-                        }
-                    }
+const listenForBookings = () => {
+    if (!booking.date || !booking.field) return;
+    const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+    
+    bookingsRef.on('value', (snapshot) => {
+        const bookingsData = snapshot.val();
+        unavailableSlots = []; 
+        if (bookingsData) {
+            for(const time in bookingsData) {
+                const bookingInfo = bookingsData[time];
+                // Only mark as unavailable if the booking exists AND its status is NOT 'pending'
+                if(bookingInfo && bookingInfo.status !== 'pending') {
+                    unavailableSlots.push(time.replace('-',':'));
                 }
-                renderTimeSlots();
-            });
-        };
+            }
+        }
+        renderTimeSlots();
+    });
+};
 
         const listenToRecurringBookings = () => {
             const recurringRef = database.ref('prenotazioniRicorrenti');
@@ -537,114 +539,124 @@
         }
 
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !form.Email.value.trim() || !form.Telefono.value.trim()) {
-                showModal("Per favore, compila tutti i campi anagrafici.");
-                return;
-            }
-            if (!form.certificato.checked) {
-                showModal("Devi dichiarare di essere in possesso di un certificato medico valido.");
-                return;
-            }
-            if (!form.privacy.checked) {
-                showModal("Devi accettare il trattamento dei dati personali.");
-                return;
-            }
+    e.preventDefault();
+    // Validazione dei campi (invariata)
+    if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !form.Email.value.trim() || !form.Telefono.value.trim()) {
+        showModal("Per favore, compila tutti i campi anagrafici.");
+        return;
+    }
+    if (!form.certificato.checked) {
+        showModal("Devi dichiarare di essere in possesso di un certificato medico valido.");
+        return;
+    }
+    if (!form.privacy.checked) {
+        showModal("Devi accettare il trattamento dei dati personali.");
+        return;
+    }
 
-            const submitBtn = form.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Verifica in corso...';
+    const submitBtn = form.querySelector('.submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Verifica in corso...';
 
-            const bookedHours = await checkWeeklyBookingLimit(form.Email.value);
-            const hoursToBook = booking.timeSlots.length;
+    // Il controllo del limite settimanale rimane invariato
+    const bookedHours = await checkWeeklyBookingLimit(form.Email.value);
+    const hoursToBook = booking.timeSlots.length;
 
-            if (bookedHours + hoursToBook > 2) {
-                showModal(`Hai già prenotato ${bookedHours} ore questa settimana. Non puoi superare il limite di 2 ore settimanali.`);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Conferma Prenotazione';
-                return;
-            }
+    if (bookedHours + hoursToBook > 2) {
+        showModal(`Hai già prenotato ${bookedHours} ore questa settimana. Non puoi superare il limite di 2 ore settimanali.`);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Conferma Prenotazione';
+        return;
+    }
 
-            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
-            const bookingId = database.ref().push().key;
-            
-            const userData = {
-                bookingId: bookingId,
-                nome: form.Nome.value,
-                cognome: form.Cognome.value,
-                email: form.Email.value,
-                telefono: form.Telefono.value,
-                prenotatoIl: firebase.database.ServerValue.TIMESTAMP
-            };
+    const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+    const bookingId = database.ref().push().key;
+    
+    // MODIFICATO: Aggiunto lo stato "pending" ai dati utente
+    const userData = {
+        bookingId: bookingId,
+        nome: form.Nome.value,
+        cognome: form.Cognome.value,
+        email: form.Email.value,
+        telefono: form.Telefono.value,
+        prenotatoIl: firebase.database.ServerValue.TIMESTAMP,
+        status: 'pending' // Stato iniziale della prenotazione
+    };
 
-            bookingsRef.transaction((currentData) => {
-                if (currentData === null) currentData = {};
-                const isSlotTaken = booking.timeSlots.some(slot => currentData[slot.replace(':', '-')]);
-                if (isSlotTaken) {
-                    return; 
-                }
-                booking.timeSlots.forEach(slot => {
-                    currentData[slot.replace(':', '-')] = userData;
-                });
-                return currentData;
-            }, (error, committed, snapshot) => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Conferma Prenotazione';
-
-                if (error) {
-                    console.error('Transazione fallita:', error);
-                    showModal('Si è verificato un errore tecnico. Riprova.');
-                } else if (!committed) {
-                    showModal('Spiacente, uno degli orari scelti è stato appena prenotato! La lista si è aggiornata.');
-                } else {
-                    const bookingIndexRef = database.ref('indicePrenotazioni/' + bookingId);
-                    bookingIndexRef.set({
-                        nome: userData.nome,
-                        cognome: userData.cognome,
-                        email: userData.email,
-                        data: booking.date,
-                        campo: booking.field,
-                        orari: booking.timeSlots,
-                        prenotatoIl: userData.prenotatoIl
-                    }).then(() => {
-                        console.log('Prenotazione e indice salvati! ID:', bookingId);
-                        
-                        document.getElementById('booking-container').style.display = 'none';
-                        const confirmationContainer = document.getElementById('confirmation-container');
-                        confirmationContainer.querySelector('h1').textContent = `Grazie, ${form.Nome.value}!`;
-                        document.getElementById('confirmation-message').innerHTML = `La tua richiesta di prenotazione (ID: <strong>${bookingId}</strong>) per il <strong>Campo ${booking.field}</strong> il giorno <strong>${summaryDate.textContent}</strong> alle ore <strong>${booking.timeSlots.sort().join(', ')}</strong> è stata confermata. A breve riceverai una mail di riepilogo.`;
-                        confirmationContainer.classList.remove('hidden');
-
-                        const CANCELLATION_PAGE_URL = "cancella.html"; 
-                        const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
-                        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkWfsEKvYnIiZ0DF3E5q6rDMEGpBPi-7kgbT3Noj0tphkoSDJAA7DiFgMX752cvHVzFg/exec";
-                        
-                        const emailData = {
-                            nome: form.Nome.value,
-                            email: form.Email.value,
-                            data: summaryDate.textContent,
-                            campo: booking.field,
-                            orari: booking.timeSlots.sort().join(', '),
-                            id: bookingId,
-                            linkCancellazione: cancellationLink
-                        };
-                        
-                        fetch(SCRIPT_URL, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            body: JSON.stringify(emailData),
-                            headers: { 'Content-Type': 'application/json' },
-                        })
-                        .then(() => console.log("Richiesta invio email partita."))
-                        .catch(error => console.error("Errore nell'invio della richiesta allo script:", error));
-
-                    }).catch(indexError => {
-                        console.error("Errore critico: impossibile salvare l'indice della prenotazione.", indexError);
-                        showModal("Si è verificato un errore grave. La tua prenotazione potrebbe non essere cancellabile. Contatta l'assistenza.");
-                    });
-                }
-            });
+    bookingsRef.transaction((currentData) => {
+        if (currentData === null) currentData = {};
+        const isSlotTaken = booking.timeSlots.some(slot => currentData[slot.replace(':', '-')]);
+        if (isSlotTaken) {
+            return; 
+        }
+        booking.timeSlots.forEach(slot => {
+            currentData[slot.replace(':', '-')] = userData;
         });
+        return currentData;
+    }, (error, committed, snapshot) => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Conferma Prenotazione';
+
+        if (error) {
+            console.error('Transazione fallita:', error);
+            showModal('Si è verificato un errore tecnico. Riprova.');
+        } else if (!committed) {
+            showModal('Spiacente, uno degli orari scelti è stato appena prenotato! La lista si è aggiornata.');
+        } else {
+            // MODIFICATO: Aggiunto lo stato 'pending' anche all'indice
+            const bookingIndexRef = database.ref('indicePrenotazioni/' + bookingId);
+            bookingIndexRef.set({
+                nome: userData.nome,
+                cognome: userData.cognome,
+                email: userData.email,
+                data: booking.date,
+                campo: booking.field,
+                orari: booking.timeSlots,
+                prenotatoIl: userData.prenotatoIl,
+                status: 'pending' // Stato anche nell'indice
+            }).then(() => {
+                console.log('Prenotazione in attesa salvata! ID:', bookingId);
+                
+                document.getElementById('booking-container').style.display = 'none';
+                const confirmationContainer = document.getElementById('confirmation-container');
+                
+                // MODIFICATO: Messaggio di attesa conferma via email
+                confirmationContainer.querySelector('h1').textContent = `Manca solo un passo, ${form.Nome.value}!`;
+                document.getElementById('confirmation-message').innerHTML = `Ti abbiamo inviato una mail all'indirizzo <strong>${userData.email}</strong>. Clicca sul link all'interno per confermare definitivamente la tua prenotazione. Il link scadrà tra 30 minuti.`;
+                confirmationContainer.classList.remove('hidden');
+
+                // MODIFICATO: Preparazione dei dati per l'email di VERIFICA
+                const CONFIRMATION_PAGE_URL = "conferma.html"; // La nuova pagina che creeremo
+                const confirmationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CONFIRMATION_PAGE_URL}?id=${bookingId}`;
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxsoCJoKT0NUPhr1YlmdGfnV9YmNnLM2Ihwr66qnvHOCBzf6P5miXHLql9rEiCjGXm/exec";
+                
+                const emailData = {
+                    type: 'verification', // Tipo di email da inviare
+                    nome: form.Nome.value,
+                    email: form.Email.value,
+                    data: new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(booking.date + "T00:00:00")),
+                    campo: booking.field,
+                    orari: booking.timeSlots.sort().join(', '),
+                    id: bookingId,
+                    linkConferma: confirmationLink // Link per la pagina di conferma
+                };
+                
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(emailData),
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(() => console.log("Richiesta invio email di verifica partita."))
+                .catch(error => console.error("Errore nell'invio della richiesta allo script:", error));
+
+            }).catch(indexError => {
+                console.error("Errore critico: impossibile salvare l'indice della prenotazione.", indexError);
+                showModal("Si è verificato un errore grave. La tua prenotazione potrebbe non essere valida. Contatta l'assistenza.");
+            });
+        }
+    });
+});
 
         // --- INITIAL EXECUTION ---
         renderDatePicker();
