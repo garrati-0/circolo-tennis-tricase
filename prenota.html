@@ -374,6 +374,9 @@
             const selectedDayOfWeek = selectedDate.getDay(); 
 
             for (let hour = 8; hour < 22; hour++) {
+                if (hour >= 13 && hour <= 15) {
+            continue;
+        }
                 const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
                 const slot = document.createElement('div');
                 slot.className = 'time-slot text-center font-semibold p-3 bg-gray-200 dark:bg-zinc-800 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde border-2 border-transparent';
