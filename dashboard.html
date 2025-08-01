@@ -38,27 +38,23 @@
         .calendar-container { display: grid; grid-template-columns: 80px repeat(3, 1fr); gap: 2px; background-color: var(--colore-bordo); border: 1px solid var(--colore-bordo); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .time-label { grid-column: 1 / 2; text-align: center; font-size: 0.9rem; font-weight: bold; color: var(--colore-testo-secondario); background-color: #F8F9FA; display: flex; align-items: center; justify-content: center; border-top: 1px solid var(--colore-bordo); }
         .time-slot { position: relative; background-color: var(--colore-superficie); min-height: 100px; border-top: 1px solid var(--colore-bordo); transition: background-color 0.2s; }
+
+        .booking-card.paid { background-color: var(--colore-successo); }
+        .booking-card.unpaid { background-color: var(--colore-accento); }
+        .booking-card .booking-card-content { cursor: pointer; }
+        .booking-card p.booking-notes { font-style: italic; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px; white-space: pre-wrap; }
         
-        /* Stile per slot vuoti prenotabili */
         .time-slot.empty { cursor: pointer; }
         .time-slot.empty:hover { background-color: var(--colore-primario-trasparente); }
         .time-slot.empty::after {
-            content: '\f067'; /* Icona + di Font Awesome */
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            color: var(--colore-primario);
-            opacity: 0;
-            transition: opacity 0.2s;
+            content: '\f067'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 24px; color: var(--colore-primario); opacity: 0; transition: opacity 0.2s;
         }
         .time-slot.empty:hover::after { opacity: 0.5; }
 
-        .booking-card { position: absolute; top: 3px; bottom: 3px; left: 3px; right: 3px; background-color: var(--colore-primario); color: white; padding: 8px; border-radius: 6px; font-size: 0.85rem; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5; display: flex; flex-direction: column; transition: opacity 0.3s ease; }
-        .booking-card.recurring { background-color: var(--colore-ricorrente); } /* Stile per ricorrenti */
+        .booking-card { position: absolute; top: 3px; bottom: 3px; left: 3px; right: 3px; background-color: var(--colore-primario); color: white; padding: 8px; border-radius: 6px; font-size: 0.85rem; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5; display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .booking-card.recurring { background-color: var(--colore-ricorrente); cursor: default; }
         .booking-card-content { flex-grow: 1; }
         .booking-card strong { display: block; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 4px; margin-bottom: 4px; }
         .booking-card p { margin: 2px 0; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
@@ -69,33 +65,79 @@
         .loading-indicator, #no-bookings { text-align: center; font-size: 1.2rem; padding: 50px; color: var(--colore-testo-secondario); }
         #no-bookings { display: none; }
 
-        /* NUOVA SEZIONE: Gestione Prenotazioni Ricorrenti */
-        .recurring-bookings-panel {
-            margin-top: 40px;
-            padding: 25px;
-            background-color: var(--colore-superficie);
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
+        .recurring-bookings-panel { margin-top: 40px; padding: 25px; background-color: var(--colore-superficie); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .recurring-bookings-panel h2 { margin-top: 0; border-bottom: 1px solid var(--colore-bordo); padding-bottom: 15px; margin-bottom: 20px; }
         .recurring-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
         #recurring-form { display: flex; flex-direction: column; gap: 15px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group label { margin-bottom: 5px; font-weight: 500; color: var(--colore-testo-secondario); font-size: 0.9rem; }
-        .form-group input, .form-group select { padding: 10px; border-radius: 6px; border: 1px solid var(--colore-bordo); font-size: 1rem; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border-radius: 6px; border: 1px solid var(--colore-bordo); font-size: 1rem; font-family: 'Noto Sans', sans-serif; }
         #recurring-form button { background-color: var(--colore-ricorrente); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background-color 0.2s; }
         #recurring-form button:hover { background-color: #5a329a; }
+        
         #recurring-list ul { list-style: none; padding: 0; margin: 0; }
         #recurring-list li { display: flex; justify-content: space-between; align-items: center; padding: 12px; background-color: var(--colore-sfondo); border-radius: 6px; margin-bottom: 8px; }
         #recurring-list .delete-recurring-btn { background-color: var(--colore-accento); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
 
-        /* NUOVA SEZIONE: Modale per prenotazione manuale */
+        /* NUOVE REGOLE PER LA LISTA RICORRENTI A FISARMONICA */
+        .recurring-day-header {
+            background-color: #e9ecef;
+            color: var(--colore-testo-principale);
+            cursor: pointer;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recurring-day-header:hover, .recurring-day-header.active {
+            background-color: #d3d9df;
+        }
+
+        .recurring-day-header::after {
+            content: '\f078'; /* Icona freccia giù di Font Awesome */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--colore-testo-secondario);
+            transition: transform 0.3s ease;
+        }
+
+        .recurring-day-header.active::after {
+            transform: rotate(-180deg);
+        }
+
+        .recurring-day-content {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #e9ecef;
+            border-top: none;
+        }
+
+        .recurring-day-content ul {
+            padding: 10px 0;
+        }
+        /* FINE NUOVE REGOLE */
+
         .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
-        .modal-content { background-color: var(--colore-superficie); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 500px; }
+        .modal-content { background-color: var(--colore-superficie); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 500px; position: relative; }
         .modal-content h2 { margin-top: 0; }
-        .modal-content .close-btn { float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
+        .modal-content .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
         .modal-content .close-btn:hover { color: #333; }
-        #manual-booking-form { margin-top: 20px; }
+        #manual-booking-form, #edit-booking-form { margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -125,36 +167,13 @@
             <h2>Gestione Prenotazioni Ricorrenti</h2>
             <div class="recurring-layout">
                 <div id="recurring-form-container">
-                    <h3>Aggiungi Nuova</h3>
+                    <h3>Aggiungi / Blocca Periodo</h3>
                     <form id="recurring-form">
-                        <div class="form-group">
-                            <label for="recurring-day">Giorno della settimana</label>
-                            <select id="recurring-day" required>
-                                <option value="1">Lunedì</option>
-                                <option value="2">Martedì</option>
-                                <option value="3">Mercoledì</option>
-                                <option value="4">Giovedì</option>
-                                <option value="5">Venerdì</option>
-                                <option value="6">Sabato</option>
-                                <option value="0">Domenica</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="recurring-time">Orario</label>
-                            <input type="time" id="recurring-time" step="900" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="recurring-field">Campo</label>
-                            <select id="recurring-field" required>
-                                <option value="1">Campo 1</option>
-                                <option value="2">Campo 2</option>
-                                <option value="3">Campo 3</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="recurring-name">Nome (es. Corso Adulti)</label>
-                            <input type="text" id="recurring-name" placeholder="Nome della prenotazione" required>
-                        </div>
+                        <div class="form-group"><label for="recurring-name">Nome (es. Corso Adulti, Blocco Campo)</label><input type="text" id="recurring-name" placeholder="Nome della prenotazione" required></div>
+                        <div class="form-group"><label for="recurring-day">Giorno della settimana</label><select id="recurring-day" required><option value="1">Lunedì</option><option value="2">Martedì</option><option value="3">Mercoledì</option><option value="4">Giovedì</option><option value="5">Venerdì</option><option value="6">Sabato</option><option value="0">Domenica</option></select></div>
+                        <div class="form-group"><label for="recurring-field">Campo</label><select id="recurring-field" required><option value="1">Campo 1</option><option value="2">Campo 2</option><option value="3">Campo 3</option></select></div>
+                        <div class="form-group"><label for="recurring-time-start">Orario Inizio</label><select id="recurring-time-start" required></select></div>
+                        <div class="form-group"><label for="recurring-time-end">Orario Fine (per blocchi di più ore)</label><select id="recurring-time-end"><option value="">Singola Ora</option></select></div>
                         <button type="submit">Aggiungi Ricorrente</button>
                     </form>
                 </div>
@@ -166,35 +185,81 @@
         </div>
     </div>
 
+    <!-- Modale per nuova prenotazione -->
     <div id="booking-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2 id="modal-title">Aggiungi Prenotazione</h2>
             <form id="manual-booking-form">
-                <input type="hidden" id="manual-field">
-                <input type="hidden" id="manual-time">
-                <div class="form-group">
-                    <label for="manual-name">Nome</label>
-                    <input type="text" id="manual-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="manual-surname">Cognome</label>
-                    <input type="text" id="manual-surname" required>
-                </div>
-                 <div class="form-group">
-                    <label for="manual-email">Email</label>
-                    <input type="email" id="manual-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="manual-phone">Telefono</label>
-                    <input type="tel" id="manual-phone" required>
-                </div>
-                
-                <button type="button" id="fill-placeholder-data" style="width: 100%; background-color: var(--colore-testo-secondario); color: white; padding: 8px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; margin-bottom: 15px;">
-                    <i class="fa-solid fa-user-check"></i> Usa dati generici (cliente senza email)
-                </button>
+                <input type="hidden" id="manual-field"><input type="hidden" id="manual-time">
+                <div class="form-group"><label for="manual-name">Nome</label><input type="text" id="manual-name" required></div>
+                <div class="form-group"><label for="manual-surname">Cognome</label><input type="text" id="manual-surname" required></div>
+                <div class="form-group"><label for="manual-email">Email</label><input type="email" id="manual-email" required></div>
+                <div class="form-group"><label for="manual-phone">Telefono</label><input type="tel" id="manual-phone" required></div>
+                <button type="button" id="fill-placeholder-data" style="width: 100%; background-color: var(--colore-testo-secondario); color: white; padding: 8px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; margin-bottom: 15px;"><i class="fa-solid fa-user-check"></i> Usa dati generici (cliente senza email)</button>
                 <button type="submit" class="submit-btn" style="width: 100%; background-color: var(--colore-successo); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;">Salva Prenotazione</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modale per modifica prenotazione -->
+    <div id="edit-booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="edit-modal-title">Modifica Prenotazione</h2>
+            <div id="edit-modal-subtitle" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></div>
+            <form id="edit-booking-form">
+                 <div class="form-group">
+                    <label for="edit-payment-status">Stato Pagamento</label>
+                    <select id="edit-payment-status">
+                        <option value="unpaid">Non Pagato</option>
+                        <option value="paid">Pagato</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-notes">Note</label>
+                    <textarea id="edit-notes" rows="4" placeholder="Aggiungi note sulla prenotazione..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn" style="width: 100%; background-color: var(--colore-primario); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;">Salva Modifiche</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modale per la cancellazione con causale -->
+    <div id="cancellation-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Conferma Cancellazione</h2>
+            <p id="cancellation-info" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></p>
+            <form id="cancellation-form">
+                <div class="form-group">
+                    <label for="cancellation-reason">Causale della cancellazione (verrà inviata al cliente)</label>
+                    <textarea id="cancellation-reason" rows="4" placeholder="Es. Manutenzione campo, pioggia, ecc..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn" style="width: 100%; background-color: var(--colore-accento); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;">Cancella e Invia Notifica</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modale generico per le notifiche -->
+    <div id="notification-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <span class="close-btn">&times;</span>
+            <div id="notification-icon" style="font-size: 40px; margin-bottom: 15px;"></div>
+            <p id="notification-message" style="font-size: 1.1rem;"></p>
+        </div>
+    </div>
+
+    <!-- Modale generico di conferma -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-btn">&times;</span>
+            <h2 id="confirm-title">Conferma Azione</h2>
+            <p id="confirm-message" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="confirm-cancel-btn" type="button" style="background-color: var(--colore-testo-secondario); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">Annulla</button>
+                <button id="confirm-action-btn" type="button" style="background-color: var(--colore-accento); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">Conferma</button>
+            </div>
         </div>
     </div>
 
@@ -208,7 +273,7 @@
             authDomain: "ct-tricase.firebaseapp.com",
             databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "ct-tricase",
-            storageBucket: "ct-tricase.firebasestorage.app",
+            storageBucket: "ct-tricase.appspot.com",
             messagingSenderId: "931504527474",
             appId: "1:931504527474:web:165880ec30f3785ff54aeb",
             measurementId: "G-7M4D22L352"
@@ -217,6 +282,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
+        // Riferimenti agli elementi DOM
         const prevDayBtn = document.getElementById('prev-day');
         const nextDayBtn = document.getElementById('next-day');
         const todayBtn = document.getElementById('today-btn');
@@ -227,19 +293,36 @@
         
         const recurringForm = document.getElementById('recurring-form');
         const recurringListDiv = document.getElementById('recurring-list');
+        const recurringFieldSelect = document.getElementById('recurring-field');
+        const recurringTimeStartSelect = document.getElementById('recurring-time-start');
+        const recurringTimeEndSelect = document.getElementById('recurring-time-end');
 
+        // Modali
         const bookingModal = document.getElementById('booking-modal');
-        const modalCloseBtn = bookingModal.querySelector('.close-btn');
-        const manualBookingForm = document.getElementById('manual-booking-form');
-        const modalTitle = document.getElementById('modal-title');
+        const editBookingModal = document.getElementById('edit-booking-modal');
+        const cancellationModal = document.getElementById('cancellation-modal');
+        const notificationModal = document.getElementById('notification-modal');
+        const confirmModal = document.getElementById('confirm-modal');
         
-        // INIZIO MODIFICA: Riferimento al nuovo pulsante
-        const fillPlaceholderDataBtn = document.getElementById('fill-placeholder-data');
-        // FINE MODIFICA
+        const manualBookingForm = document.getElementById('manual-booking-form');
+        const editBookingForm = document.getElementById('edit-booking-form');
+        const cancellationForm = document.getElementById('cancellation-form');
 
         let currentDate = new Date();
         let currentBookingsListener = null;
         let recurringBookings = {};
+
+        function showNotification(message, isError = false) {
+            const iconDiv = document.getElementById('notification-icon');
+            const messageP = document.getElementById('notification-message');
+            messageP.textContent = message;
+            if (isError) {
+                iconDiv.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color: var(--colore-accento);"></i>';
+            } else {
+                iconDiv.innerHTML = '<i class="fa-solid fa-circle-check" style="color: var(--colore-successo);"></i>';
+            }
+            notificationModal.style.display = 'flex';
+        }
 
         const renderCalendar = (dayBookings = {}) => {
             calendarGrid.innerHTML = '';
@@ -251,16 +334,11 @@
                 if (parseInt(rb.giornoSettimana) === currentDayOfWeek) {
                     const fieldId = `campo-${rb.campo}`;
                     const timeKey = rb.orario.replace(':', '-');
-                    if (!dayBookings[fieldId]) {
-                        dayBookings[fieldId] = {};
-                    }
+                    if (!dayBookings[fieldId]) dayBookings[fieldId] = {};
                     if (!dayBookings[fieldId][timeKey]) {
                         dayBookings[fieldId][timeKey] = {
-                            nome: rb.nome,
-                            cognome: '(Ricorrente)',
-                            telefono: rb.telefono || 'N/A',
-                            email: rb.email || 'N/A',
-                            isRecurring: true,
+                            nome: rb.nome, cognome: '(Ricorrente)', telefono: 'N/A',
+                            email: 'N/A', isRecurring: true,
                         };
                     }
                 }
@@ -293,15 +371,18 @@
                 for (const time in fieldBookings) {
                     const booking = fieldBookings[time];
                     if (!booking) continue;
-                    const [startHour, startMinute] = time.replace('-',':').split(':').map(Number);
+                    const [startHour] = time.replace('-',':').split(':').map(Number);
                     const targetSlotId = `slot-${startHour}-${fieldNumber}`;
                     const targetSlot = slots[targetSlotId];
                     
                     if (targetSlot) {
                         const card = document.createElement('div');
                         card.className = 'booking-card';
+                        
                         if (booking.isRecurring) {
                             card.classList.add('recurring');
+                        } else {
+                            card.classList.add(booking.pagato ? 'paid' : 'unpaid');
                         }
                         
                         let deleteButtonHTML = '';
@@ -311,12 +392,14 @@
 
                         card.innerHTML = `
                             ${deleteButtonHTML}
-                            <div class="booking-card-content">
+                            <div class="booking-card-content" data-field="${fieldId}" data-time="${time}">
                                 <strong>${booking.nome || 'N/A'} ${booking.cognome || ''}</strong>
                                 <p><i class="fa-solid fa-clock fa-fw"></i> ${time.replace('-',':')} ${booking.isRecurring ? '<i class="fa-solid fa-sync recurring-icon" title="Ricorrente"></i>' : ''}</p>
                                 <p><i class="fa-solid fa-phone fa-fw"></i> ${booking.telefono || '-'}</p>
                                 <p><i class="fa-solid fa-envelope fa-fw"></i> ${booking.email || '-'}</p>
+                                ${booking.note ? `<p class="booking-notes"><i class="fa-solid fa-note-sticky fa-fw"></i> ${booking.note}</p>` : ''}
                             </div>`;
+                        
                         targetSlot.appendChild(card);
                     }
                 }
@@ -326,7 +409,12 @@
                 if (slot.childElementCount === 0) {
                     slot.classList.add('empty');
                     const [, hour, field] = slot.id.split('-');
-                    slot.dataset.hour = hour;
+                    let minutes = '00';
+                    if (field === '2') minutes = '15';
+                    else if (field === '3') minutes = '30';
+                    const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
+                    
+                    slot.dataset.time = timeString;
                     slot.dataset.field = field;
                 }
             });
@@ -335,9 +423,7 @@
         };
 
         const listenToBookingsForDate = () => {
-            if (currentBookingsListener) {
-                currentBookingsListener.off();
-            }
+            if (currentBookingsListener) { currentBookingsListener.off(); }
             loadingIndicator.style.display = 'block';
             calendarGrid.innerHTML = '';
             noBookingsMsg.style.display = 'none';
@@ -352,7 +438,7 @@
                 renderCalendar(bookings);
             }, (error) => {
                 console.error("Errore di Firebase:", error);
-                loadingIndicator.textContent = "Errore nel caricamento dei dati.";
+                showNotification("Errore nel caricamento dei dati.", true);
             });
         };
 
@@ -365,84 +451,122 @@
             });
         };
         
+        // MODIFICATA: renderRecurringList per creare una fisarmonica
         const renderRecurringList = () => {
             recurringListDiv.innerHTML = '';
             if (Object.keys(recurringBookings).length === 0) {
                 recurringListDiv.innerHTML = '<p>Nessuna prenotazione ricorrente impostata.</p>';
                 return;
             }
-            const ul = document.createElement('ul');
-            const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+
+            const bookingsByDay = {};
             for (const id in recurringBookings) {
-                const rb = recurringBookings[id];
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>
-                        <strong>${rb.nome}</strong> - ${days[rb.giornoSettimana]}, ore ${rb.orario}, Campo ${rb.campo}
-                    </span>
-                    <button class="delete-recurring-btn" data-id="${id}" title="Cancella ricorrente"><i class="fa-solid fa-trash-can"></i></button>
-                `;
-                ul.appendChild(li);
+                const booking = recurringBookings[id];
+                booking.id = id; // Aggiungo l'id all'oggetto per un facile accesso
+                const day = booking.giornoSettimana;
+                if (!bookingsByDay[day]) {
+                    bookingsByDay[day] = [];
+                }
+                bookingsByDay[day].push(booking);
             }
-            recurringListDiv.appendChild(ul);
+
+            const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+            const dayOrder = [1, 2, 3, 4, 5, 6, 0]; // Ordine da Lunedì a Domenica
+
+            for (const dayIndex of dayOrder) {
+                if (bookingsByDay[dayIndex]) {
+                    const dayName = days[dayIndex];
+                    const dayBookings = bookingsByDay[dayIndex];
+
+                    const header = document.createElement('button');
+                    header.className = 'recurring-day-header';
+                    header.innerHTML = `<span>${dayName}</span> <span style="font-weight:normal; color: var(--colore-testo-secondario); font-size: 0.9rem;">${dayBookings.length} prenotazioni</span>`;
+                    
+                    const content = document.createElement('div');
+                    content.className = 'recurring-day-content';
+                    
+                    const ul = document.createElement('ul');
+                    // Ordina le prenotazioni per orario
+                    dayBookings.sort((a, b) => a.orario.localeCompare(b.orario));
+
+                    for (const rb of dayBookings) {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span><strong>${rb.nome}</strong> - ore ${rb.orario}, Campo ${rb.campo}</span>
+                            <button class="delete-recurring-btn" data-id="${rb.id}" title="Cancella ricorrente"><i class="fa-solid fa-trash-can"></i></button>
+                        `;
+                        ul.appendChild(li);
+                    }
+                    
+                    content.appendChild(ul);
+                    recurringListDiv.appendChild(header);
+                    recurringListDiv.appendChild(content);
+                }
+            }
         };
 
-         calendarGrid.addEventListener('click', async (e) => {
+        calendarGrid.addEventListener('click', async (e) => {
             const deleteBtn = e.target.closest('.delete-btn');
+            const emptySlot = e.target.closest('.time-slot.empty');
+            const editTrigger = e.target.closest('.booking-card-content');
+
             if (deleteBtn) {
                 const { field, time, bookingId } = deleteBtn.dataset;
-                const card = deleteBtn.closest('.booking-card');
-                const bookingName = card.querySelector('strong').textContent;
-                const timeToDeleteFormatted = time.replace('-', ':');
+                const dateString = currentDate.toISOString().split('T')[0];
+                const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
 
-                if (confirm(`Sei sicuro di voler cancellare la prenotazione di ${bookingName} (${timeToDeleteFormatted})?`)) {
-                    card.style.opacity = '0.5';
-                    const dateString = currentDate.toISOString().split('T')[0];
-                    const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
-                    const indexPath = `indicePrenotazioni/${bookingId}`;
-                    const indexRef = database.ref(indexPath);
-
-                    try {
-                        const indexSnapshot = await indexRef.once('value');
-                        const indexData = indexSnapshot.val();
-                        
-                        const updates = {};
-                        updates[bookingPath] = null;
-
-                        if (indexData && indexData.orari && indexData.orari.length > 1) {
-                            const newOrari = indexData.orari.filter(t => t !== timeToDeleteFormatted);
-                            updates[`${indexPath}/orari`] = newOrari;
-                        } else {
-                            updates[indexPath] = null;
-                        }
-
-                        await database.ref().update(updates);
-                        console.log('Cancellazione completata con successo.');
-
-                    } catch (error) {
-                        alert(`Errore durante la cancellazione: ${error.message}`);
-                        card.style.opacity = '1';
+                const bookingRef = database.ref(bookingPath);
+                bookingRef.once('value', (snapshot) => {
+                    const bookingData = snapshot.val();
+                    if (!bookingData) {
+                        showNotification('Impossibile trovare i dati della prenotazione da cancellare.', true);
+                        return;
                     }
-                }
-            }
+                    
+                    document.getElementById('cancellation-info').textContent = `Stai per cancellare la prenotazione di ${bookingData.nome} ${bookingData.cognome} per le ore ${time.replace('-',':')}.`;
+                    
+                    const form = document.getElementById('cancellation-form');
+                    form.reset();
+                    form.dataset.bookingPath = bookingPath;
+                    form.dataset.indexPath = `indicePrenotazioni/${bookingId}`;
+                    form.dataset.bookingId = bookingId;
+                    form.dataset.userEmail = bookingData.email;
+                    form.dataset.userName = bookingData.nome;
+                    form.dataset.bookingDate = new Date(dateString).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    form.dataset.bookingTime = time.replace('-',':');
+                    
+                    cancellationModal.style.display = 'flex';
+                });
 
-            const emptySlot = e.target.closest('.time-slot.empty');
-            if (emptySlot) {
-                const { hour, field } = emptySlot.dataset;
-                
-                let minutes = '00';
-                if (field === '2') {
-                    minutes = '15';
-                } else if (field === '3') {
-                    minutes = '30';
-                }
-                const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
-
-                modalTitle.textContent = `Aggiungi Prenotazione - Campo ${field} ore ${timeString}`;
+            } else if (emptySlot) {
+                const { time, field } = emptySlot.dataset;
+                document.getElementById('modal-title').textContent = `Aggiungi Prenotazione - Campo ${field} ore ${time}`;
                 manualBookingForm.reset();
                 document.getElementById('manual-field').value = field;
-                document.getElementById('manual-time').value = timeString;
+                document.getElementById('manual-time').value = time;
                 bookingModal.style.display = 'flex';
+            
+            } else if (editTrigger && !editTrigger.closest('.booking-card.recurring')) {
+                const { field, time } = editTrigger.dataset;
+                const dateString = currentDate.toISOString().split('T')[0];
+                const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
+
+                const bookingRef = database.ref(bookingPath);
+                bookingRef.once('value', (snapshot) => {
+                    const bookingData = snapshot.val();
+                    if (!bookingData) return;
+
+                    const fieldNumber = field.split('-')[1];
+                    const timeFormatted = time.replace('-', ':');
+                    
+                    document.getElementById('edit-modal-subtitle').textContent = `${bookingData.nome} ${bookingData.cognome} - Campo ${fieldNumber} ore ${timeFormatted}`;
+                    
+                    document.getElementById('edit-payment-status').value = bookingData.pagato ? 'paid' : 'unpaid';
+                    document.getElementById('edit-notes').value = bookingData.note || '';
+                    
+                    editBookingForm.dataset.bookingPath = bookingPath;
+                    editBookingModal.style.display = 'flex';
+                });
             }
         });
         
@@ -450,151 +574,272 @@
         nextDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() + 1); listenToBookingsForDate(); });
         todayBtn.addEventListener('click', () => { currentDate = new Date(); listenToBookingsForDate(); });
 
+        function populateRecurringTimes() {
+            const field = recurringFieldSelect.value;
+            let minutes;
+            if (field === '1') minutes = '00';
+            else if (field === '2') minutes = '15';
+            else if (field === '3') minutes = '30';
+            else minutes = '00';
+
+            recurringTimeStartSelect.innerHTML = '';
+            recurringTimeEndSelect.innerHTML = '<option value="">Singola Ora</option>';
+
+            for (let hour = 8; hour < 22; hour++) {
+                const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
+                recurringTimeStartSelect.add(new Option(timeString, timeString));
+                recurringTimeEndSelect.add(new Option(timeString, timeString));
+            }
+        }
+        recurringFieldSelect.addEventListener('change', populateRecurringTimes);
+
         recurringForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            const timeValue = document.getElementById('recurring-time').value;
-            const fieldValue = document.getElementById('recurring-field').value;
-            const minutes = timeValue.split(':')[1];
+            const submitBtn = recurringForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
 
-            let expectedMinutes = '00';
-            if (fieldValue === '2') {
-                expectedMinutes = '15';
-            } else if (fieldValue === '3') {
-                expectedMinutes = '30';
-            }
+            const name = document.getElementById('recurring-name').value.trim();
+            const dayOfWeek = document.getElementById('recurring-day').value;
+            const field = document.getElementById('recurring-field').value;
+            const startTime = document.getElementById('recurring-time-start').value;
+            const endTime = document.getElementById('recurring-time-end').value;
 
-            if (minutes !== expectedMinutes) {
-                alert(`Errore di validazione: L'orario per il Campo ${fieldValue} deve finire con ":${expectedMinutes}". Hai inserito ${timeValue}.`);
+            const updates = {};
+            const startHour = parseInt(startTime.split(':')[0]);
+            const minutes = startTime.split(':')[1];
+            const endHour = endTime ? parseInt(endTime.split(':')[0]) : startHour + 1;
+
+            if (endTime && startHour >= endHour) {
+                showNotification("L'orario di fine deve essere successivo a quello di inizio.", true);
+                submitBtn.disabled = false;
                 return;
             }
 
-            const newRecurringBooking = {
-                giornoSettimana: document.getElementById('recurring-day').value,
-                orario: timeValue,
-                campo: fieldValue,
-                nome: document.getElementById('recurring-name').value.trim(),
-                email: 'ricorrente@cttricase.it',
-                telefono: '000-0000000'
-            };
-
-            database.ref('prenotazioniRicorrenti').push(newRecurringBooking)
+            for (let hour = startHour; hour < endHour; hour++) {
+                const time = `${String(hour).padStart(2, '0')}:${minutes}`;
+                const newRecurringBooking = {
+                    giornoSettimana: dayOfWeek,
+                    orario: time,
+                    campo: field,
+                    nome: name,
+                    email: 'ricorrente@cttricase.it',
+                    telefono: '000-0000000'
+                };
+                const newKey = database.ref('prenotazioniRicorrenti').push().key;
+                updates[`/prenotazioniRicorrenti/${newKey}`] = newRecurringBooking;
+            }
+            
+            database.ref().update(updates)
                 .then(() => {
                     recurringForm.reset();
-                    alert('Prenotazione ricorrente aggiunta!');
+                    populateRecurringTimes();
+                    showNotification('Prenotazione/i ricorrente aggiunta con successo!');
                 })
-                .catch(err => alert('Errore: ' + err.message));
+                .catch(err => showNotification('Errore: ' + err.message, true))
+                .finally(() => submitBtn.disabled = false);
         });
 
+        // MODIFICATO: Listener unico per la lista ricorrenti (fisarmonica + cancellazione)
         recurringListDiv.addEventListener('click', (e) => {
+            const header = e.target.closest('.recurring-day-header');
+            if (header) {
+                header.classList.toggle('active');
+                const content = header.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+                return;
+            }
+
             const deleteBtn = e.target.closest('.delete-recurring-btn');
             if (deleteBtn) {
                 const id = deleteBtn.dataset.id;
-                if (confirm('Sei sicuro di voler cancellare questa prenotazione ricorrente?')) {
-                    database.ref(`prenotazioniRicorrenti/${id}`).remove();
-                }
+                
+                document.getElementById('confirm-title').textContent = 'Cancella Ricorrenza';
+                document.getElementById('confirm-message').textContent = 'Sei sicuro di voler cancellare questa prenotazione ricorrente? L\'azione è irreversibile.';
+                
+                const confirmActionBtn = document.getElementById('confirm-action-btn');
+                
+                const newConfirmActionBtn = confirmActionBtn.cloneNode(true);
+                confirmActionBtn.parentNode.replaceChild(newConfirmActionBtn, confirmActionBtn);
+
+                const handleConfirm = () => {
+                    database.ref(`prenotazioniRicorrenti/${id}`).remove()
+                        .then(() => showNotification('Ricorrenza cancellata.'))
+                        .catch(err => showNotification('Errore: ' + err.message, true));
+                    confirmModal.style.display = 'none';
+                };
+                
+                newConfirmActionBtn.addEventListener('click', handleConfirm);
+                
+                confirmModal.style.display = 'flex';
             }
         });
 
-        modalCloseBtn.addEventListener('click', () => bookingModal.style.display = 'none');
-        window.addEventListener('click', (e) => {
-            if (e.target == bookingModal) {
-                bookingModal.style.display = 'none';
-            }
+
+        // Gestione chiusura modali
+        [bookingModal, editBookingModal, cancellationModal, notificationModal, confirmModal].forEach(modal => {
+            modal.querySelector('.close-btn').addEventListener('click', () => modal.style.display = 'none');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
         });
         
-        // INIZIO MODIFICA: Event listener per il nuovo pulsante
-        fillPlaceholderDataBtn.addEventListener('click', () => {
+        document.getElementById('confirm-cancel-btn').addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+        });
+        
+        document.getElementById('fill-placeholder-data').addEventListener('click', () => {
             document.getElementById('manual-email').value = 'cliente@interno.it';
             document.getElementById('manual-phone').value = '0000000000';
         });
-        // FINE MODIFICA
-
-  manualBookingForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const submitBtn = manualBookingForm.querySelector('.submit-btn');
-    submitBtn.disabled = true;
-
-    // Dati dal form manuale
-    const field = document.getElementById('manual-field').value;
-    const time = document.getElementById('manual-time').value;
-    const dateString = currentDate.toISOString().split('T')[0];
-    
-    // Creazione ID unico e dati di prenotazione
-    const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
-    const bookingId = bookingRef.push().key;
-
-    const bookingData = {
-        bookingId: bookingId,
-        nome: document.getElementById('manual-name').value.trim(),
-        cognome: document.getElementById('manual-surname').value.trim(),
-        email: document.getElementById('manual-email').value.trim(),
-        telefono: document.getElementById('manual-phone').value.trim(),
-        prenotatoIl: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    // Preparazione per l'aggiornamento atomico del database
-    const timeKey = time.replace(':', '-');
-    const bookingPath = `prenotazioni/${dateString}/campo-${field}/${timeKey}`;
-    const indexPath = `indicePrenotazioni/${bookingId}`;
-    
-    const updates = {};
-    updates[bookingPath] = bookingData;
-    updates[indexPath] = {
-        data: dateString,
-        campo: field,
-        orari: [time], // Mantenuto come array per coerenza con l'indice
-        nome: bookingData.nome,
-        cognome: bookingData.cognome,
-        email: bookingData.email,
-        prenotatoIl: bookingData.prenotatoIl
-    };
-
-    try {
-        // 1. Salvataggio della prenotazione nel database
-        await database.ref().update(updates);
         
-        // --- INIZIO BLOCCO AGGIUNTO PER INVIO EMAIL ---
+        manualBookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = manualBookingForm.querySelector('.submit-btn');
+            submitBtn.disabled = true;
 
-        // 2. Preparazione e invio dell'email di conferma
-        const CANCELLATION_PAGE_URL = "cancella.html"; 
-        const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkWfsEKvYnIiZ0DF3E5q6rDMEGpBPi-7kgbT3Noj0tphkoSDJAA7DiFgMX752cvHVzFg/exec";
-        
-        const emailData = {
-            nome: bookingData.nome,
-            email: bookingData.email,
-            data: new Date(dateString).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }), // Formatta la data per l'email
-            campo: field,
-            orari: time, // Nella prenotazione manuale c'è un solo orario
-            id: bookingId,
-            linkCancellazione: cancellationLink
-        };
-        
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors', // Importante per evitare problemi CORS con Google Scripts
-            body: JSON.stringify(emailData),
-            headers: { 'Content-Type': 'application/json' },
-        })
-        .then(() => console.log("Richiesta di invio email per la prenotazione manuale partita con successo."))
-        .catch(error => console.error("Errore nell'invio della richiesta allo script:", error));
+            const field = document.getElementById('manual-field').value;
+            const time = document.getElementById('manual-time').value;
+            const dateString = currentDate.toISOString().split('T')[0];
+            
+            const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
+            const bookingId = bookingRef.push().key;
 
-        // --- FINE BLOCCO AGGIUNTO ---
+            const bookingData = {
+                bookingId: bookingId,
+                nome: document.getElementById('manual-name').value.trim(),
+                cognome: document.getElementById('manual-surname').value.trim(),
+                email: document.getElementById('manual-email').value.trim(),
+                telefono: document.getElementById('manual-phone').value.trim(),
+                prenotatoIl: firebase.database.ServerValue.TIMESTAMP,
+                pagato: false, note: ''
+            };
 
-        // 3. Feedback all'utente
-        alert('Prenotazione salvata con successo e email di conferma inviata!');
-        bookingModal.style.display = 'none';
+            const timeKey = time.replace(':', '-');
+            const bookingPath = `prenotazioni/${dateString}/campo-${field}/${timeKey}`;
+            const indexPath = `indicePrenotazioni/${bookingId}`;
+            
+            const updates = {};
+            updates[bookingPath] = bookingData;
+            updates[indexPath] = {
+                data: dateString, campo: field, orari: [time],
+                nome: bookingData.nome, cognome: bookingData.cognome,
+                email: bookingData.email, prenotatoIl: bookingData.prenotatoIl
+            };
 
-    } catch (error) {
-        alert('Errore nel salvataggio: ' + error.message);
-    } finally {
-        submitBtn.disabled = false;
-    }
-});
+            try {
+                await database.ref().update(updates);
+                
+                const CANCELLATION_PAGE_URL = "cancella.html"; 
+                const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbye8eB2g7m1OwRko81Qv849e4DeBZ5uH9aXEpuVO79JWT8ZXzt8EHGNf316pNBVeqt5/exec";
+                const emailData = {
+                    type: 'confirmation',
+                    nome: bookingData.nome, email: bookingData.email,
+                    data: new Date(dateString).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                    campo: field, orari: time, id: bookingId, linkCancellazione: cancellationLink
+                };
+                
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(emailData), headers: { 'Content-Type': 'application/json' } })
+                    .then(() => console.log("Richiesta di invio email di conferma partita."))
+                    .catch(error => console.error("Errore script:", error));
 
-    listenToRecurringBookings();
-});
-</script>
+                showNotification('Prenotazione salvata e email inviata!');
+                bookingModal.style.display = 'none';
+
+            } catch (error) {
+                showNotification('Errore nel salvataggio: ' + error.message, true);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        editBookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = editBookingForm.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+
+            const bookingPath = editBookingForm.dataset.bookingPath;
+            if (!bookingPath) {
+                showNotification('Errore: percorso del booking non trovato.', true);
+                submitBtn.disabled = false; return;
+            }
+
+            const updates = {
+                pagato: document.getElementById('edit-payment-status').value === 'paid',
+                note: document.getElementById('edit-notes').value.trim()
+            };
+
+            try {
+                await database.ref(bookingPath).update(updates);
+                showNotification('Modifiche salvate con successo!');
+                editBookingModal.style.display = 'none';
+            } catch (error) {
+                showNotification('Errore salvataggio modifiche: ' + error.message, true);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        cancellationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = cancellationForm.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+
+            const { bookingPath, indexPath, bookingId, userEmail, userName, bookingDate, bookingTime } = e.target.dataset;
+            const reason = document.getElementById('cancellation-reason').value.trim();
+
+            const indexRef = database.ref(indexPath);
+            try {
+                const indexSnapshot = await indexRef.once('value');
+                const indexData = indexSnapshot.val();
+                
+                const updates = {};
+                updates[bookingPath] = null;
+
+                if (indexData && indexData.orari && indexData.orari.length > 1) {
+                    const timeToDeleteFormatted = bookingTime.replace('-', ':');
+                    const newOrari = indexData.orari.filter(t => t !== timeToDeleteFormatted);
+                    updates[`${indexPath}/orari`] = newOrari;
+                } else {
+                    updates[indexPath] = null;
+                }
+
+                await database.ref().update(updates);
+
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbye8eB2g7m1OwRko81Qv849e4DeBZ5uH9aXEpuVO79JWT8ZXzt8EHGNf316pNBVeqt5/exec";
+                const emailData = {
+                    type: 'cancellation',
+                    nome: userName,
+                    email: userEmail,
+                    data: bookingDate,
+                    orari: bookingTime,
+                    causale: reason
+                };
+
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(emailData), headers: { 'Content-Type': 'application/json' } })
+                    .then(() => console.log("Richiesta di invio email di cancellazione partita."))
+                    .catch(error => console.error("Errore script:", error));
+                
+                showNotification('Prenotazione cancellata e notifica inviata al cliente.');
+                cancellationModal.style.display = 'none';
+
+            } catch (error) {
+                showNotification(`Errore durante la cancellazione: ${error.message}`, true);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Inizializzazione
+        populateRecurringTimes();
+        listenToRecurringBookings();
+    });
+    </script>
 </body>
 </html>
