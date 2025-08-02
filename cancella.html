@@ -1,48 +1,78 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" class="scroll-smooth dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cancella Prenotazione - C.T. Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <style>
-        :root {
-            --primary-color: #007BFF;
-            --danger-color: #dc3545;
-            --danger-color-hover: #c82333;
-            --success-color: #28a745;
-            --background-secondary: #F4F7FC;
-            --surface-color: #FFFFFF;
-            --border-color: #DEE2E6;
-            --text-primary: #212529;
-            --text-secondary: #6C757D;
-            --shadow-color: rgba(0,0,0,0.05);
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            isolation: isolate;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: 'Noto Sans', sans-serif; 
-            background-color: var(--background-secondary); 
-            color: var(--text-primary); 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+
+        body {
+            background-color: #F5F5F5;
+            color: #1f2937;
         }
-        h1, h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; }
-        .cancellation-panel {
-            background-color: var(--surface-color);
-            border-radius: 16px;
-            padding: 32px 40px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px var(--shadow-color);
-            max-width: 550px;
-            width: 100%;
-            text-align: center;
+
+        .dark body {
+            background-color: #141414;
+            color: #F0F0F0;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
+
+        @keyframes move-glow {
+            0% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+            50% { transform: translate(60vw, 80vh) scale(2); background-color: #C4D831; }
+            100% { transform: translate(10vw, -20vh) scale(1.5); background-color: #B3544C; }
+        }
+
+        .dark body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 50vmax; height: 50vmax;
+            border-radius: 50%;
+            background-color: #B3544C;
+            opacity: 0.1;
+            filter: blur(120px);
+            z-index: -1;
+            animation: move-glow 25s linear infinite;
+            will-change: transform;
+        }
+
+        .font-display { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: -0.05em; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+
+        .bg-terra-light { background-color: #D95D51; }
+        .text-terra-light { color: #B9473B; }
+        .border-terra-light { border-color: #B9473B; }
+        .bg-verde-light { background-color: #AEC521; }
+        .text-verde-light { color: #88A009; }
+        .border-verde-light { border-color: #88A009; }
+        .text-verde { color: #C4D831; }
+        .dark .bg-terra { background-color: #B3544C; }
+        .dark .text-terra { color: #B3544C; }
+        .dark .border-terra { border-color: #B3544C; }
+        .dark .bg-verde { background-color: #C4D831; }
+        .dark .border-verde { border-color: #C4D831; }
+
+        /* Specific styles for cancellation page */
         .icon-wrapper {
             width: 70px;
             height: 70px;
@@ -52,52 +82,161 @@
             align-items: center;
             justify-content: center;
             font-size: 2rem;
+            opacity: 0.8;
         }
-        .icon-wrapper.loading { background-color: rgba(0, 123, 255, 0.1); color: var(--primary-color); }
-        .icon-wrapper.success { background-color: rgba(40, 167, 69, 0.1); color: var(--success-color); }
-        .icon-wrapper.error { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-color); }
-        h1 { font-size: 1.8rem; margin-bottom: 12px; }
-        p { color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+        .icon-wrapper.loading { background-color: rgba(174, 197, 33, 0.2); color: #AEC521; } /* verde-light translucent */
+        .dark .icon-wrapper.loading { background-color: rgba(196, 216, 49, 0.2); color: #C4D831; } /* verde translucent */
+        
+        .icon-wrapper.success { background-color: rgba(40, 167, 69, 0.2); color: #28a745; }
+        .icon-wrapper.error { background-color: rgba(220, 53, 69, 0.2); color: #dc3545; }
+
+        .cancellation-panel {
+            background-color: #ffffff; /* Light theme white */
+            border-radius: 16px;
+            padding: 32px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Adjusted border for light theme */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Stronger shadow */
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+            color: #212529; /* Primary text for light theme */
+        }
+
+        .dark .cancellation-panel {
+            background-color: rgba(0, 0, 0, 0.3); /* Dark theme black with opacity */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Darker shadow for dark mode */
+            color: #F0F0F0; /* Light text for dark theme */
+        }
+        
+        h1 { 
+            font-family: 'Inter', sans-serif; 
+            font-weight: 900; 
+            font-size: 2.2rem; 
+            margin-bottom: 12px;
+            color: #1f2937; /* Dark text for light theme */
+        }
+        .dark h1 {
+            color: #F0F0F0; /* Light text for dark theme */
+        }
+
+        p { 
+            font-family: 'Roboto Mono', monospace;
+            color: #6C757D; 
+            line-height: 1.6; 
+            margin-bottom: 24px; 
+        }
+        .dark p {
+            color: #9CA3AF; /* Lighter secondary text for dark theme */
+        }
+
         #booking-details {
             text-align: left;
-            background-color: var(--background-secondary);
-            border: 1px solid var(--border-color);
+            background-color: #F4F7FC; /* Light secondary background */
+            border: 1px solid #DEE2E6; /* Light border */
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 24px;
+            color: #212529; /* Primary text for details in light theme */
         }
+        .dark #booking-details {
+            background-color: #1E1E1E; /* Darker background for details in dark theme */
+            border: 1px solid #333; /* Darker border */
+            color: #F0F0F0; /* Light text for details in dark theme */
+        }
+
         #booking-details div {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
+            font-family: 'Roboto Mono', monospace;
         }
-        #booking-details div:not(:last-child) { border-bottom: 1px dashed var(--border-color); }
-        #booking-details span { font-weight: 500; }
+        #booking-details div:not(:last-child) { 
+            border-bottom: 1px dashed #DEE2E6; /* Light dashed border */
+        }
+        .dark #booking-details div:not(:last-child) {
+            border-bottom: 1px dashed #555; /* Darker dashed border */
+        }
+        #booking-details span { 
+            font-weight: 400; /* Regular weight for labels */
+            color: #6C757D; /* Secondary text color */
+        }
+        .dark #booking-details span {
+            color: #9CA3AF; /* Lighter secondary text for dark theme */
+        }
+        #booking-details strong {
+            font-weight: 700; /* Bold for values */
+        }
+
         .btn {
             width: 100%;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px; /* Slightly more rounded */
             padding: 14px;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem; /* Slightly larger font */
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
             display: block;
             text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for buttons */
         }
-        .btn-danger { background-color: var(--danger-color); color: white; }
-        .btn-danger:hover { background-color: var(--danger-color-hover); }
-        .btn-danger:disabled { background-color: #6c757d; cursor: wait; }
-        .btn-secondary { background-color: var(--border-color); color: var(--text-primary); margin-top: 12px; }
+        .btn-danger { 
+            background-color: #D95D51; /* terra-light */
+            color: white; 
+        }
+        .btn-danger:hover { 
+            background-color: #B9473B; /* border-terra-light */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* More pronounced shadow on hover */
+        }
+        .dark .btn-danger {
+            background-color: #B3544C; /* terra */
+        }
+        .dark .btn-danger:hover {
+            background-color: #8C423A; /* darker terra for hover */
+        }
+
+        .btn-danger:disabled { 
+            background-color: #9CA3AF; /* gray-400 */
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .dark .btn-danger:disabled {
+            background-color: #4B5563; /* zinc-600 */
+        }
+
+        .btn-secondary { 
+            background-color: #E5E7EB; /* gray-200 */
+            color: #374151; /* gray-800 */
+            margin-top: 12px; 
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background-color: #D1D5DB; /* gray-300 */
+        }
+        .dark .btn-secondary { 
+            background-color: #374151; /* zinc-700 */
+            color: #D1D5DB; /* gray-300 */
+        }
+        .dark .btn-secondary:hover {
+            background-color: #4B5563; /* zinc-600 */
+        }
     </style>
 </head>
-<body>
+<body class="antialiased flex flex-col items-center justify-center min-h-screen p-4">
+
+    <header class="fixed top-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/20 dark:border-white/10 text-zinc-800 dark:text-white">
+            <a href="index.html" class="font-mono text-lg font-bold">C.T. TRICASE</a>
+            <a href="index.html" class="bg-verde-light dark:bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">TORNA ALLA HOME</a>
+        </div>
+    </header>
 
     <div class="cancellation-panel">
         <div id="icon-wrapper" class="icon-wrapper loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
-        <h1 id="status-title">Verifica Prenotazione</h1>
-        <p id="status-message">Stiamo cercando i dettagli della tua prenotazione. Attendere prego...</p>
+        <h1 id="status-title" class="font-display">Verifica Prenotazione</h1>
+        <p id="status-message" class="font-mono">Stiamo cercando i dettagli della tua prenotazione. Attendere prego...</p>
         
         <div id="booking-details" style="display: none;"></div>
 
@@ -105,10 +244,42 @@
         <a id="back-home-btn" href="index.html" class="btn btn-secondary" style="display: none;">Torna alla Home</a>
     </div>
 
+    <button id="theme-toggle" class="fixed bottom-5 right-5 z-50 bg-gray-500/20 dark:bg-zinc-700/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-500/40 dark:hover:bg-zinc-600/60 transition-colors">
+        <svg id="theme-toggle-sun" class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <svg id="theme-toggle-moon" class="w-6 h-6 text-slate-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
     <script>
+    // --- THEME TOGGLE SCRIPT (Copied from the provided booking page for consistency) ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('theme-toggle-sun');
+    const moonIcon = document.getElementById('theme-toggle-moon');
+    const htmlEl = document.documentElement;
+
+    function toggleIcons() {
+        sunIcon.classList.toggle('hidden');
+        moonIcon.classList.toggle('hidden');
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('theme') === 'light') {
+            htmlEl.classList.remove('dark');
+            toggleIcons();
+        } else {
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+    });
+
+    themeToggleBtn.addEventListener('click', () => {
+        htmlEl.classList.toggle('dark');
+        toggleIcons();
+        localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+    });
+
     // --- 1. CONFIGURAZIONE DI FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
@@ -246,6 +417,6 @@
             console.error("Errore nel recuperare la prenotazione:", error);
         }
     });
-</script>
+    </script>
 </body>
 </html>

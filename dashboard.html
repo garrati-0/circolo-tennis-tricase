@@ -144,14 +144,11 @@
     <div class="container">
         <h1>Dashboard Prenotazioni</h1>
         <div class="date-navigation">
-    <button id="prev-day"><i class="fa-solid fa-chevron-left"></i> Precedente</button>
-    <button id="today-btn"><i class="fa-solid fa-calendar-day"></i> Oggi</button>
-    <button id="delete-pending-btn" style="background-color: var(--colore-accento); color: white; margin-left: auto;" title="Elimina tutte le prenotazioni in attesa di conferma">
-        <i class="fa-solid fa-user-clock"></i> Elimina Pending
-    </button>
-    <h2 id="current-date">Caricamento...</h2>
-    <button id="next-day">Successivo <i class="fa-solid fa-chevron-right"></i></button>
-</div>
+            <button id="prev-day"><i class="fa-solid fa-chevron-left"></i> Precedente</button>
+            <button id="today-btn"><i class="fa-solid fa-calendar-day"></i> Oggi</button>
+            <h2 id="current-date">Caricamento...</h2>
+            <button id="next-day">Successivo <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
         
         <div class="column-headers">
             <div class="header-item">Orario</div>
@@ -425,50 +422,82 @@
             calendarGrid.appendChild(fragment);
         };
 
-const listenToBookingsForDate = () => {
-    if (currentBookingsListener) { currentBookingsListener.off(); }
-    loadingIndicator.style.display = 'block';
-    calendarGrid.innerHTML = '';
-    noBookingsMsg.style.display = 'none';
-    currentDateElem.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'full' }).format(currentDate);
-    
-    const dateString = currentDate.toISOString().split('T')[0];
-    const bookingsRef = database.ref('prenotazioni/' + dateString);
-    currentBookingsListener = bookingsRef;
-    
-    bookingsRef.on('value', (snapshot) => {
-        const allBookings = snapshot.val() || {};
-        const confirmedBookings = {};
+        const listenToBookingsForDate = () => {
+            if (currentBookingsListener) { currentBookingsListener.off(); }
+            loadingIndicator.style.display = 'block';
+            calendarGrid.innerHTML = '';
+            noBookingsMsg.style.display = 'none';
+            currentDateElem.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'full' }).format(currentDate);
+            
+            const dateString = currentDate.toISOString().split('T')[0];
+            const bookingsRef = database.ref('prenotazioni/' + dateString);
+            currentBookingsListener = bookingsRef;
+            
+            bookingsRef.on('value', (snapshot) => {
+                const bookings = snapshot.val() || {};
+                renderCalendar(bookings);
+            }, (error) => {
+                console.error("Errore di Firebase:", error);
+                showNotification("Errore nel caricamento dei dati.", true);
+            });
+        };
 
-        // Loop through each field (e.g., 'campo-1', 'campo-2')
-        for (const fieldId in allBookings) {
-            const fieldBookings = allBookings[fieldId];
-            const confirmedFieldBookings = {};
+        // Funzione per la pulizia delle prenotazioni 'pending' scadute
+        const cleanupPendingBookings = async () => {
+            console.log("Esecuzione della pulizia delle prenotazioni in attesa...");
+            const now = Date.now();
+            // 5 minuti in millisecondi
+            const timeout = 5 * 60 * 1000; 
 
-            // Loop through each time slot for the current field
-            for (const timeKey in fieldBookings) {
-                const bookingDetails = fieldBookings[timeKey];
+            // Ottiene un riferimento a tutte le prenotazioni nell'indice
+            const indexRef = database.ref('indicePrenotazioni');
+            const snapshot = await indexRef.once('value');
+
+            if (snapshot.exists()) {
+                const bookingsData = snapshot.val();
                 
-                // Keep the booking only if its status is NOT 'pending'
-                if (bookingDetails && bookingDetails.status !== 'pending') {
-                    confirmedFieldBookings[timeKey] = bookingDetails;
+                // Itera su tutte le prenotazioni dell'indice
+                for (const bookingId in bookingsData) {
+                    const bookingEntry = bookingsData[bookingId];
+                    if (bookingEntry.status === 'pending') {
+                        // Calcola il tempo trascorso dalla creazione
+                        const timeElapsed = now - bookingEntry.prenotatoIl;
+
+                        // Se la prenotazione è più vecchia del timeout, la cancella
+                        if (timeElapsed > timeout) {
+                            console.log(`Cancellazione prenotazione scaduta: ${bookingId}`);
+                            
+                            // Cancella l'entry dall'indice
+                            await indexRef.child(bookingId).remove();
+
+                            // Cancella gli slot di tempo dal calendario principale
+                            const { data, campo, orari } = bookingEntry;
+                            if (data && campo && orari) {
+                                const bookingsRef = database.ref(`prenotazioni/${data}/campo-${campo}`);
+                                const updates = {};
+                                orari.forEach(time => {
+                                    updates[time.replace(':', '-')] = null;
+                                });
+                                await bookingsRef.update(updates);
+                                console.log(`Cancellati gli slot per la prenotazione ${bookingId} nel campo ${campo} del ${data}.`);
+                            }
+                        }
+                    }
                 }
             }
+        };
 
-            // Only add the field to the final object if it has confirmed bookings
-            if (Object.keys(confirmedFieldBookings).length > 0) {
-                confirmedBookings[fieldId] = confirmedFieldBookings;
-            }
-        }
-        
-        // Render the calendar with only the filtered, confirmed bookings
-        renderCalendar(confirmedBookings);
+        // Avvia l'esecuzione periodica della funzione di pulizia
+        const cleanupInterval = setInterval(() => {
+            cleanupPendingBookings().catch(err => {
+                console.error("Errore durante la pulizia periodica:", err);
+            });
+        }, 10000); // Esegue la pulizia ogni 10 secondi (10000 ms)
 
-    }, (error) => {
-        console.error("Errore di Firebase:", error);
-        showNotification("Errore nel caricamento dei dati.", true);
-    });
-};
+        // Interrompe l'intervallo quando l'utente naviga via dalla pagina
+        window.addEventListener('beforeunload', () => {
+            clearInterval(cleanupInterval);
+        });
 
         const listenToRecurringBookings = () => {
             const recurringRef = database.ref('prenotazioniRicorrenti');
@@ -863,75 +892,6 @@ const listenToBookingsForDate = () => {
                 submitBtn.disabled = false;
             }
         });
-        // Aggiungi questo blocco alla fine del tuo script
-
-const deletePendingBtn = document.getElementById('delete-pending-btn');
-
-deletePendingBtn.addEventListener('click', () => {
-    document.getElementById('confirm-title').textContent = 'Elimina Prenotazioni in Attesa';
-    document.getElementById('confirm-message').textContent = 'Sei sicuro di voler eliminare TUTTE le prenotazioni "pending" su TUTTE le date? Questa azione non può essere annullata.';
-    
-    const confirmActionBtn = document.getElementById('confirm-action-btn');
-    const newConfirmActionBtn = confirmActionBtn.cloneNode(true); // Clona per rimuovere vecchi listener
-    confirmActionBtn.parentNode.replaceChild(newConfirmActionBtn, confirmActionBtn);
-    newConfirmActionBtn.style.backgroundColor = 'var(--colore-accento)'; // Colore rosso per pericolo
-
-    const handleConfirm = async () => {
-        confirmModal.style.display = 'none';
-        showNotification('Eliminazione in corso...');
-
-        const bookingsRef = database.ref('prenotazioni');
-        try {
-            const snapshot = await bookingsRef.once('value');
-            const allBookingsByDate = snapshot.val();
-            if (!allBookingsByDate) {
-                showNotification('Nessuna prenotazione trovata.', false);
-                return;
-            }
-
-            const updates = {};
-            let pendingCount = 0;
-
-            // Scansiona tutte le prenotazioni per trovare quelle con stato "pending"
-            for (const date in allBookingsByDate) {
-                for (const fieldId in allBookingsByDate[date]) {
-                    for (const timeKey in allBookingsByDate[date][fieldId]) {
-                        const booking = allBookingsByDate[date][fieldId][timeKey];
-                        if (booking && booking.status === 'pending') {
-                            pendingCount++;
-                            const bookingPath = `prenotazioni/${date}/${fieldId}/${timeKey}`;
-                            updates[bookingPath] = null; // Imposta a null per eliminare
-
-                            // Prepara l'eliminazione anche dall'indice
-                            if (booking.bookingId) {
-                                const indexPath = `indicePrenotazioni/${booking.bookingId}`;
-                                updates[indexPath] = null;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (pendingCount === 0) {
-                showNotification('Nessuna prenotazione in attesa trovata.', false);
-                return;
-            }
-
-            // Esegui l'eliminazione di massa
-            await database.ref().update(updates);
-            showNotification(`${pendingCount} prenotazioni in attesa sono state eliminate con successo!`, false);
-
-        } catch (error) {
-            console.error("Errore durante l'eliminazione delle prenotazioni pending:", error);
-            showNotification('Si è verificato un errore durante l\'eliminazione.', true);
-        }
-    };
-    
-    // Aggiunge l'evento al nuovo pulsante di conferma
-    newConfirmActionBtn.addEventListener('click', handleConfirm, { once: true });
-    
-    confirmModal.style.display = 'flex';
-});
 
         // Inizializzazione
         populateRecurringTimes();

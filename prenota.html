@@ -423,25 +423,80 @@
             }
         };
 
-const listenForBookings = () => {
-    if (!booking.date || !booking.field) return;
-    const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
-    
-    bookingsRef.on('value', (snapshot) => {
-        const bookingsData = snapshot.val();
-        unavailableSlots = []; 
-        if (bookingsData) {
-            for(const time in bookingsData) {
-                const bookingInfo = bookingsData[time];
-                // Only mark as unavailable if the booking exists AND its status is NOT 'pending'
-                if(bookingInfo && bookingInfo.status !== 'pending') {
-                    unavailableSlots.push(time.replace('-',':'));
+        const listenForBookings = () => {
+            if (!booking.date || !booking.field) return;
+            const bookingsRef = database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`);
+            
+            bookingsRef.on('value', (snapshot) => {
+                const bookingsData = snapshot.val();
+                unavailableSlots = []; 
+                if (bookingsData) {
+                    for(const time in bookingsData) {
+                        if(bookingsData[time]) {
+                            unavailableSlots.push(time.replace('-',':'));
+                            
+                        }
+                    }
+                }
+                renderTimeSlots();
+            });
+        };
+        // Funzione per la pulizia delle prenotazioni 'pending' scadute
+        const cleanupPendingBookings = async () => {
+            console.log("Esecuzione della pulizia delle prenotazioni in attesa...");
+            const now = Date.now();
+            // 5 minuti in millisecondi
+            const timeout = 5 * 60 * 1000; 
+
+            // Ottiene un riferimento a tutte le prenotazioni nell'indice
+            const indexRef = database.ref('indicePrenotazioni');
+            const snapshot = await indexRef.once('value');
+
+            if (snapshot.exists()) {
+                const bookingsData = snapshot.val();
+                
+                // Itera su tutte le prenotazioni dell'indice
+                for (const bookingId in bookingsData) {
+                    const bookingEntry = bookingsData[bookingId];
+                    if (bookingEntry.status === 'pending') {
+                        // Calcola il tempo trascorso dalla creazione
+                        const timeElapsed = now - bookingEntry.prenotatoIl;
+
+                        // Se la prenotazione è più vecchia del timeout, la cancella
+                        if (timeElapsed > timeout) {
+                            console.log(`Cancellazione prenotazione scaduta: ${bookingId}`);
+                            
+                            // Cancella l'entry dall'indice
+                            await indexRef.child(bookingId).remove();
+
+                            // Cancella gli slot di tempo dal calendario principale
+                            const { data, campo, orari } = bookingEntry;
+                            if (data && campo && orari) {
+                                const bookingsRef = database.ref(`prenotazioni/${data}/campo-${campo}`);
+                                const updates = {};
+                                orari.forEach(time => {
+                                    updates[time.replace(':', '-')] = null;
+                                });
+                                await bookingsRef.update(updates);
+                                console.log(`Cancellati gli slot per la prenotazione ${bookingId} nel campo ${campo} del ${data}.`);
+                            }
+                        }
+                    }
                 }
             }
-        }
-        renderTimeSlots();
-    });
-};
+        };
+
+        // Avvia l'esecuzione periodica della funzione di pulizia
+        const cleanupInterval = setInterval(() => {
+            cleanupPendingBookings().catch(err => {
+                console.error("Errore durante la pulizia periodica:", err);
+            });
+        }, 60000); // Esegue la pulizia ogni 60 secondi (60000 ms)
+
+        // Interrompe l'intervallo quando l'utente naviga via dalla pagina
+        window.addEventListener('beforeunload', () => {
+            clearInterval(cleanupInterval);
+        });
 
         const listenToRecurringBookings = () => {
             const recurringRef = database.ref('prenotazioniRicorrenti');
@@ -622,12 +677,12 @@ const listenForBookings = () => {
                 
                 // MODIFICATO: Messaggio di attesa conferma via email
                 confirmationContainer.querySelector('h1').textContent = `Manca solo un passo, ${form.Nome.value}!`;
-                document.getElementById('confirmation-message').innerHTML = `Ti abbiamo inviato una mail all'indirizzo <strong>${userData.email}</strong>. Clicca sul link all'interno per confermare definitivamente la tua prenotazione. Il link scadrà tra 30 minuti.`;
+                document.getElementById('confirmation-message').innerHTML = `Ti abbiamo inviato una mail all'indirizzo <strong>${userData.email}</strong>. Clicca sul link all'interno per confermare definitivamente la tua prenotazione. Il link scadrà tra 5 minuti.`;
                 confirmationContainer.classList.remove('hidden');
 
                 // MODIFICATO: Preparazione dei dati per l'email di VERIFICA
                 const CONFIRMATION_PAGE_URL = "conferma.html"; // La nuova pagina che creeremo
-                const confirmationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CONFIRMATION_PAGE_URL}?id=${bookingId}`;
+                const confirmationLink = `ttps://garrati-0.github.io/circolo-tennis-tricase/${CONFIRMATION_PAGE_URL}?id=${bookingId}`;
                 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxsoCJoKT0NUPhr1YlmdGfnV9YmNnLM2Ihwr66qnvHOCBzf6P5miXHLql9rEiCjGXm/exec";
                 
                 const emailData = {
