@@ -491,7 +491,7 @@
             cleanupPendingBookings().catch(err => {
                 console.error("Errore durante la pulizia periodica:", err);
             });
-        }, 60000); // Esegue la pulizia ogni 60 secondi (60000 ms)
+        }, 50000); // Esegue la pulizia ogni 60 secondi (60000 ms)
 
         // Interrompe l'intervallo quando l'utente naviga via dalla pagina
         window.addEventListener('beforeunload', () => {
