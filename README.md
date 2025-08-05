@@ -2,7 +2,7 @@
 [x] nk map anche da email
 [x]togliere 13-15, togliere la domenica 
 [x]dashboard
-[] C.F. 90009420754 P.Iva 03771960758
+[x] C.F. 90009420754 P.Iva 03771960758
 [] PEC ct.tricase@pec.it
 [] imagine icona
 [] nelle mai esce nome ct tricase prenotazioni, ct tricase conferma
@@ -23,6 +23,8 @@ Questa semplice modifica ridurrà il consumo di dati di questa funzione di oltre
 [] aggiungere le 7 di mattina e le 22 di sera nella dashboard
 [] inserire calendario 
 [] togliere doppia mail e salvare in altri file
-[] scrivere storia da voltantino
+[x] scrivere storia da voltantino
 [] inserire foto maestri di gruppo
 [] inserire imagini tute
+[x] spostare maestri in corsi
+[] galleria scorribile in automatico delle foto in club house e chi siamo
