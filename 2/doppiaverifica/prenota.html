@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="img/icona.svg">
+    <title>Conferma Prenotazione - C.T. Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .dark body { background-color: #141414; color: #F0F0F0; }
+        .font-display { font-family: 'Inter', sans-serif; font-weight: 900; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .text-verde { color: #C4D831; }
+    </style>
+</head>
+<body class="antialiased dark">
+
+    <main class="container mx-auto px-4 flex items-center justify-center min-h-screen">
+        <div class="text-center bg-black/30 backdrop-blur-md p-10 rounded-2xl border border-white/10 max-w-3xl mx-auto" id="status-container">
+            <div id="spinner" class="animate-spin w-16 h-16 mx-auto mb-6 border-4 border-zinc-700 border-t-verde rounded-full"></div>
+            <h1 class="font-display text-4xl sm:text-5xl text-white">Verifica in corso...</h1>
+            <p id="status-message" class="font-mono max-w-2xl mx-auto mt-4 text-gray-400">Stiamo confermando la tua prenotazione. Attendi un istante.</p>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+            authDomain: "ct-tricase.firebaseapp.com",
+            databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ct-tricase",
+            storageBucket: "ct-tricase.appspot.com",
+            messagingSenderId: "931504527474",
+            appId: "1:931504527474:web:165880ec30f3785ff54aeb"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const statusContainer = document.getElementById('status-container');
+        const spinner = document.getElementById('spinner');
+        const statusH1 = statusContainer.querySelector('h1');
+        const statusMessage = document.getElementById('status-message');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('id');
+
+        if (!bookingId) {
+            showResult('error', 'ID Prenotazione Mancante', 'Il link utilizzato non è valido. Impossibile trovare la prenotazione.');
+            return;
+        }
+
+        const bookingIndexRef = database.ref(`indicePrenotazioni/${bookingId}`);
+
+        bookingIndexRef.get().then(snapshot => {
+            if (!snapshot.exists()) {
+                showResult('error', 'Prenotazione Non Trovata', 'Non esiste una prenotazione con questo ID, potrebbe essere scaduta o già cancellata.');
+                return;
+            }
+
+            const bookingData = snapshot.val();
+            
+            // --- CONTROLLO SCADENZA 10 MINUTI ---
+            const CREATED_AT = bookingData.prenotatoIl;
+            const NOW = Date.now();
+            const TEN_MINUTES_IN_MS = 5 * 60 * 1000;
+
+            if (NOW - CREATED_AT > TEN_MINUTES_IN_MS) {
+                showResult('error', 'Link Scaduto', 'Sono passati più di 10 minuti. Per favore, effettua una nuova prenotazione.');
+                // Opzionale: si potrebbe tentare di eliminare la prenotazione scaduta da qui
+                // bookingIndexRef.remove(); // Potrebbe liberare lo slot
+                return;
+            }
+
+            if (bookingData.status === 'confirmed') {
+                showResult('info', 'Già Confermato!', `La prenotazione per il campo ${bookingData.campo} del ${bookingData.data} è già stata confermata.`);
+                return;
+            }
+
+            if (bookingData.status !== 'pending') {
+                showResult('error', 'Stato Non Valido', 'Questa prenotazione non può essere confermata.');
+                return;
+            }
+            
+            const updates = {};
+            updates[`/indicePrenotazioni/${bookingId}/status`] = 'confirmed';
+            bookingData.orari.forEach(time => {
+                const timeKey = time.replace(':', '-');
+                updates[`/prenotazioni/${bookingData.data}/campo-${bookingData.campo}/${timeKey}/status`] = 'confirmed';
+            });
+
+            database.ref().update(updates)
+                .then(() => {
+                    showResult('success', 'Prenotazione Confermata!', `La tua prenotazione per il <strong>Campo ${bookingData.campo}</strong> del <strong>${new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(bookingData.data + "T00:00:00"))}</strong> alle ore <strong>${bookingData.orari.sort().join(', ')}</strong> è ora definitiva. Riceverai a breve una mail di riepilogo.`);
+                    sendFinalConfirmationEmail(bookingData);
+                })
+                .catch(error => {
+                    showResult('error', 'Errore di Conferma', 'Si è verificato un problema tecnico durante la conferma. Riprova o contatta il circolo.');
+                });
+
+        }).catch(error => {
+            showResult('error', 'Errore di Sistema', 'Impossibile accedere ai dati della prenotazione. Controlla la tua connessione e riprova.');
+        });
+
+        function showResult(type, title, message) {
+            spinner.style.display = 'none';
+            const iconMap = {
+                success: '<i class="fa-solid fa-circle-check text-4xl text-green-400"></i>',
+                info: '<i class="fa-solid fa-circle-info text-4xl text-blue-400"></i>',
+                error: '<i class="fa-solid fa-circle-xmark text-4xl text-red-400"></i>'
+            };
+            const iconContainer = document.createElement('div');
+            iconContainer.className = 'w-20 h-20 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center';
+            iconContainer.innerHTML = iconMap[type] || iconMap['error'];
+            statusContainer.insertBefore(iconContainer, statusH1);
+            statusH1.textContent = title;
+            statusMessage.innerHTML = message;
+        }
+
+        function sendFinalConfirmationEmail(data) {
+             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkWfsEKvYnIiZ0DF3E5q6rDMEGpBPi-7kgbT3Noj0tphkoSDJAA7DiFgMX752cvHVzFg/exec";
+             const CANCELLATION_PAGE_URL = "cancella.html"; 
+             const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
+
+             const emailData = {
+                type: 'final_confirmation',
+                nome: data.nome,
+                email: data.email,
+                data: new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(data.data + "T00:00:00")),
+                campo: data.campo,
+                orari: data.orari.sort().join(', '),
+                id: bookingId,
+                linkCancellazione: cancellationLink
+            };
+
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(emailData), headers: { 'Content-Type': 'application/json' }})
+            .catch(error => console.error("Errore script email finale:", error));
+        }
+    });
+    </script>
+</body>
+</html>
