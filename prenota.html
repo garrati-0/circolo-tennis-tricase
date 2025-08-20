@@ -192,13 +192,23 @@
                             <tbody>
                                 <tr class="border-b border-gray-300 dark:border-zinc-700">
                                     <td class="p-2 font-bold">Soci</td>
-                                    <td class="p-2 text-center">€10</td>
-                                    <td class="p-2 text-center">€15</td>
+                                    <td class="p-2 text-center">€3</td>
+                                    <td class="p-2 text-center">€4</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2 font-bold">Non Soci</td>
-                                    <td class="p-2 text-center">€15</td>
-                                    <td class="p-2 text-center">€20</td>
+                                    <td class="p-2 font-bold">Non Socio</td>
+                                    <td class="p-2 text-center">€6</td>
+                                    <td class="p-2 text-center">€8</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">Doppio socio</td>
+                                    <td class="p-2 text-center">€5</td>
+                                    <td class="p-2 text-center">€7</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold">Doppio Non Socio</td>
+                                    <td class="p-2 text-center">€6</td>
+                                    <td class="p-2 text-center">€8</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -393,7 +403,7 @@
             const selectedDayOfWeek = selectedDate.getDay(); 
 
             for (let hour = 8; hour < 22; hour++) {
-                if (hour >= 13 && hour <= 15) { // Lunch break
+                if (hour >= 13 && hour <= 15 || hour == 21) { // Lunch break
                     continue;
                 }
                 const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
