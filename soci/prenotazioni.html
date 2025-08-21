@@ -24,7 +24,7 @@
         body {
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
-            transition: background-color: 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
             position: relative;
             isolation: isolate;
         }
@@ -112,6 +112,13 @@
             cursor: not-allowed;
             text-decoration: line-through;
         }
+        /* Style for member-only slots */
+        .socio-star {
+            color: #f59e0b; /* amber-500 */
+            font-size: 0.75rem;
+            margin-left: 4px;
+            vertical-align: super;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -168,6 +175,7 @@
                         <div class="flex flex-wrap gap-x-6 gap-y-2 mt-6 pt-4 border-t border-gray-300 dark:border-zinc-700 text-sm text-gray-600 dark:text-gray-400">
                             <div class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-terra-light dark:bg-terra"></span> Prenotato</div>
                             <div class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-amber-500"></span> Corsi</div>
+                            <div class="flex items-center gap-2"><span class="socio-star">★</span> Solo Soci</div>
                         </div>
                     </div>
                 </div>
@@ -175,10 +183,13 @@
                 <!-- Summary Panel -->
                 <!-- Light theme: Opaque white card with shadow. Dark theme: Original style -->
                 <div id="summary-panel" class="lg:col-span-1 bg-white dark:bg-black/30 p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-white/10 shadow-lg sticky top-24">
-                    <h2 class="font-mono text-2xl font-bold mb-6">Riepilogo e Prezzi</h2>
-                  <div class="mb-6">
+                    <h2 class="font-mono text-2xl font-bold mb-4">Riepilogo e Prezzi</h2>
+                    
+                    <!-- Price List -->
+                    <div class="mb-6">
                         <h3 class="font-mono text-lg font-bold mb-3 text-verde-light dark:text-verde">Listino Prezzi Orari</h3>
                         <table class="w-full text-sm text-left">
+                            <!-- Light theme: Lighter gray header. Dark theme: Original style -->
                             <thead class="font-bold bg-gray-100 dark:bg-zinc-800">
                                 <tr>
                                     <th class="p-2 rounded-tl-lg"></th>
@@ -192,13 +203,13 @@
                                     <td class="p-2 text-center">€3</td>
                                     <td class="p-2 text-center">€4</td>
                                 </tr>
-                                <tr class="border-b border-gray-300 dark:border-zinc-700">
+                                <tr>
                                     <td class="p-2 font-bold">Non Socio</td>
                                     <td class="p-2 text-center">€6</td>
                                     <td class="p-2 text-center">€8</td>
                                 </tr>
-                                <tr class="border-b border-gray-300 dark:border-zinc-700">
-                                    <td class="p-2 font-bold">Doppio Socio</td>
+                                <tr>
+                                    <td class="p-2 font-bold">Doppio socio</td>
                                     <td class="p-2 text-center">€5</td>
                                     <td class="p-2 text-center">€7</td>
                                 </tr>
@@ -212,7 +223,7 @@
                     </div>
 
                     <!-- Booking Summary -->
-                    <div id="booking-summary" class="hidden font-mono space-y-2 text-sm mt-6 pt-6 border-t border-gray-300 dark:border-zinc-700">
+                    <div id="booking-summary" class="hidden font-mono space-y-2 text-sm">
                         <div class="flex justify-between items-center py-2 border-b border-gray-300 dark:border-zinc-700">
                             <span class="text-gray-500 dark:text-gray-400">Data</span>
                             <span class="font-bold" id="summary-date">-</span>
@@ -255,11 +266,11 @@
         <!-- Confirmation Message -->
         <div class="text-center py-20 hidden" id="confirmation-container">
              <div class="bg-white dark:bg-black/30 backdrop-blur-md p-10 rounded-2xl border border-gray-200 dark:border-white/10 shadow-lg max-w-3xl mx-auto">
-                   <div class="w-20 h-20 mx-auto mb-6 bg-verde-light/20 dark:bg-verde/20 rounded-full flex items-center justify-center">
-                       <i class="fa-solid fa-circle-check text-4xl text-verde-light dark:text-verde"></i>
-                   </div>
-                   <h1 class="font-display text-4xl sm:text-5xl text-zinc-900 dark:text-white">Grazie!</h1>
-                   <p id="confirmation-message" class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400"></p>
+                    <div class="w-20 h-20 mx-auto mb-6 bg-verde-light/20 dark:bg-verde/20 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-circle-check text-4xl text-verde-light dark:text-verde"></i>
+                    </div>
+                    <h1 class="font-display text-4xl sm:text-5xl text-zinc-900 dark:text-white">Grazie!</h1>
+                    <p id="confirmation-message" class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400"></p>
              </div>
         </div>
     </main>
@@ -360,50 +371,32 @@
         let unavailableSlots = [];
         let recurringBookings = {};
 
-        // Renders the date picker based on the booking week logic
+        // Renders the date picker for the next 7 days or until Sunday
         const renderDatePicker = () => {
             datePicker.innerHTML = '';
             const today = new Date();
-            const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-
-            let loopStartDate;
-
-            // If today is Sunday, we show the next week (Mon-Sat)
-            if (dayOfWeek === 0) {
-                loopStartDate = new Date(today);
-                loopStartDate.setDate(today.getDate() + 1); // Start from next Monday
-            } else {
-            // Otherwise, we show the rest of the current week (today until Sat)
-                loopStartDate = new Date(today);
-            }
-
-            // Find the Saturday of the week that loopStartDate is in.
-            const endOfWeek = new Date(loopStartDate);
-            endOfWeek.setDate(loopStartDate.getDate() + (6 - loopStartDate.getDay()));
-
-            let firstDayRendered = false;
-            
-            // Loop from the calculated start date until that week's Saturday.
-            for (let d = new Date(loopStartDate); d <= endOfWeek; d.setDate(d.getDate() + 1)) {
-                const date = new Date(d); // Create a copy to avoid mutation issues in the loop
-                
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() + i);
                 const dateValue = date.toISOString().split('T')[0];
                 const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
                 const dayNum = date.getDate();
                 const option = document.createElement('div');
-                
                 option.className = 'date-option flex-grow text-center font-semibold p-3 bg-gray-50 border border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde';
                 option.dataset.date = dateValue;
                 option.innerHTML = `<div class="text-xs uppercase text-gray-500 dark:text-gray-400">${dayName}</div><div class="text-2xl">${dayNum}</div>`;
-                
-                // Select the first available day in the sequence
-                if (!firstDayRendered) {
+                if (i === 0) {
                     booking.date = dateValue;
                     option.classList.add('selected');
-                    firstDayRendered = true;
                 }
-
                 datePicker.appendChild(option);
+                // The original logic stopped at the first Sunday. This ensures a full 7-day view.
+                // If you want to stop on Sunday, uncomment the following block.
+                
+                if (date.getDay() === 0) { // Stop if Sunday is reached
+                    break;
+                }
+                
             }
         };
 
@@ -412,28 +405,36 @@
             timeSlotsContainer.innerHTML = '';
             if (!booking.date) return;
 
-            // Adjust start minute based on the field number
             let minuteOffset = 0;
             if (booking.field === '2') minuteOffset = 15;
             else if (booking.field === '3') minuteOffset = 30;
 
             const selectedDate = new Date(booking.date + "T00:00:00");
             const selectedDayOfWeek = selectedDate.getDay(); 
+            const socioHours = [13, 14, 15, 21, 22]; // Member-only hours
 
-            for (let hour = 8; hour < 22; hour++) {
-                if (hour >= 13 && hour <= 15 || hour == 21) { // Lunch break
+            // Loop now includes the new member-only hours
+            for (let hour = 8; hour < 23; hour++) {
+                 // Skip the afternoon break for non-member hours
+                if (hour > 15 && hour < 16 && !socioHours.includes(hour)) {
                     continue;
                 }
+
                 const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
                 const slot = document.createElement('div');
-                // DESIGN UPDATE: Changed classes for a cleaner light theme look
                 slot.className = 'time-slot text-center font-semibold p-3 bg-gray-50 border border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde';
                 slot.dataset.time = time;
                 slot.textContent = time;
 
+                const isSocioOnlySlot = socioHours.includes(hour) || selectedDayOfWeek === 0;
+
+                if (isSocioOnlySlot) {
+                    slot.innerHTML += `<span class="socio-star">★</span>`;
+                    slot.dataset.socio = "true";
+                }
+
                 const isRegularlyBooked = unavailableSlots.includes(time);
 
-                // Check for recurring bookings (e.g., courses)
                 let isRecurringlyBooked = false;
                 for (const key in recurringBookings) {
                     const rb = recurringBookings[key];
@@ -462,7 +463,19 @@
                 summaryDate.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(booking.date + "T00:00:00"));
             }
             summaryField.textContent = `Campo ${booking.field}`;
-            summaryTime.textContent = booking.timeSlots.length > 0 ? booking.timeSlots.sort().join(', ') : '-';
+            
+            const sortedTimes = booking.timeSlots.sort();
+            let timeText = sortedTimes.length > 0 ? '' : '-';
+            sortedTimes.forEach(time => {
+                const hour = parseInt(time.split(':')[0]);
+                const selectedDate = new Date(booking.date + "T00:00:00");
+                const isSunday = selectedDate.getDay() === 0;
+                const socioHours = [13, 14, 15, 21, 22];
+                const isSocioSlot = isSunday || socioHours.includes(hour);
+                timeText += `${time}${isSocioSlot ? '<span class="socio-star">★</span>' : ''} `;
+            });
+
+            summaryTime.innerHTML = timeText.trim();
             
             if (booking.timeSlots.length > 0) {
                 summaryDiv.classList.remove('hidden');
@@ -562,6 +575,26 @@
             }
             updateSummary();
         });
+        
+        // NEW: Function to check if a user is a member
+        async function isSocio(nome, cognome, email) {
+            const sociRef = database.ref('soci');
+            const snapshot = await sociRef.orderByChild('email').equalTo(email.trim().toLowerCase()).once('value');
+            
+            if (!snapshot.exists()) {
+                return false; // No member with this email
+            }
+
+            let isMatch = false;
+            snapshot.forEach(childSnapshot => {
+                const socioData = childSnapshot.val();
+                if (socioData.nome.trim().toLowerCase() === nome.trim().toLowerCase() &&
+                    socioData.cognome.trim().toLowerCase() === cognome.trim().toLowerCase()) {
+                    isMatch = true;
+                }
+            });
+            return isMatch;
+        }
 
         // Checks if the user has exceeded the weekly booking limit
         async function checkWeeklyBookingLimit(email) {
@@ -598,11 +631,13 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const nome = form.Nome.value.trim();
+            const cognome = form.Cognome.value.trim();
             const email = form.Email.value.trim();
             const confirmEmail = document.getElementById('confirm-email').value.trim();
 
             // Form validation
-            if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !email || !form.Telefono.value.trim()) {
+            if (!nome || !cognome || !email || !form.Telefono.value.trim()) {
                 showModal("Per favore, compila tutti i campi anagrafici.");
                 return;
             }
@@ -623,6 +658,25 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Verifica in corso...';
 
+            // NEW: Check if a member-only slot is selected and verify membership
+            const socioHours = [13, 14, 15, 21, 22];
+            const selectedDate = new Date(booking.date + "T00:00:00");
+            const isSunday = selectedDate.getDay() === 0;
+            const requiresSocioCheck = booking.timeSlots.some(time => {
+                const hour = parseInt(time.split(':')[0]);
+                return isSunday || socioHours.includes(hour);
+            });
+
+            if (requiresSocioCheck) {
+                const isUserSocio = await isSocio(nome, cognome, email);
+                if (!isUserSocio) {
+                    showModal("Le ore con la stella (★) e tutte le ore della domenica sono riservate ai soli soci. Verifica i dati inseriti o contatta la segreteria.");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Conferma Prenotazione';
+                    return;
+                }
+            }
+
             // Check weekly booking limit
             const bookedHours = await checkWeeklyBookingLimit(email);
             const hoursToBook = booking.timeSlots.length;
@@ -639,12 +693,12 @@
             
             const userData = {
                 bookingId: bookingId,
-                nome: form.Nome.value,
-                cognome: form.Cognome.value,
+                nome: nome,
+                cognome: cognome,
                 email: email,
                 telefono: form.Telefono.value,
                 prenotatoIl: firebase.database.ServerValue.TIMESTAMP,
-                status: 'confirmed' // Booking is confirmed immediately
+                status: 'confirmed'
             };
 
             // Use a transaction to prevent double bookings
@@ -704,20 +758,20 @@
              const cancellationLink = `https://www.circolotennistricase.it/${CANCELLATION_PAGE_URL}?id=${data.bookingId}`;
 
              const emailData = {
-                 type: 'final_confirmation',
-                 nome: data.nome,
-                 email: data.email,
-                 data: new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(data.data + "T00:00:00")),
-                 campo: data.campo,
-                 orari: data.orari.sort().join(', '),
-                 id: data.bookingId,
-                 linkCancellazione: cancellationLink
+                  type: 'final_confirmation',
+                  nome: data.nome,
+                  email: data.email,
+                  data: new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(data.data + "T00:00:00")),
+                  campo: data.campo,
+                  orari: data.orari.sort().join(', '),
+                  id: data.bookingId,
+                  linkCancellazione: cancellationLink
              };
 
              fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(emailData), headers: { 'Content-Type': 'application/json' }})
              .then(() => console.log("Final confirmation email request sent."))
              .catch(error => console.error("Error sending final email request:", error));
-         }
+        }
 
         // --- INITIAL EXECUTION ---
         renderDatePicker();
