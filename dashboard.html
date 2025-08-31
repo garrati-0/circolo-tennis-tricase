@@ -364,6 +364,14 @@
         let currentBookingsListener = null;
         let recurringBookings = {};
 
+        // --- FIX: Timezone-safe date formatting helper ---
+        const toLocalISOString = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // +1 because getMonth() is 0-indexed
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
         // --- Initialization ---
         const fp = flatpickr(datepickerBtn, {
             locale: "it",
@@ -533,7 +541,10 @@
             currentDateElem.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'full' }).format(currentDate);
             fp.setDate(currentDate, false);
             
-            const dateString = currentDate.toISOString().split('T')[0];
+            // --- FIX APPLIED HERE ---
+            const dateString = toLocalISOString(currentDate);
+            // --- END OF FIX ---
+
             const bookingsRef = database.ref('prenotazioni/' + dateString);
             currentBookingsListener = bookingsRef;
             
@@ -602,7 +613,10 @@
 
             if (deleteBtn) {
                 const { field, time, bookingId } = deleteBtn.dataset;
-                const dateString = currentDate.toISOString().split('T')[0];
+                
+                // --- FIX APPLIED HERE ---
+                const dateString = toLocalISOString(currentDate);
+                // --- END OF FIX ---
                 const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
 
                 database.ref(bookingPath).once('value', (snapshot) => {
@@ -619,7 +633,7 @@
                         bookingId,
                         userEmail: bookingData.email,
                         userName: bookingData.nome,
-                        bookingDate: new Date(dateString).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                        bookingDate: new Date(dateString + 'T12:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                         bookingTime: time.replace('-',':')
                     });
                     document.getElementById('cancellation-info').textContent = `Stai per cancellare la prenotazione di ${bookingData.nome} ${bookingData.cognome} per le ore ${time.replace('-',':')}.`;
@@ -636,7 +650,10 @@
             
             } else if (editTrigger && !editTrigger.closest('.booking-card.recurring')) {
                 const { field, time } = editTrigger.dataset;
-                const dateString = currentDate.toISOString().split('T')[0];
+                
+                // --- FIX APPLIED HERE ---
+                const dateString = toLocalISOString(currentDate);
+                // --- END OF FIX ---
                 const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
 
                 database.ref(bookingPath).once('value', (snapshot) => {
@@ -770,7 +787,10 @@
 
             const field = document.getElementById('manual-field').value;
             const time = document.getElementById('manual-time').value;
-            const dateString = currentDate.toISOString().split('T')[0];
+            
+            // --- FIX APPLIED HERE ---
+            const dateString = toLocalISOString(currentDate);
+            // --- END OF FIX ---
             
             const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
             const bookingId = bookingRef.push().key;
@@ -802,12 +822,12 @@
                 await database.ref().update(updates);
                 
                 const CANCELLATION_PAGE_URL = "cancella.html"; 
-                const cancellationLink = `https://garrati-0.github.io/circolo-tennis-tricase/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
-                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbye8eB2g7m1OwRko81Qv849e4DeBZ5uH9aXEpuVO79JWT8ZXzt8EHGNf316pNBVeqt5/exec";
+                const cancellationLink = `https://www.circolotennistricase.it/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJAXEg-M5Y_wZS37n-avMvoWGQdrmWqrK4-K8212n4WcYziuOUiMR-b8ItFFyKC11ymg/exec";
                 const emailData = {
                     type: 'confirmation',
                     nome: bookingData.nome, email: bookingData.email,
-                    data: new Date(dateString).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                    data: new Date(dateString + 'T12:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                     campo: field, orari: time, id: bookingId, linkCancellazione: cancellationLink
                 };
                 
@@ -872,7 +892,7 @@
                 }
                 await database.ref().update(updates);
                 
-                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbye8eB2g7m1OwRko81Qv849e4DeBZ5uH9aXEpuVO79JWT8ZXzt8EHGNf316pNBVeqt5/exec";
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJAXEg-M5Y_wZS37n-avMvoWGQdrmWqrK4-K8212n4WcYziuOUiMR-b8ItFFyKC11ymg/exec";
                 const emailData = {
                     type: 'cancellation',
                     nome: userName,
@@ -944,7 +964,7 @@
                     personData.bookings.forEach(b => {
                         const li = document.createElement('li');
                         li.innerHTML = `
-                            <span>${new Date(b.date).toLocaleDateString('it-IT')} ore ${b.time.replace('-',':')} (Campo ${b.field.split('-')[1]})</span>
+                            <span>${new Date(b.date + 'T12:00:00').toLocaleDateString('it-IT')} ore ${b.time.replace('-',':')} (Campo ${b.field.split('-')[1]})</span>
                             <button class="mark-as-paid-btn" data-path="${b.path}">Segna Pagato</button>
                         `;
                         ul.appendChild(li);
@@ -971,7 +991,9 @@
                     .then(() => {
                         showToast('Stato pagamento aggiornato!', 'success');
                         showUnpaidBookings();
-                        if (path.split('/')[1] === currentDate.toISOString().split('T')[0]) {
+                        // --- FIX APPLIED HERE ---
+                        if (path.split('/')[1] === toLocalISOString(currentDate)) {
+                        // --- END OF FIX ---
                             listenToBookingsForDate();
                         }
                     })
@@ -1040,7 +1062,7 @@
                 li.innerHTML = `
                     <strong>${res.nome} ${res.cognome}</strong>
                     <span>
-                        <i class="fa-solid fa-calendar-day"></i> ${new Date(res.date).toLocaleDateString('it-IT')} 
+                        <i class="fa-solid fa-calendar-day"></i> ${new Date(res.date + 'T12:00:00').toLocaleDateString('it-IT')} 
                         <i class="fa-solid fa-clock"></i> ${res.time.replace('-',':')} 
                         <i class="fa-solid fa-person-shelter"></i> Campo ${res.fieldId.split('-')[1]}
                     </span>
@@ -1055,8 +1077,7 @@
 
             const { date, field, time } = targetLi.dataset;
             
-            currentDate = new Date(date);
-            currentDate.setHours(12);
+            currentDate = new Date(date + 'T12:00:00'); // Use noon to avoid timezone shifts
             listenToBookingsForDate();
 
             setTimeout(() => {
