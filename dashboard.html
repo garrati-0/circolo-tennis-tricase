@@ -140,7 +140,7 @@
         .modal-content h2 { margin-top: 0; }
         .modal-content .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
         .modal-content .close-btn:hover { color: #333; }
-        #manual-booking-form, #edit-booking-form { margin-top: 20px; }
+        #manual-booking-form, #edit-booking-form { margin-top: 20px; overflow-y: auto; padding-right: 15px; }
         
         /* Unpaid List Modal */
         #unpaid-list-container { overflow-y: auto; }
@@ -243,6 +243,12 @@
             <h2 id="edit-modal-title">Modifica Prenotazione</h2>
             <div id="edit-modal-subtitle" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></div>
             <form id="edit-booking-form">
+                <!-- MODIFICATION START: Added fields to edit customer data -->
+                <div class="form-group"><label for="edit-name">Nome</label><input type="text" id="edit-name" required></div>
+                <div class="form-group"><label for="edit-surname">Cognome</label><input type="text" id="edit-surname" required></div>
+                <div class="form-group"><label for="edit-email">Email</label><input type="email" id="edit-email" required></div>
+                <div class="form-group"><label for="edit-phone">Telefono</label><input type="tel" id="edit-phone" required></div>
+                <!-- MODIFICATION END -->
                  <div class="form-group">
                     <label for="edit-payment-status">Stato Pagamento</label>
                     <select id="edit-payment-status">
@@ -664,9 +670,22 @@
                     const timeFormatted = time.replace('-', ':');
                     
                     document.getElementById('edit-modal-subtitle').textContent = `${bookingData.nome} ${bookingData.cognome} - Campo ${fieldNumber} ore ${timeFormatted}`;
+                    
+                    // MODIFICATION START: Populate the new edit fields
+                    document.getElementById('edit-name').value = bookingData.nome || '';
+                    document.getElementById('edit-surname').value = bookingData.cognome || '';
+                    document.getElementById('edit-email').value = bookingData.email || '';
+                    document.getElementById('edit-phone').value = bookingData.telefono || '';
+                    // MODIFICATION END
+                    
                     document.getElementById('edit-payment-status').value = bookingData.pagato ? 'paid' : 'unpaid';
                     document.getElementById('edit-notes').value = bookingData.note || '';
                     editBookingForm.dataset.bookingPath = bookingPath;
+                    
+                    // MODIFICATION START: Store booking ID for updating the index
+                    editBookingForm.dataset.bookingId = bookingData.bookingId;
+                    // MODIFICATION END
+
                     editBookingModal.style.display = 'flex';
                 });
             }
@@ -851,18 +870,47 @@
             submitBtn.disabled = true;
 
             const bookingPath = editBookingForm.dataset.bookingPath;
+            // MODIFICATION START: Get bookingId from dataset
+            const bookingId = editBookingForm.dataset.bookingId;
+            // MODIFICATION END
+
             if (!bookingPath) {
                 showToast('Errore: percorso del booking non trovato.', 'error');
                 submitBtn.disabled = false; return;
             }
 
-            const updates = {
+            // MODIFICATION START: Create an object with all updated data and perform a multi-path update
+            const updatedData = {
+                nome: document.getElementById('edit-name').value.trim(),
+                cognome: document.getElementById('edit-surname').value.trim(),
+                email: document.getElementById('edit-email').value.trim(),
+                telefono: document.getElementById('edit-phone').value.trim(),
                 pagato: document.getElementById('edit-payment-status').value === 'paid',
                 note: document.getElementById('edit-notes').value.trim()
             };
 
+            const updates = {};
+            // Update the main booking object fields individually
+            updates[`${bookingPath}/nome`] = updatedData.nome;
+            updates[`${bookingPath}/cognome`] = updatedData.cognome;
+            updates[`${bookingPath}/email`] = updatedData.email;
+            updates[`${bookingPath}/telefono`] = updatedData.telefono;
+            updates[`${bookingPath}/pagato`] = updatedData.pagato;
+            updates[`${bookingPath}/note`] = updatedData.note;
+
+            // Also update the search index if bookingId is present
+            if (bookingId) {
+                const indexPath = `indicePrenotazioni/${bookingId}`;
+                updates[`${indexPath}/nome`] = updatedData.nome;
+                updates[`${indexPath}/cognome`] = updatedData.cognome;
+                updates[`${indexPath}/email`] = updatedData.email;
+            }
+            // MODIFICATION END
+
             try {
-                await database.ref(bookingPath).update(updates);
+                // MODIFICATION START: Use the multi-path updates object
+                await database.ref().update(updates);
+                // MODIFICATION END
                 showToast('Modifiche salvate!', 'success');
                 editBookingModal.style.display = 'none';
             } catch (error) {
