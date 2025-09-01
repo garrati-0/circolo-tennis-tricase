@@ -67,9 +67,6 @@
         #unpaid-btn:hover { background-color: var(--colore-warning); color: white; }
         .date-navigation h2 { color: var(--colore-primario); font-size: 1.8rem; margin: 0; text-align: center; flex-grow: 1; }
 
-        /* MOBILE: Field Selector Tabs */
-        .mobile-field-selector { display: none; }
-        
         /* Calendar Grid */
         .column-headers { display: grid; grid-template-columns: 80px repeat(3, 1fr); gap: 3px; margin-bottom: -3px; padding: 0; font-weight: bold; text-align: center; }
         .header-item { background-color: #343A40; color: white; padding: 15px; border-radius: 8px 8px 0 0; border-bottom: 5px solid transparent; }
@@ -156,41 +153,6 @@
         .unpaid-person-content li { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--colore-bordo); }
         .unpaid-person-content li:last-child { border-bottom: none; }
         .mark-as-paid-btn { background-color: var(--colore-successo); color: white; border: none; padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; cursor: pointer; }
-        
-        /* Search in Unpaid Modal */
-        .search-unpaid-container {
-            margin-bottom: 20px;
-            position: relative;
-            display: flex;
-            gap: 5px;
-        }
-        #unpaid-search-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 1rem;
-            border-radius: 6px;
-            border: 1px solid var(--colore-bordo);
-            box-sizing: border-box;
-            flex-grow: 1;
-        }
-        #unpaid-search-btn {
-            padding: 0 15px;
-            border-radius: 6px;
-            border: 1px solid var(--colore-bordo);
-            background-color: var(--colore-sfondo);
-            cursor: pointer;
-            color: var(--colore-testo-secondario);
-            font-size: 1rem;
-            transition: background-color 0.2s;
-        }
-        #unpaid-search-btn:hover {
-            background-color: #e9ecef;
-        }
-        #unpaid-search-input:focus {
-            border-color: var(--colore-primario);
-            box-shadow: 0 0 0 3px var(--colore-primario-trasparente);
-            outline: none;
-        }
 
         /* Search Results Modal */
         #search-results-list { list-style: none; padding: 0; margin: 0; max-height: 60vh; overflow-y: auto; }
@@ -198,126 +160,6 @@
         #search-results-list li:hover { background-color: var(--colore-primario-trasparente); }
         #search-results-list li strong { display: block; font-size: 1.1rem; margin-bottom: 5px; }
         #search-results-list li span { color: var(--colore-testo-secondario); font-size: 0.9rem; }
-
-        /* --- RESPONSIVE STYLES --- */
-        @media (max-width: 800px) {
-            .container {
-                padding: 10px;
-            }
-
-            .date-navigation {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                row-gap: 10px;
-            }
-             /* Force a line break after the first "row" of controls */
-            .date-navigation h2::after {
-                content: '';
-                flex-basis: 100%;
-                width: 0;
-                order: 2; /* Position the line break after the date and arrows */
-            }
-            .date-navigation h2 {
-                order: 2;
-                flex-grow: 1; /* Push arrows to sides */
-                text-align: center;
-                margin: 0;
-                font-size: 1.4rem;
-            }
-            #prev-day {
-                order: 1;
-            }
-            #next-day {
-                order: 3;
-            }
-            /* Style the second row of buttons */
-            #today-btn, #datepicker-btn, #unpaid-btn {
-                order: 4;
-                flex-grow: 1;
-                justify-content: center;
-            }
-            .date-navigation button {
-                padding: 8px 10px;
-                font-size: 0.9rem;
-            }
-
-            /* Show mobile tabs, hide desktop headers */
-            .mobile-field-selector {
-                display: flex;
-                justify-content: stretch;
-                margin-bottom: 10px;
-                gap: 3px;
-            }
-            .mobile-field-selector .field-tab {
-                flex-grow: 1;
-                padding: 12px 5px;
-                border: 1px solid var(--colore-bordo);
-                background-color: var(--colore-superficie);
-                border-radius: 8px;
-                cursor: pointer;
-                font-weight: bold;
-                transition: all 0.2s;
-            }
-            .mobile-field-selector .field-tab.active {
-                background-color: var(--colore-primario);
-                color: white;
-                border-color: var(--colore-primario);
-            }
-            .column-headers {
-                display: none;
-            }
-
-            /* Adjust calendar grid for mobile view */
-            .calendar-container {
-                grid-template-columns: 65px 1fr; /* Smaller time column */
-            }
-            .time-label {
-                font-size: 0.8rem;
-            }
-            .time-slot {
-                 /* Reset grid-column that might be set by JS or inline styles if any */
-                grid-column: auto !important;
-            }
-
-            /* Hide non-active fields */
-            .calendar-container.show-field-1 .field-2,
-            .calendar-container.show-field-1 .field-3 { display: none; }
-
-            .calendar-container.show-field-2 .field-1,
-            .calendar-container.show-field-2 .field-3 { display: none; }
-            
-            .calendar-container.show-field-3 .field-1,
-            .calendar-container.show-field-3 .field-2 { display: none; }
-
-            .skeleton-loader {
-                grid-template-columns: 65px 1fr;
-            }
-            /* Hide skeleton items for the non-visible fields */
-            .skeleton-loader .skeleton-item:nth-child(4n-1), /* Corresponds to field 2 */
-            .skeleton-loader .skeleton-item:nth-child(4n) {   /* Corresponds to field 3 */
-                display: none;
-            }
-
-
-            /* Recurring bookings layout */
-            .recurring-layout {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            /* Modals and Forms */
-            .modal-content {
-                padding: 20px 15px;
-                width: 95%;
-            }
-            #manual-booking-form, #edit-booking-form {
-                padding-right: 5px;
-            }
-            #search-form {
-                flex-direction: column;
-            }
-        }
     </style>
 </head>
 <body>
@@ -327,17 +169,10 @@
         <div class="date-navigation">
             <button id="prev-day"><i class="fa-solid fa-chevron-left"></i></button>
             <button id="today-btn"><i class="fa-solid fa-calendar-day"></i> Oggi</button>
-            <button id="datepicker-btn"><i class="fa-solid fa-calendar-alt"></i> Data</button>
+            <button id="datepicker-btn"><i class="fa-solid fa-calendar-alt"></i> Seleziona Data</button>
             <button id="unpaid-btn"><i class="fa-solid fa-file-invoice-dollar"></i> Da Pagare</button>
             <h2 id="current-date">Caricamento...</h2>
             <button id="next-day"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
-        
-        <!-- MOBILE ONLY: Field selector tabs -->
-        <div class="mobile-field-selector">
-            <button class="field-tab active" data-field="1">Campo 1</button>
-            <button class="field-tab" data-field="2">Campo 2</button>
-            <button class="field-tab" data-field="3">Campo 3</button>
         </div>
         
         <div class="column-headers">
@@ -347,8 +182,7 @@
             <div class="header-item campo-3">Campo 3</div>
         </div>
 
-        <!-- The class "show-field-1" will be managed by JS for mobile view -->
-        <div id="calendar-grid" class="calendar-container show-field-1">
+        <div id="calendar-grid" class="calendar-container">
              <!-- Skeleton Loader will be injected here by JS -->
         </div>
         <div id="no-bookings">Nessuna prenotazione per questa data.</div>
@@ -462,10 +296,6 @@
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2>Clienti con Pagamenti in Sospeso</h2>
-            <form id="unpaid-search-form" class="search-unpaid-container">
-                <input type="search" id="unpaid-search-input" placeholder="Cerca cliente...">
-                <button type="submit" id="unpaid-search-btn"><i class="fa-solid fa-search"></i></button>
-            </form>
             <div id="unpaid-list-container">
                 <!-- La lista verrà generata dinamicamente qui -->
             </div>
@@ -522,9 +352,6 @@
         const recurringFieldSelect = document.getElementById('recurring-field');
         const recurringTimeStartSelect = document.getElementById('recurring-time-start');
         const recurringTimeEndSelect = document.getElementById('recurring-time-end');
-        
-        // MOBILE ONLY
-        const mobileFieldSelector = document.querySelector('.mobile-field-selector');
 
         // Modals
         const bookingModal = document.getElementById('booking-modal');
@@ -533,8 +360,6 @@
         const confirmModal = document.getElementById('confirm-modal');
         const unpaidModal = document.getElementById('unpaid-modal');
         const searchResultsModal = document.getElementById('search-results-modal');
-        const unpaidSearchInput = document.getElementById('unpaid-search-input');
-        const unpaidSearchForm = document.getElementById('unpaid-search-form');
         
         const manualBookingForm = document.getElementById('manual-booking-form');
         const editBookingForm = document.getElementById('edit-booking-form');
@@ -649,7 +474,7 @@
                 for (let field = 1; field <= 3; field++) {
                     const slotId = `slot-${hour}-${field}`;
                     const slotDiv = document.createElement('div');
-                    slotDiv.className = `time-slot field-${field}`; // MOD: Added field-X class
+                    slotDiv.className = 'time-slot';
                     slotDiv.id = slotId;
                     slots[slotId] = slotDiv; 
                     fragment.appendChild(slotDiv);
@@ -869,18 +694,6 @@
         prevDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() - 1); listenToBookingsForDate(); });
         nextDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() + 1); listenToBookingsForDate(); });
         todayBtn.addEventListener('click', () => { currentDate = new Date(); listenToBookingsForDate(); });
-        
-        // MOBILE ONLY: Event listener for field tabs
-        mobileFieldSelector.addEventListener('click', (e) => {
-            if (e.target.classList.contains('field-tab')) {
-                const field = e.target.dataset.field;
-                mobileFieldSelector.querySelectorAll('.field-tab').forEach(tab => tab.classList.remove('active'));
-                e.target.classList.add('active');
-
-                calendarGrid.className = 'calendar-container'; // Reset all classes
-                calendarGrid.classList.add(`show-field-${field}`);
-            }
-        });
 
         function populateRecurringTimes() {
             recurringTimeStartSelect.innerHTML = '';
@@ -1151,7 +964,7 @@
             }
         });
 
-        const showUnpaidBookings = async (searchTerm = '') => {
+        const showUnpaidBookings = async () => {
             const unpaidListContainer = document.getElementById('unpaid-list-container');
             unpaidListContainer.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Caricamento...';
             unpaidModal.style.display = 'flex';
@@ -1167,9 +980,6 @@
                             const booking = bookingsByDate[date][fieldId][time];
                             if (booking && !booking.pagato && !booking.isRecurring) {
                                 const personKey = `${booking.nome} ${booking.cognome}`.trim().toLowerCase();
-                                if (searchTerm && !personKey.includes(searchTerm)) {
-                                    continue; // Salta se non corrisponde alla ricerca
-                                }
                                 if (!unpaidByPerson[personKey]) {
                                     unpaidByPerson[personKey] = { name: `${booking.nome} ${booking.cognome}`.trim(), bookings: [] };
                                 }
@@ -1184,7 +994,7 @@
                 
                 unpaidListContainer.innerHTML = '';
                 if (Object.keys(unpaidByPerson).length === 0) {
-                    unpaidListContainer.innerHTML = `<p>Nessun pagamento in sospeso trovato${searchTerm ? ' per "' + searchTerm + '"' : ''}.</p>`;
+                    unpaidListContainer.innerHTML = '<p>Nessun pagamento in sospeso trovato.</p>';
                     return;
                 }
 
@@ -1220,17 +1030,7 @@
                 unpaidListContainer.innerHTML = '<p>Errore nel caricamento dei dati.</p>';
             }
         };
-        
-        unpaidBtn.addEventListener('click', () => {
-            unpaidSearchInput.value = '';
-            showUnpaidBookings();
-        });
-
-        unpaidSearchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            showUnpaidBookings(unpaidSearchInput.value.trim().toLowerCase());
-        });
-
+        unpaidBtn.addEventListener('click', showUnpaidBookings);
 
         document.getElementById('unpaid-list-container').addEventListener('click', (e) => {
             if (e.target.classList.contains('mark-as-paid-btn')) {
@@ -1238,7 +1038,7 @@
                 database.ref(path).update({ pagato: true })
                     .then(() => {
                         showToast('Stato pagamento aggiornato!', 'success');
-                        showUnpaidBookings(unpaidSearchInput.value.trim().toLowerCase()); // Ricarica la lista mantenendo la ricerca
+                        showUnpaidBookings();
                         // --- FIX APPLIED HERE ---
                         if (path.split('/')[1] === toLocalISOString(currentDate)) {
                         // --- END OF FIX ---
