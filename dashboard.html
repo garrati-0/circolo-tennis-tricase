@@ -84,6 +84,7 @@
 
         .booking-card.paid { background: linear-gradient(135deg, var(--colore-successo), #1e7e34); }
         .booking-card.unpaid { background: linear-gradient(135deg, var(--colore-accento), #a71d2a); }
+        .booking-card.partially-paid { background: linear-gradient(135deg, var(--colore-warning), #d39e00); }
         .booking-card .booking-card-content { cursor: pointer; }
         .booking-card p.booking-notes { font-style: italic; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px; white-space: pre-wrap; }
         
@@ -448,18 +449,21 @@
             <h2 id="edit-modal-title">Modifica Prenotazione</h2>
             <div id="edit-modal-subtitle" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></div>
             <form id="edit-booking-form">
-                <!-- MODIFICATION START: Added fields to edit customer data -->
                 <div class="form-group"><label for="edit-name">Nome</label><input type="text" id="edit-name" required></div>
                 <div class="form-group"><label for="edit-surname">Cognome</label><input type="text" id="edit-surname" required></div>
                 <div class="form-group"><label for="edit-email">Email</label><input type="email" id="edit-email" required></div>
                 <div class="form-group"><label for="edit-phone">Telefono</label><input type="tel" id="edit-phone" required></div>
-                <!-- MODIFICATION END -->
                  <div class="form-group">
                     <label for="edit-payment-status">Stato Pagamento</label>
                     <select id="edit-payment-status">
                         <option value="unpaid">Non Pagato</option>
+                        <option value="partially_paid">Parzialmente Pagato</option>
                         <option value="paid">Pagato</option>
                     </select>
+                </div>
+                <div class="form-group" id="edit-daSalvareDa-group" style="display: none;">
+                    <label for="edit-daSalvareDa">Mancante da (Nome)</label>
+                    <input type="text" id="edit-daSalvareDa" placeholder="Nome di chi deve ancora pagare">
                 </div>
                 <div class="form-group">
                     <label for="edit-notes">Note</label>
@@ -582,6 +586,8 @@
         const manualBookingForm = document.getElementById('manual-booking-form');
         const editBookingForm = document.getElementById('edit-booking-form');
         const cancellationForm = document.getElementById('cancellation-form');
+        const editPaymentStatusSelect = document.getElementById('edit-payment-status');
+        const editDaSalvareDaGroup = document.getElementById('edit-daSalvareDa-group');
 
         // --- State ---
         let currentDate = new Date();
@@ -693,7 +699,7 @@
                 for (let field = 1; field <= 3; field++) {
                     const slotId = `slot-${hour}-${field}`;
                     const slotDiv = document.createElement('div');
-                    slotDiv.className = `time-slot field-${field}`; // MOD: Added field-X class
+                    slotDiv.className = `time-slot field-${field}`;
                     slotDiv.id = slotId;
                     slots[slotId] = slotDiv; 
                     fragment.appendChild(slotDiv);
@@ -719,7 +725,13 @@
                         if (booking.isRecurring) {
                             card.classList.add('recurring');
                         } else {
-                            card.classList.add(booking.pagato ? 'paid' : 'unpaid');
+                            if (booking.pagato === 'paid' || booking.pagato === true) {
+                                card.classList.add('paid');
+                            } else if (booking.pagato === 'partially_paid') {
+                                card.classList.add('partially-paid');
+                            } else {
+                                card.classList.add('unpaid');
+                            }
                         }
                         
                         let deleteButtonHTML = '';
@@ -735,6 +747,7 @@
                                 <p><i class="fa-solid fa-phone fa-fw"></i> ${booking.telefono || '-'}</p>
                                 <p><i class="fa-solid fa-envelope fa-fw"></i> ${booking.email || '-'}</p>
                                 ${booking.note ? `<p class="booking-notes"><i class="fa-solid fa-note-sticky fa-fw"></i> ${booking.note}</p>` : ''}
+                                ${(booking.pagato === 'partially_paid' && booking.daSalvareDa) ? `<p class="booking-notes"><i class="fa-solid fa-user-clock fa-fw"></i> Saldo: <strong>${booking.daSalvareDa}</strong></p>` : ''}
                             </div>`;
                         
                         targetSlot.appendChild(card);
@@ -766,9 +779,7 @@
             currentDateElem.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'full' }).format(currentDate);
             fp.setDate(currentDate, false);
             
-            // --- FIX APPLIED HERE ---
             const dateString = toLocalISOString(currentDate);
-            // --- END OF FIX ---
 
             const bookingsRef = database.ref('prenotazioni/' + dateString);
             currentBookingsListener = bookingsRef;
@@ -840,10 +851,7 @@
 
             if (deleteBtn) {
                 const { field, time, bookingId } = deleteBtn.dataset;
-                
-                // --- FIX APPLIED HERE ---
                 const dateString = toLocalISOString(currentDate);
-                // --- END OF FIX ---
                 const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
 
                 database.ref(bookingPath).once('value', (snapshot) => {
@@ -877,10 +885,7 @@
             
             } else if (editTrigger && !editTrigger.closest('.booking-card.recurring')) {
                 const { field, time } = editTrigger.dataset;
-                
-                // --- FIX APPLIED HERE ---
                 const dateString = toLocalISOString(currentDate);
-                // --- END OF FIX ---
                 const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
 
                 database.ref(bookingPath).once('value', (snapshot) => {
@@ -891,21 +896,31 @@
                     const timeFormatted = time.replace('-', ':');
                     
                     document.getElementById('edit-modal-subtitle').textContent = `${bookingData.nome} ${bookingData.cognome} - Campo ${fieldNumber} ore ${timeFormatted}`;
-                    
-                    // MODIFICATION START: Populate the new edit fields
                     document.getElementById('edit-name').value = bookingData.nome || '';
                     document.getElementById('edit-surname').value = bookingData.cognome || '';
                     document.getElementById('edit-email').value = bookingData.email || '';
                     document.getElementById('edit-phone').value = bookingData.telefono || '';
-                    // MODIFICATION END
                     
-                    document.getElementById('edit-payment-status').value = bookingData.pagato ? 'paid' : 'unpaid';
+                    let paymentStatus = 'unpaid';
+                    if (bookingData.pagato === true || bookingData.pagato === 'paid') {
+                        paymentStatus = 'paid';
+                    } else if (bookingData.pagato === 'partially_paid') {
+                        paymentStatus = 'partially_paid';
+                    }
+                    editPaymentStatusSelect.value = paymentStatus;
+
+                    const daSalvareDaInput = document.getElementById('edit-daSalvareDa');
+                    if (paymentStatus === 'partially_paid') {
+                        editDaSalvareDaGroup.style.display = 'block';
+                        daSalvareDaInput.value = bookingData.daSalvareDa || '';
+                    } else {
+                        editDaSalvareDaGroup.style.display = 'none';
+                        daSalvareDaInput.value = '';
+                    }
+
                     document.getElementById('edit-notes').value = bookingData.note || '';
                     editBookingForm.dataset.bookingPath = bookingPath;
-                    
-                    // MODIFICATION START: Store booking ID for updating the index
                     editBookingForm.dataset.bookingId = bookingData.bookingId;
-                    // MODIFICATION END
 
                     editBookingModal.style.display = 'flex';
                 });
@@ -916,14 +931,12 @@
         nextDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() + 1); listenToBookingsForDate(); });
         todayBtn.addEventListener('click', () => { currentDate = new Date(); listenToBookingsForDate(); });
         
-        // MOBILE ONLY: Event listener for field tabs
         mobileFieldSelector.addEventListener('click', (e) => {
             if (e.target.classList.contains('field-tab')) {
                 const field = e.target.dataset.field;
                 mobileFieldSelector.querySelectorAll('.field-tab').forEach(tab => tab.classList.remove('active'));
                 e.target.classList.add('active');
-
-                calendarGrid.className = 'calendar-container'; // Reset all classes
+                calendarGrid.className = 'calendar-container';
                 calendarGrid.classList.add(`show-field-${field}`);
             }
         });
@@ -1016,7 +1029,6 @@
             }
         });
 
-
         // Modal Management
         [bookingModal, editBookingModal, cancellationModal, confirmModal, unpaidModal, searchResultsModal].forEach(modal => {
             modal.querySelector('.close-btn').addEventListener('click', () => modal.style.display = 'none');
@@ -1032,6 +1044,10 @@
             document.getElementById('manual-phone').value = '0000000000';
         });
         
+        editPaymentStatusSelect.addEventListener('change', () => {
+            editDaSalvareDaGroup.style.display = (editPaymentStatusSelect.value === 'partially_paid') ? 'block' : 'none';
+        });
+
         manualBookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = manualBookingForm.querySelector('.submit-btn');
@@ -1040,7 +1056,6 @@
             const email = document.getElementById('manual-email').value.trim().toLowerCase();
             const phone = document.getElementById('manual-phone').value.trim();
 
-            // BLACKLIST CHECK
             for (const id in blacklistData) {
                 const blockedUser = blacklistData[id];
                 const blockedEmail = (blockedUser.email || '').trim().toLowerCase();
@@ -1055,11 +1070,7 @@
 
             const field = document.getElementById('manual-field').value;
             const time = document.getElementById('manual-time').value;
-            
-            // --- FIX APPLIED HERE ---
             const dateString = toLocalISOString(currentDate);
-            // --- END OF FIX ---
-            
             const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
             const bookingId = bookingRef.push().key;
 
@@ -1067,10 +1078,10 @@
                 bookingId: bookingId,
                 nome: document.getElementById('manual-name').value.trim(),
                 cognome: document.getElementById('manual-surname').value.trim(),
-                email: email, // Use sanitized email
-                telefono: phone, // Use sanitized phone
+                email: email,
+                telefono: phone,
                 prenotatoIl: firebase.database.ServerValue.TIMESTAMP,
-                pagato: false, 
+                pagato: 'unpaid',
                 note: ''
             };
 
@@ -1119,47 +1130,38 @@
             submitBtn.disabled = true;
 
             const bookingPath = editBookingForm.dataset.bookingPath;
-            // MODIFICATION START: Get bookingId from dataset
             const bookingId = editBookingForm.dataset.bookingId;
-            // MODIFICATION END
 
             if (!bookingPath) {
                 showToast('Errore: percorso del booking non trovato.', 'error');
                 submitBtn.disabled = false; return;
             }
 
-            // MODIFICATION START: Create an object with all updated data and perform a multi-path update
-            const updatedData = {
-                nome: document.getElementById('edit-name').value.trim(),
-                cognome: document.getElementById('edit-surname').value.trim(),
-                email: document.getElementById('edit-email').value.trim(),
-                telefono: document.getElementById('edit-phone').value.trim(),
-                pagato: document.getElementById('edit-payment-status').value === 'paid',
-                note: document.getElementById('edit-notes').value.trim()
-            };
+            const paymentStatus = document.getElementById('edit-payment-status').value;
+            const daSalvareDa = document.getElementById('edit-daSalvareDa').value.trim();
 
             const updates = {};
-            // Update the main booking object fields individually
-            updates[`${bookingPath}/nome`] = updatedData.nome;
-            updates[`${bookingPath}/cognome`] = updatedData.cognome;
-            updates[`${bookingPath}/email`] = updatedData.email;
-            updates[`${bookingPath}/telefono`] = updatedData.telefono;
-            updates[`${bookingPath}/pagato`] = updatedData.pagato;
-            updates[`${bookingPath}/note`] = updatedData.note;
-
-            // Also update the search index if bookingId is present
-            if (bookingId) {
-                const indexPath = `indicePrenotazioni/${bookingId}`;
-                updates[`${indexPath}/nome`] = updatedData.nome;
-                updates[`${indexPath}/cognome`] = updatedData.cognome;
-                updates[`${indexPath}/email`] = updatedData.email;
+            updates[`${bookingPath}/nome`] = document.getElementById('edit-name').value.trim();
+            updates[`${bookingPath}/cognome`] = document.getElementById('edit-surname').value.trim();
+            updates[`${bookingPath}/email`] = document.getElementById('edit-email').value.trim();
+            updates[`${bookingPath}/telefono`] = document.getElementById('edit-phone').value.trim();
+            updates[`${bookingPath}/pagato`] = paymentStatus;
+            updates[`${bookingPath}/note`] = document.getElementById('edit-notes').value.trim();
+            
+            if (paymentStatus === 'partially_paid') {
+                updates[`${bookingPath}/daSalvareDa`] = daSalvareDa;
+            } else {
+                updates[`${bookingPath}/daSalvareDa`] = null; // Remove if not partially paid
             }
-            // MODIFICATION END
+
+            if (bookingId) {
+                updates[`indicePrenotazioni/${bookingId}/nome`] = updates[`${bookingPath}/nome`];
+                updates[`indicePrenotazioni/${bookingId}/cognome`] = updates[`${bookingPath}/cognome`];
+                updates[`indicePrenotazioni/${bookingId}/email`] = updates[`${bookingPath}/email`];
+            }
 
             try {
-                // MODIFICATION START: Use the multi-path updates object
                 await database.ref().update(updates);
-                // MODIFICATION END
                 showToast('Modifiche salvate!', 'success');
                 editBookingModal.style.display = 'none';
             } catch (error) {
@@ -1227,10 +1229,10 @@
                     for (const fieldId in bookingsByDate[date]) {
                         for (const time in bookingsByDate[date][fieldId]) {
                             const booking = bookingsByDate[date][fieldId][time];
-                            if (booking && !booking.pagato && !booking.isRecurring) {
+                            if (booking && (booking.pagato === 'unpaid' || booking.pagato === 'partially_paid' || booking.pagato === false) && !booking.isRecurring) {
                                 const personKey = `${booking.nome} ${booking.cognome}`.trim().toLowerCase();
                                 if (searchTerm && !personKey.includes(searchTerm)) {
-                                    continue; // Salta se non corrisponde alla ricerca
+                                    continue;
                                 }
                                 if (!unpaidByPerson[personKey]) {
                                     unpaidByPerson[personKey] = { name: `${booking.nome} ${booking.cognome}`.trim(), bookings: [] };
@@ -1256,15 +1258,27 @@
                     card.className = 'unpaid-person-card';
                     const header = document.createElement('button');
                     header.className = 'unpaid-person-header';
-                    header.innerHTML = `<span>${personData.name}</span> <span class="booking-count">${personData.bookings.length} prenotazioni non pagate</span>`;
+                    header.innerHTML = `<span>${personData.name}</span> <span class="booking-count">${personData.bookings.length} prenotazioni da saldare</span>`;
                     const content = document.createElement('div');
                     content.className = 'unpaid-person-content';
                     const ul = document.createElement('ul');
 
                     personData.bookings.forEach(b => {
                         const li = document.createElement('li');
+                        const statusText = b.pagato === 'partially_paid' ? 'Parzialmente Pagato' : 'Non Pagato';
+                        const statusColor = b.pagato === 'partially_paid' ? 'var(--colore-warning)' : 'var(--colore-accento)';
+                        
+                        let daSalvareDaHtml = '';
+                        if (b.pagato === 'partially_paid' && b.daSalvareDa) {
+                            daSalvareDaHtml = `<span style="font-weight: normal; color: var(--colore-testo-secondario); font-size: 0.8rem; display: block;">Saldo da: <strong>${b.daSalvareDa}</strong></span>`;
+                        }
+                        
                         li.innerHTML = `
-                            <span>${new Date(b.date + 'T12:00:00').toLocaleDateString('it-IT')} ore ${b.time.replace('-',':')} (Campo ${b.field.split('-')[1]})</span>
+                            <div>
+                                <span>${new Date(b.date + 'T12:00:00').toLocaleDateString('it-IT')} ore ${b.time.replace('-',':')} (Campo ${b.field.split('-')[1]})</span>
+                                <span style="font-weight: bold; color: ${statusColor}; font-size: 0.8rem; display: block;">${statusText}</span>
+                                ${daSalvareDaHtml}
+                            </div>
                             <button class="mark-as-paid-btn" data-path="${b.path}">Segna Pagato</button>
                         `;
                         ul.appendChild(li);
@@ -1280,6 +1294,7 @@
                 }
             } catch (error) {
                 unpaidListContainer.innerHTML = '<p>Errore nel caricamento dei dati.</p>';
+                console.error("Error fetching unpaid bookings:", error);
             }
         };
         
@@ -1297,13 +1312,11 @@
         document.getElementById('unpaid-list-container').addEventListener('click', (e) => {
             if (e.target.classList.contains('mark-as-paid-btn')) {
                 const path = e.target.dataset.path;
-                database.ref(path).update({ pagato: true })
+                database.ref(path).update({ pagato: 'paid' })
                     .then(() => {
                         showToast('Stato pagamento aggiornato!', 'success');
-                        showUnpaidBookings(unpaidSearchInput.value.trim().toLowerCase()); // Ricarica la lista mantenendo la ricerca
-                        // --- FIX APPLIED HERE ---
+                        showUnpaidBookings(unpaidSearchInput.value.trim().toLowerCase());
                         if (path.split('/')[1] === toLocalISOString(currentDate)) {
-                        // --- END OF FIX ---
                             listenToBookingsForDate();
                         }
                     })
@@ -1493,13 +1506,12 @@
             recurringRef.on('value', (snapshot) => {
                 recurringBookings = snapshot.val() || {};
                 renderRecurringList();
-                // Re-render the current day's calendar to reflect any changes
                 listenToBookingsForDate(); 
             });
         }
 
         listenToRecurringBookings();
-        listenToBlacklist(); // Start listening for blacklist changes
+        listenToBlacklist();
     });
     </script>
 </body>
