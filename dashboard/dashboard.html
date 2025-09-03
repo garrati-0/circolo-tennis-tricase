@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Prenotazioni</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --colore-primario: #007BFF;
+            --colore-primario-trasparente: rgba(0, 123, 255, 0.1);
+            --colore-accento: #DC3545;
+            --colore-successo: #28a745;
+            --colore-warning: #ffc107;
+            --colore-info: #17a2b8;
+            --colore-ricorrente: #6f42c1;
+            --colore-sfondo: #F4F7FC;
+            --colore-superficie: #FFFFFF;
+            --colore-bordo: #CED4DA; /* Made darker for better contrast */
+            --colore-testo-principale: #212529;
+            --colore-testo-secondario: #5A6268; /* Made darker for better readability */
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.08); /* Made slightly stronger */
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1); /* Made slightly stronger */
+        }
+        body { font-family: 'Noto Sans', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); margin: 0; }
+        .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Toast Notifications */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background-color: var(--colore-superficie); padding: 15px 20px; border-radius: 8px; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 15px; transform: translateX(120%); opacity: 0; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 5px solid; }
+        .toast.show { transform: translateX(0); opacity: 1; }
+        .toast-success { border-color: var(--colore-successo); }
+        .toast-error { border-color: var(--colore-accento); }
+        .toast-info { border-color: var(--colore-primario); }
+        .toast-icon { font-size: 1.5rem; }
+        .toast-success .toast-icon { color: var(--colore-successo); }
+        .toast-error .toast-icon { color: var(--colore-accento); }
+        .toast-info .toast-icon { color: var(--colore-primario); }
+
+        /* Header & Search */
+        .main-header {
+            background-color: var(--colore-superficie);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px; /* Changed from margin-bottom */
+            box-shadow: var(--shadow-md);
+        }
+        .main-header h1 { margin: 0 0 15px 0; text-align: center; color: var(--colore-primario); }
+        #search-form { display: flex; gap: 10px; }
+        #search-input { flex-grow: 1; padding: 10px 15px; font-size: 1rem; border: 1px solid var(--colore-bordo); border-radius: 8px; }
+        #search-input:focus { border-color: var(--colore-primario); box-shadow: 0 0 0 3px var(--colore-primario-trasparente); outline: none; }
+        #search-btn { padding: 10px 20px; background-color: var(--colore-primario); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; }
+
+        /* Navigation */
+        .date-navigation { display: flex; justify-content: space-between; align-items: center; gap: 10px; background-color: var(--colore-superficie); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow-md); flex-wrap: wrap; }
+        .date-navigation button { background: none; border: 1px solid var(--colore-bordo); color: var(--colore-primario); padding: 10px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .date-navigation button:hover { background-color: var(--colore-primario); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); }
+        .date-navigation #today-btn { color: var(--colore-successo); border-color: var(--colore-successo); }
+        .date-navigation #today-btn:hover { background-color: var(--colore-successo); color: white; }
+        #unpaid-btn { color: var(--colore-warning); border-color: var(--colore-warning);}
+        #unpaid-btn:hover { background-color: var(--colore-warning); color: white; }
+        .date-navigation h2 { color: var(--colore-primario); font-size: 1.8rem; margin: 0; text-align: center; flex-grow: 1; }
+
+        /* MOBILE: Field Selector Tabs */
+        .mobile-field-selector { display: none; }
+        
+        /* Calendar Grid */
+        .column-headers { display: grid; grid-template-columns: 80px repeat(3, 1fr); gap: 3px; margin-bottom: -3px; padding: 0; font-weight: bold; text-align: center; }
+        .header-item { background-color: #343A40; color: white; padding: 15px; border-radius: 8px 8px 0 0; border-bottom: 5px solid transparent; }
+        .header-item:first-child { background-color: transparent; color: transparent; border-bottom: none; }
+        .header-item.campo-1 { border-color: var(--colore-primario); }
+        .header-item.campo-2 { border-color: var(--colore-successo); }
+        .header-item.campo-3 { border-color: var(--colore-warning); }
+        
+        .calendar-container { display: grid; grid-template-columns: 80px repeat(3, 1fr); gap: 3px; /* Increased gap for thicker lines */ background-color: var(--colore-bordo); border: 1px solid var(--colore-bordo); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-md); position: relative; }
+        .time-label { grid-column: 1 / 2; text-align: center; font-size: 0.9rem; font-weight: bold; color: var(--colore-testo-secondario); background-color: #F8F9FA; display: flex; align-items: center; justify-content: center; border-top: 1px solid var(--colore-bordo); }
+        .time-slot { position: relative; background-color: var(--colore-superficie); min-height: 120px; transition: background-color 0.2s; }
+
+        .booking-card.paid { background: linear-gradient(135deg, var(--colore-successo), #1e7e34); }
+        .booking-card.unpaid { background: linear-gradient(135deg, var(--colore-accento), #a71d2a); }
+        .booking-card .booking-card-content { cursor: pointer; }
+        .booking-card p.booking-notes { font-style: italic; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px; white-space: pre-wrap; }
+        
+        .time-slot.empty { cursor: pointer; }
+        .time-slot.empty:hover { background-color: var(--colore-primario-trasparente); }
+        .time-slot.empty::after { content: '\f067'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: var(--colore-primario); opacity: 0; transition: opacity 0.2s; }
+        .time-slot.empty:hover::after { opacity: 0.5; }
+
+        .booking-card { position: absolute; top: 4px; bottom: 4px; left: 4px; right: 4px; color: white; padding: 10px; border-radius: 8px; font-size: 0.85rem; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5; display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .booking-card:hover { transform: scale(1.03); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 6; }
+        .booking-card.recurring { background: linear-gradient(135deg, var(--colore-ricorrente), #563d7c); cursor: default; }
+        .booking-card.highlight { animation: highlight-anim 2s ease-out; }
+        @keyframes highlight-anim { 0% { box-shadow: 0 0 0 4px var(--colore-info); } 100% { box-shadow: 0 2px 5px rgba(0,0,0,0.2); } }
+        .booking-card-content { flex-grow: 1; }
+        .booking-card strong { display: block; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 4px; margin-bottom: 4px; }
+        .booking-card p { margin: 4px 0; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+        .booking-card .recurring-icon { font-size: 0.7rem; opacity: 0.8; }
+        .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.2); border: none; color: white; cursor: pointer; font-size: 0.8rem; opacity: 0.6; transition: all 0.2s; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .delete-btn:hover { opacity: 1; color: white; background-color: var(--colore-accento); transform: scale(1.1); }
+        
+        /* Skeleton Loader */
+        .skeleton-loader { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--colore-sfondo); z-index: 10; display: grid; grid-template-columns: 80px repeat(3, 1fr); grid-template-rows: repeat(17, 120px); gap: 3px; padding: 1px; }
+        .skeleton-item { background-color: #e0e0e0; border-radius: 4px; animation: pulse 1.5s infinite ease-in-out; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .skeleton-loader .time-label-skeleton { grid-column: 1 / 2; background-color: #f0f0f0; }
+
+        #no-bookings { text-align: center; font-size: 1.2rem; padding: 50px; color: var(--colore-testo-secondario); display: none; }
+
+        /* Recurring Bookings Panel */
+        .recurring-bookings-panel { margin-top: 40px; padding: 25px; background-color: var(--colore-superficie); border-radius: 12px; box-shadow: var(--shadow-md); }
+        .recurring-bookings-panel h2 { margin-top: 0; border-bottom: 1px solid var(--colore-bordo); padding-bottom: 15px; margin-bottom: 20px; }
+        .recurring-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        #recurring-form { display: flex; flex-direction: column; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 500; color: var(--colore-testo-secondario); font-size: 0.9rem; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border-radius: 6px; border: 1px solid var(--colore-bordo); font-size: 1rem; font-family: 'Noto Sans', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--colore-primario); box-shadow: 0 0 0 3px var(--colore-primario-trasparente); outline: none; }
+        #recurring-form button { background-color: var(--colore-ricorrente); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background-color 0.2s; }
+        #recurring-form button:hover { background-color: #5a329a; }
+        
+        #recurring-list ul { list-style: none; padding: 0; margin: 0; }
+        #recurring-list li { display: flex; justify-content: space-between; align-items: center; padding: 12px; background-color: var(--colore-sfondo); border-radius: 6px; margin-bottom: 8px; }
+        #recurring-list .delete-recurring-btn { background-color: var(--colore-accento); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
+
+        .recurring-day-header { background-color: #E2E6EA; color: var(--colore-testo-principale); cursor: pointer; padding: 15px; width: 100%; border: none; text-align: left; outline: none; font-size: 1.1rem; font-weight: bold; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; border-radius: 8px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .recurring-day-header:hover, .recurring-day-header.active { background-color: #D5DCE2; }
+        .recurring-day-header::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: var(--colore-testo-secondario); transition: transform 0.3s ease; }
+        .recurring-day-header.active::after { transform: rotate(-180deg); }
+        .recurring-day-content { padding: 0 18px; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; border-radius: 0 0 8px 8px; border: 1px solid var(--colore-bordo); border-top: none; }
+        .recurring-day-content ul { padding: 10px 0; }
+
+        /* Modals */
+        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content { background-color: var(--colore-superficie); padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 90%; max-width: 600px; position: relative; max-height: 90vh; display: flex; flex-direction: column; animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content .close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
+        .modal-content .close-btn:hover { color: #333; }
+        #manual-booking-form, #edit-booking-form { margin-top: 20px; overflow-y: auto; padding-right: 15px; }
+        
+        /* Unpaid List Modal */
+        #unpaid-list-container { overflow-y: auto; }
+        .unpaid-person-card { background: var(--colore-superficie); border-radius: 8px; margin-bottom: 15px; box-shadow: var(--shadow-sm); border: 1px solid var(--colore-bordo); }
+        .unpaid-person-header { background-color: #F1F3F5; color: var(--colore-testo-principale); cursor: pointer; padding: 15px; width: 100%; border: none; text-align: left; outline: none; font-size: 1.1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--colore-bordo); border-radius: 8px 8px 0 0; }
+        .unpaid-person-header:hover { background-color: #E2E6EA; }
+        .unpaid-person-header .booking-count { color: var(--colore-testo-secondario); font-weight: normal; font-size: 0.9rem; }
+        .unpaid-person-content { padding: 0; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; border-radius: 0 0 8px 8px; }
+        .unpaid-person-content ul { list-style: none; padding: 0; margin: 0; }
+        .unpaid-person-content li { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--colore-bordo); }
+        .unpaid-person-content li:last-child { border-bottom: none; }
+        .mark-as-paid-btn { background-color: var(--colore-successo); color: white; border: none; padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; cursor: pointer; }
+        
+        /* Search in Unpaid Modal */
+        .search-unpaid-container {
+            margin-bottom: 20px;
+            position: relative;
+            display: flex;
+            gap: 5px;
+        }
+        #unpaid-search-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--colore-bordo);
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+        #unpaid-search-btn {
+            padding: 0 15px;
+            border-radius: 6px;
+            border: 1px solid var(--colore-bordo);
+            background-color: var(--colore-sfondo);
+            cursor: pointer;
+            color: var(--colore-testo-secondario);
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        #unpaid-search-btn:hover {
+            background-color: #e9ecef;
+        }
+        #unpaid-search-input:focus {
+            border-color: var(--colore-primario);
+            box-shadow: 0 0 0 3px var(--colore-primario-trasparente);
+            outline: none;
+        }
+
+        /* Search Results Modal */
+        #search-results-list { list-style: none; padding: 0; margin: 0; max-height: 60vh; overflow-y: auto; }
+        #search-results-list li { padding: 15px; border-bottom: 1px solid var(--colore-bordo); cursor: pointer; transition: background-color 0.2s; }
+        #search-results-list li:hover { background-color: var(--colore-primario-trasparente); }
+        #search-results-list li strong { display: block; font-size: 1.1rem; margin-bottom: 5px; }
+        #search-results-list li span { color: var(--colore-testo-secondario); font-size: 0.9rem; }
+
+        /* --- RESPONSIVE STYLES --- */
+        @media (max-width: 800px) {
+            .container {
+                padding: 10px;
+            }
+
+            .date-navigation {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                row-gap: 10px;
+            }
+             /* Force a line break after the first "row" of controls */
+            .date-navigation h2::after {
+                content: '';
+                flex-basis: 100%;
+                width: 0;
+                order: 2; /* Position the line break after the date and arrows */
+            }
+            .date-navigation h2 {
+                order: 2;
+                flex-grow: 1; /* Push arrows to sides */
+                text-align: center;
+                margin: 0;
+                font-size: 1.4rem;
+            }
+            #prev-day {
+                order: 1;
+            }
+            #next-day {
+                order: 3;
+            }
+            /* Style the second row of buttons */
+            #today-btn, #datepicker-btn, #unpaid-btn {
+                order: 4;
+                flex-grow: 1;
+                justify-content: center;
+            }
+            .date-navigation button {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+
+            /* Show mobile tabs, hide desktop headers */
+            .mobile-field-selector {
+                display: flex;
+                justify-content: stretch;
+                margin-bottom: 10px;
+                gap: 3px;
+            }
+            .mobile-field-selector .field-tab {
+                flex-grow: 1;
+                padding: 12px 5px;
+                border: 1px solid var(--colore-bordo);
+                background-color: var(--colore-superficie);
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: all 0.2s;
+            }
+            .mobile-field-selector .field-tab.active {
+                background-color: var(--colore-primario);
+                color: white;
+                border-color: var(--colore-primario);
+            }
+            .column-headers {
+                display: none;
+            }
+
+            /* Adjust calendar grid for mobile view */
+            .calendar-container {
+                grid-template-columns: 65px 1fr; /* Smaller time column */
+            }
+            .time-label {
+                font-size: 0.8rem;
+            }
+            .time-slot {
+                 /* Reset grid-column that might be set by JS or inline styles if any */
+                grid-column: auto !important;
+            }
+
+            /* Hide non-active fields */
+            .calendar-container.show-field-1 .field-2,
+            .calendar-container.show-field-1 .field-3 { display: none; }
+
+            .calendar-container.show-field-2 .field-1,
+            .calendar-container.show-field-2 .field-3 { display: none; }
+            
+            .calendar-container.show-field-3 .field-1,
+            .calendar-container.show-field-3 .field-2 { display: none; }
+
+            .skeleton-loader {
+                grid-template-columns: 65px 1fr;
+            }
+            /* Hide skeleton items for the non-visible fields */
+            .skeleton-loader .skeleton-item:nth-child(4n-1), /* Corresponds to field 2 */
+            .skeleton-loader .skeleton-item:nth-child(4n) {   /* Corresponds to field 3 */
+                display: none;
+            }
+
+
+            /* Recurring bookings layout */
+            .recurring-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            /* Modals and Forms */
+            .modal-content {
+                padding: 20px 15px;
+                width: 95%;
+            }
+            #manual-booking-form, #edit-booking-form {
+                padding-right: 5px;
+            }
+            #search-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <div class="container">
+        <div class="date-navigation">
+            <button id="prev-day"><i class="fa-solid fa-chevron-left"></i></button>
+            <button id="today-btn"><i class="fa-solid fa-calendar-day"></i> Oggi</button>
+            <button id="datepicker-btn"><i class="fa-solid fa-calendar-alt"></i> Data</button>
+            <button id="unpaid-btn"><i class="fa-solid fa-file-invoice-dollar"></i> Da Pagare</button>
+            <h2 id="current-date">Caricamento...</h2>
+            <button id="next-day"><i class="fa-solid fa-chevron-right"></i></button>
+            <a href="settimana.html">
+        <button id="unpaid-btn">
+            <i class="fa-solid fa-file-invoice-dollar"></i>settimana
+        </button>
+    </a>
+        </div>
+        
+        <!-- MOBILE ONLY: Field selector tabs -->
+        <div class="mobile-field-selector">
+            <button class="field-tab active" data-field="1">Campo 1</button>
+            <button class="field-tab" data-field="2">Campo 2</button>
+            <button class="field-tab" data-field="3">Campo 3</button>
+        </div>
+        
+        <div class="column-headers">
+            <div class="header-item">Orario</div>
+            <div class="header-item campo-1">Campo 1</div>
+            <div class="header-item campo-2">Campo 2</div>
+            <div class="header-item campo-3">Campo 3</div>
+        </div>
+
+        <!-- The class "show-field-1" will be managed by JS for mobile view -->
+        <div id="calendar-grid" class="calendar-container show-field-1">
+             <!-- Skeleton Loader will be injected here by JS -->
+        </div>
+        <div id="no-bookings">Nessuna prenotazione per questa data.</div>
+        
+        <!-- Search Section Moved Here -->
+        <div class="main-header">
+            <h1>Cerca Prenotazione</h1>
+            <form id="search-form">
+                <input type="search" id="search-input" placeholder="Cerca per nome, cognome, email, telefono...">
+                <button type="submit" id="search-btn"><i class="fa-solid fa-search"></i> Cerca</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="recurring-bookings-panel">
+            <h2>Gestione Prenotazioni Ricorrenti</h2>
+            <div class="recurring-layout">
+                <div id="recurring-form-container">
+                    <h3>Aggiungi / Blocca Periodo</h3>
+                    <form id="recurring-form">
+                        <div class="form-group"><label for="recurring-name">Nome (es. Corso Adulti, Blocco Campo)</label><input type="text" id="recurring-name" placeholder="Nome della prenotazione" required></div>
+                        <div class="form-group"><label for="recurring-day">Giorno della settimana</label><select id="recurring-day" required><option value="1">Lunedì</option><option value="2">Martedì</option><option value="3">Mercoledì</option><option value="4">Giovedì</option><option value="5">Venerdì</option><option value="6">Sabato</option><option value="0">Domenica</option></select></div>
+                        <div class="form-group"><label for="recurring-field">Campo</label><select id="recurring-field" required><option value="1">Campo 1</option><option value="2">Campo 2</option><option value="3">Campo 3</option></select></div>
+                        <div class="form-group"><label for="recurring-time-start">Orario Inizio</label><select id="recurring-time-start" required></select></div>
+                        <div class="form-group"><label for="recurring-time-end">Orario Fine (per blocchi di più ore)</label><select id="recurring-time-end"><option value="">Singola Ora</option></select></div>
+                        <button type="submit">Aggiungi Ricorrente</button>
+                    </form>
+                </div>
+                <div id="recurring-list-container">
+                    <h3>Prenotazioni Attive</h3>
+                    <div id="recurring-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="modal-title">Aggiungi Prenotazione</h2>
+            <form id="manual-booking-form">
+                <input type="hidden" id="manual-field"><input type="hidden" id="manual-time">
+                <div class="form-group"><label for="manual-name">Nome</label><input type="text" id="manual-name" required></div>
+                <div class="form-group"><label for="manual-surname">Cognome</label><input type="text" id="manual-surname" required></div>
+                <div class="form-group"><label for="manual-email">Email</label><input type="email" id="manual-email" required></div>
+                <div class="form-group"><label for="manual-phone">Telefono</label><input type="tel" id="manual-phone" required></div>
+                <button type="button" id="fill-placeholder-data" style="width: 100%; background-color: var(--colore-testo-secondario); color: white; padding: 8px; border: none; border-radius: 6px; font-size: 0.9rem; cursor: pointer; margin-bottom: 15px;"><i class="fa-solid fa-user-check"></i> Usa dati generici (cliente senza email)</button>
+                <button type="submit" class="submit-btn" style="width: 100%; background-color: var(--colore-successo); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;">Salva Prenotazione</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="edit-booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="edit-modal-title">Modifica Prenotazione</h2>
+            <div id="edit-modal-subtitle" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></div>
+            <form id="edit-booking-form">
+                <!-- MODIFICATION START: Added fields to edit customer data -->
+                <div class="form-group"><label for="edit-name">Nome</label><input type="text" id="edit-name" required></div>
+                <div class="form-group"><label for="edit-surname">Cognome</label><input type="text" id="edit-surname" required></div>
+                <div class="form-group"><label for="edit-email">Email</label><input type="email" id="edit-email" required></div>
+                <div class="form-group"><label for="edit-phone">Telefono</label><input type="tel" id="edit-phone" required></div>
+                <!-- MODIFICATION END -->
+                 <div class="form-group">
+                    <label for="edit-payment-status">Stato Pagamento</label>
+                    <select id="edit-payment-status">
+                        <option value="unpaid">Non Pagato</option>
+                        <option value="paid">Pagato</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-notes">Note</label>
+                    <textarea id="edit-notes" rows="4" placeholder="Aggiungi note sulla prenotazione..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn" style="width: 100%; background-color: var(--colore-primario); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;">Salva Modifiche</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cancellation-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Conferma Cancellazione</h2>
+            <p id="cancellation-info" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></p>
+            <form id="cancellation-form">
+                <div class="form-group">
+                    <label for="cancellation-reason">Causale della cancellazione (verrà inviata al cliente)</label>
+                    <textarea id="cancellation-reason" rows="4" placeholder="Es. Manutenzione campo, pioggia, ecc..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn" style="width: 100%; background-color: var(--colore-accento); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;">Cancella e Invia Notifica</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-btn">&times;</span>
+            <h2 id="confirm-title">Conferma Azione</h2>
+            <p id="confirm-message" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="confirm-cancel-btn" type="button" style="background-color: var(--colore-testo-secondario); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">Annulla</button>
+                <button id="confirm-action-btn" type="button" style="background-color: var(--colore-accento); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">Conferma</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="unpaid-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Clienti con Pagamenti in Sospeso</h2>
+            <form id="unpaid-search-form" class="search-unpaid-container">
+                <input type="search" id="unpaid-search-input" placeholder="Cerca cliente...">
+                <button type="submit" id="unpaid-search-btn"><i class="fa-solid fa-search"></i></button>
+            </form>
+            <div id="unpaid-list-container">
+                <!-- La lista verrà generata dinamicamente qui -->
+            </div>
+        </div>
+    </div>
+
+    <div id="search-results-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="search-results-title">Risultati della Ricerca</h2>
+            <div id="search-results-container">
+                <ul id="search-results-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/it.js"></script>
+    <script src="js/logic.js"></script>
+</body>
+</html>

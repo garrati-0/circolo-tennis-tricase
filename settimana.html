@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Settimanale Prenotazioni</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --colore-primario: #007BFF;
+            --colore-primario-trasparente: rgba(0, 123, 255, 0.1);
+            --colore-accento: #DC3545;
+            --colore-successo: #28a745;
+            --colore-warning: #ffc107;
+            --colore-info: #17a2b8;
+            --colore-ricorrente: #6f42c1;
+            --colore-sfondo: #F4F7FC;
+            --colore-superficie: #FFFFFF;
+            --colore-bordo: #DEE2E6;
+            --colore-testo-principale: #212529;
+            --colore-testo-secondario: #5A6268;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        body { font-family: 'Noto Sans', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); margin: 0; }
+        .container { padding: 20px; max-width: 1800px; margin: 0 auto; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* --- Navigation --- */
+        .week-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--colore-superficie);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            flex-wrap: wrap;
+        }
+        .week-navigation button {
+            background: none;
+            border: 1px solid var(--colore-bordo);
+            color: var(--colore-primario);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .week-navigation button:hover {
+            background-color: var(--colore-primario);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        }
+        #today-btn { color: var(--colore-successo); border-color: var(--colore-successo); }
+        #today-btn:hover { background-color: var(--colore-successo); color: white; }
+        #daily-view-btn { color: var(--colore-info); border-color: var(--colore-info); }
+        #daily-view-btn:hover { background-color: var(--colore-info); color: white; }
+
+        .week-navigation h2 {
+            color: var(--colore-primario);
+            font-size: 1.5rem;
+            margin: 0;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        /* --- Weekly Grid --- */
+        .field-grid-container {
+            margin-bottom: 30px;
+        }
+        .field-grid-container h2 {
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--colore-primario);
+            color: var(--colore-testo-principale);
+        }
+        .week-grid {
+            display: grid;
+            grid-template-columns: 60px repeat(7, 1fr);
+            gap: 2px;
+            background-color: var(--colore-bordo);
+            border: 1px solid var(--colore-bordo);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .grid-header, .time-label-week, .week-slot {
+            background-color: var(--colore-superficie);
+            padding: 8px;
+            text-align: center;
+            min-height: 60px;
+        }
+        .grid-header {
+            background-color: #343A40;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .time-label-week {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--colore-testo-secondario);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top: 1px solid var(--colore-bordo);
+        }
+        .week-slot {
+            position: relative;
+            padding: 2px;
+            border-top: 1px solid var(--colore-bordo);
+            transition: background-color 0.2s;
+            cursor: pointer; /* Make slot clickable for navigation */
+        }
+        .week-slot:hover {
+            background-color: var(--colore-primario-trasparente); /* Add hover effect */
+        }
+
+        /* --- Booking Card (adapted for smaller size) --- */
+         .booking-card {
+            position: absolute;
+            top: 2px; bottom: 2px; left: 2px; right: 2px;
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .booking-card:hover {
+            transform: scale(1.05);
+            z-index: 6;
+        }
+        .booking-card strong {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .booking-card.paid { background: linear-gradient(135deg, var(--colore-successo), #1e7e34); }
+        .booking-card.unpaid { background: linear-gradient(135deg, var(--colore-accento), #a71d2a); }
+        .booking-card.recurring { background: linear-gradient(135deg, var(--colore-ricorrente), #563d7c); }
+
+        /* --- Skeleton Loader for Week View --- */
+        .skeleton-item {
+            background-color: #e9ecef;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        /* Toast Notifications */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background-color: var(--colore-superficie); padding: 15px 20px; border-radius: 8px; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 15px; transform: translateX(120%); opacity: 0; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 5px solid; }
+        .toast.show { transform: translateX(0); opacity: 1; }
+        .toast-success { border-color: var(--colore-successo); } .toast-error { border-color: var(--colore-accento); } .toast-info { border-color: var(--colore-primario); }
+        .toast-icon { font-size: 1.5rem; }
+        .toast-success .toast-icon { color: var(--colore-successo); } .toast-error .toast-icon { color: var(--colore-accento); } .toast-info .toast-icon { color: var(--colore-primario); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container { padding: 10px; }
+            .week-navigation h2 { font-size: 1.2rem; }
+            .grid-header { font-size: 0.75rem; padding: 8px 4px; }
+            .week-grid { grid-template-columns: 45px repeat(7, 1fr); }
+            .booking-card { font-size: 0.65rem; padding: 3px; }
+            .time-label-week { font-size: 0.7rem; }
+        }
+         @media (max-width: 768px) {
+            .week-navigation {
+                justify-content: center;
+                row-gap: 10px;
+            }
+             .week-navigation h2 {
+                order: 1;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .week-grid {
+                grid-template-columns: 40px repeat(7, 1fr);
+                gap: 1px;
+            }
+            .grid-header span { display: none; }
+            .grid-header::first-letter { font-size: 1rem; }
+         }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <div class="container">
+        <div class="week-navigation">
+            <button id="prev-week"><i class="fa-solid fa-chevron-left"></i></button>
+            <button id="today-btn"><i class="fa-solid fa-calendar-day"></i> Questa Settimana</button>
+            <button id="datepicker-btn"><i class="fa-solid fa-calendar-alt"></i> Scegli Data</button>
+            <h2 id="current-week-label">Caricamento...</h2>
+             <button id="daily-view-btn"><i class="fa-solid fa-calendar-day"></i> Vista Giornaliera</button>
+            <button id="next-week"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <div id="week-view-container">
+            <!-- Grids will be injected here by JS -->
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/it.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+            authDomain: "ct-tricase.firebaseapp.com",
+            databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ct-tricase",
+            storageBucket: "ct-tricase.appspot.com",
+            messagingSenderId: "931504527474",
+            appId: "1:931504527474:web:165880ec30f3785ff54aeb",
+            measurementId: "G-7M4D22L352"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // --- DOM Elements ---
+        const weekViewContainer = document.getElementById('week-view-container');
+        const prevWeekBtn = document.getElementById('prev-week');
+        const nextWeekBtn = document.getElementById('next-week');
+        const todayBtn = document.getElementById('today-btn');
+        const datepickerBtn = document.getElementById('datepicker-btn');
+        const dailyViewBtn = document.getElementById('daily-view-btn');
+        const currentWeekLabel = document.getElementById('current-week-label');
+
+        // --- State ---
+        let weekStartDate = getWeekStartDate(new Date());
+        let recurringBookings = {};
+
+        // --- Date Helper Functions ---
+        function getWeekStartDate(d) {
+            const date = new Date(d);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+            return new Date(date.setDate(diff));
+        }
+
+        const toLocalISOString = (date) => {
+            const d = new Date(date);
+            d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            return d.toISOString().slice(0, 10);
+        };
+        
+        const getWeekDates = (startDate) => {
+            const dates = [];
+            for (let i = 0; i < 7; i++) {
+                const newDate = new Date(startDate);
+                newDate.setDate(startDate.getDate() + i);
+                dates.push(newDate);
+            }
+            return dates;
+        };
+
+        // --- Flatpickr Initialization ---
+        const fp = flatpickr(datepickerBtn, {
+            locale: "it",
+            dateFormat: "Y-m-d",
+            onChange: function(selectedDates) {
+                if (selectedDates.length > 0) {
+                    weekStartDate = getWeekStartDate(selectedDates[0]);
+                    listenToBookingsForWeek();
+                }
+            },
+        });
+
+        // --- Toast Notification Function ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            let iconClass = 'fa-solid fa-circle-info';
+            if (type === 'success') iconClass = 'fa-solid fa-circle-check';
+            if (type === 'error') iconClass = 'fa-solid fa-circle-xmark';
+            toast.innerHTML = `<div class="toast-icon"><i class="${iconClass}"></i></div><div class="toast-message">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, 4000);
+        }
+
+        // --- Skeleton Loader ---
+        function showSkeletonLoader() {
+            weekViewContainer.innerHTML = '';
+            for (let i = 1; i <= 3; i++) {
+                 weekViewContainer.innerHTML += `
+                    <div class="field-grid-container">
+                        <h2>Campo ${i}</h2>
+                        <div class="week-grid">
+                            ${Array(144).fill('<div class="skeleton-item"></div>').join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // --- Calendar Rendering ---
+        const renderWeekCalendar = (weekBookings) => {
+            weekViewContainer.innerHTML = '';
+            const weekDates = getWeekDates(weekStartDate);
+            
+            for (let field = 1; field <= 3; field++) {
+                const fieldContainer = document.createElement('div');
+                fieldContainer.className = 'field-grid-container';
+
+                const title = document.createElement('h2');
+                title.textContent = `Campo ${field}`;
+                fieldContainer.appendChild(title);
+                
+                const grid = document.createElement('div');
+                grid.className = 'week-grid';
+                grid.id = `grid-campo-${field}`;
+                
+                // Add Headers
+                grid.innerHTML += `<div class="grid-header">Ora</div>`;
+                const daysOfWeek = ['<span>Lunedì</span>', '<span>Martedì</span>', '<span>Mercoledì</span>', '<span>Giovedì</span>', '<span>Venerdì</span>', '<span>Sabato</span>', '<span>Domenica</span>'];
+                weekDates.forEach((date, i) => {
+                    grid.innerHTML += `<div class="grid-header">${daysOfWeek[i]} ${date.getDate()}/${date.getMonth() + 1}</div>`;
+                });
+                
+                // Add Rows
+                for (let hour = 7; hour < 24; hour++) {
+                    let minutes = '00';
+                    if (field === 2) minutes = '15';
+                    else if (field === 3) minutes = '30';
+                    const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
+                    
+                    grid.innerHTML += `<div class="time-label-week">${timeString}</div>`;
+                    
+                    weekDates.forEach((date, dayIndex) => {
+                        const dateString = toLocalISOString(date);
+                        const timeKey = timeString.replace(':', '-');
+                        const fieldId = `campo-${field}`;
+                        
+                        let booking = weekBookings[dateString]?.[fieldId]?.[timeKey] || null;
+                        
+                        // Check for recurring bookings
+                        const dayOfWeek = date.getDay();
+                        for (const id in recurringBookings) {
+                            const rb = recurringBookings[id];
+                            if (parseInt(rb.giornoSettimana) === dayOfWeek && rb.orario === timeString && parseInt(rb.campo) === field) {
+                                booking = { ...rb, isRecurring: true };
+                                break;
+                            }
+                        }
+
+                        const slot = document.createElement('div');
+                        slot.className = 'week-slot';
+                        slot.dataset.date = dateString; // Add date to slot for navigation
+                        
+                        if (booking) {
+                            const card = document.createElement('div');
+                            card.className = 'booking-card';
+                            card.innerHTML = `<strong>${booking.nome} ${booking.cognome || ''}</strong>`;
+                            
+                            if (booking.isRecurring) {
+                                card.classList.add('recurring');
+                            } else {
+                                card.classList.add(booking.pagato ? 'paid' : 'unpaid');
+                            }
+                            slot.appendChild(card);
+                        } else {
+                            slot.classList.add('empty');
+                        }
+                        grid.appendChild(slot);
+                    });
+                }
+                fieldContainer.appendChild(grid);
+                weekViewContainer.appendChild(fieldContainer);
+            }
+        };
+
+        // --- Data Fetching ---
+        const listenToBookingsForWeek = async () => {
+            showSkeletonLoader();
+            const weekDates = getWeekDates(weekStartDate);
+            const startDateString = weekDates[0].toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+            const endDateString = weekDates[6].toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+            currentWeekLabel.textContent = `${startDateString} - ${endDateString} ${weekDates[6].getFullYear()}`;
+            
+            const promises = weekDates.map(date => {
+                const dateString = toLocalISOString(date);
+                return database.ref('prenotazioni/' + dateString).once('value');
+            });
+
+            try {
+                const snapshots = await Promise.all(promises);
+                const weekBookings = {};
+                snapshots.forEach((snapshot, i) => {
+                    const dateString = toLocalISOString(weekDates[i]);
+                    weekBookings[dateString] = snapshot.val();
+                });
+                renderWeekCalendar(weekBookings);
+            } catch (error) {
+                console.error("Firebase error:", error);
+                showToast("Errore nel caricamento dei dati.", 'error');
+                weekViewContainer.innerHTML = '<p>Impossibile caricare i dati. Riprova.</p>';
+            }
+        };
+        
+        // --- Event Listeners ---
+        prevWeekBtn.addEventListener('click', () => {
+            weekStartDate.setDate(weekStartDate.getDate() - 7);
+            listenToBookingsForWeek();
+        });
+        nextWeekBtn.addEventListener('click', () => {
+            weekStartDate.setDate(weekStartDate.getDate() + 7);
+            listenToBookingsForWeek();
+        });
+        todayBtn.addEventListener('click', () => {
+            weekStartDate = getWeekStartDate(new Date());
+            listenToBookingsForWeek();
+        });
+        dailyViewBtn.addEventListener('click', () => {
+            window.location.href = 'dashboard.html';
+        });
+
+        // Add click listener for navigating to daily view
+        weekViewContainer.addEventListener('click', (e) => {
+            const targetSlot = e.target.closest('.week-slot');
+            if (targetSlot && targetSlot.dataset.date) {
+                const date = targetSlot.dataset.date;
+                // Redirect to the daily view, passing the selected date as a URL parameter
+                window.location.href = `dashboard.html?date=${date}`;
+            }
+        });
+
+        // --- Initial Load ---
+        function listenToRecurringBookings() {
+            const recurringRef = database.ref('prenotazioniRicorrenti');
+            recurringRef.on('value', (snapshot) => {
+                recurringBookings = snapshot.val() || {};
+                listenToBookingsForWeek(); 
+            });
+        }
+
+        listenToRecurringBookings();
+    });
+    </script>
+</body>
+</html>
+

@@ -197,20 +197,10 @@
                                     <td class="p-2 text-center">€6</td>
                                     <td class="p-2 text-center">€8</td>
                                 </tr>
-                                <tr class="border-b border-gray-300 dark:border-zinc-700">
+                                <tr>
                                     <td class="p-2 font-bold">Corsista</td>
                                     <td class="p-2 text-center">€4</td>
                                     <td class="p-2 text-center">€5</td>
-                                </tr>
-                                <tr class="border-b border-gray-300 dark:border-zinc-700">
-                                    <td class="p-2 font-bold">Doppio Socio</td>
-                                    <td class="p-2 text-center">€5</td>
-                                    <td class="p-2 text-center">€7</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-2 font-bold">Doppio Non Socio</td>
-                                    <td class="p-2 text-center">€6</td>
-                                    <td class="p-2 text-center">€8</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -260,11 +250,11 @@
         <!-- Confirmation Message -->
         <div class="text-center py-20 hidden" id="confirmation-container">
              <div class="bg-white dark:bg-black/30 backdrop-blur-md p-10 rounded-2xl border border-gray-200 dark:border-white/10 shadow-lg max-w-3xl mx-auto">
-                   <div class="w-20 h-20 mx-auto mb-6 bg-verde-light/20 dark:bg-verde/20 rounded-full flex items-center justify-center">
-                       <i class="fa-solid fa-circle-check text-4xl text-verde-light dark:text-verde"></i>
-                   </div>
-                   <h1 class="font-display text-4xl sm:text-5xl text-zinc-900 dark:text-white">Grazie!</h1>
-                   <p id="confirmation-message" class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400"></p>
+                 <div class="w-20 h-20 mx-auto mb-6 bg-verde-light/20 dark:bg-verde/20 rounded-full flex items-center justify-center">
+                     <i class="fa-solid fa-circle-check text-4xl text-verde-light dark:text-verde"></i>
+                 </div>
+                 <h1 class="font-display text-4xl sm:text-5xl text-zinc-900 dark:text-white">Grazie!</h1>
+                 <p id="confirmation-message" class="font-mono max-w-2xl mx-auto mt-4 text-gray-600 dark:text-gray-400"></p>
              </div>
         </div>
     </main>
@@ -364,6 +354,7 @@
         const booking = { date: null, field: '1', timeSlots: [] };
         let unavailableSlots = [];
         let recurringBookings = {};
+        let blacklistData = {}; // State for blacklist
 
         // Helper to format date string correctly, avoiding timezone issues
         const toLocalISOString = (date) => {
@@ -515,6 +506,14 @@
             });
         };
 
+        // Fetches blacklist data
+        const listenToBlacklist = () => {
+            const blacklistRef = database.ref('blacklist');
+            blacklistRef.on('value', (snapshot) => {
+                blacklistData = snapshot.val() || {};
+            });
+        };
+
         // Event listener for date selection
         datePicker.addEventListener('click', e => {
             const target = e.target.closest('.date-option');
@@ -620,11 +619,12 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = form.Email.value.trim();
-            const confirmEmail = document.getElementById('confirm-email').value.trim();
+            const email = form.Email.value.trim().toLowerCase();
+            const phone = form.Telefono.value.trim();
+            const confirmEmail = document.getElementById('confirm-email').value.trim().toLowerCase();
 
             // Form validation
-            if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !email || !form.Telefono.value.trim()) {
+            if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !email || !phone) {
                 showModal("Per favore, compila tutti i campi anagrafici.");
                 return;
             }
@@ -644,6 +644,20 @@
             const submitBtn = form.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Verifica in corso...';
+            
+            // Blacklist check
+            for (const id in blacklistData) {
+                const blockedUser = blacklistData[id];
+                const blockedEmail = (blockedUser.email || '').trim().toLowerCase();
+                const blockedPhone = (blockedUser.telefono || '').trim();
+
+                if ((blockedEmail && blockedEmail === email) || (blockedPhone && blockedPhone === phone)) {
+                    showModal('Spiacente, non sei autorizzato a prenotare. Contatta il circolo per maggiori informazioni.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Conferma Prenotazione';
+                    return;
+                }
+            }
 
             // Check weekly booking limit
             // --- FIX APPLIED HERE ---
@@ -667,7 +681,7 @@
                 nome: form.Nome.value,
                 cognome: form.Cognome.value,
                 email: email,
-                telefono: form.Telefono.value,
+                telefono: phone,
                 prenotatoIl: firebase.database.ServerValue.TIMESTAMP,
                 status: 'confirmed' // Booking is confirmed immediately
             };
@@ -749,8 +763,10 @@
         fieldSelector.querySelector('.field-option[data-field="1"]').classList.add('selected');
         listenToRecurringBookings(); 
         listenForBookings();
+        listenToBlacklist(); // Fetch blacklist data on load
         updateSummary();
     });
     </script>
 </body>
 </html>
+
