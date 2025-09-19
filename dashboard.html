@@ -27,7 +27,7 @@
             --shadow-sm: 0 2px 5px rgba(0,0,0,0.08); /* Made slightly stronger */
             --shadow-md: 0 4px 12px rgba(0,0,0,0.1); /* Made slightly stronger */
         }
-        body { font-family: 'Noto Sans', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); margin: 0; }
+        body { font-family: 'Noto Sans', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); margin: 0; padding-top: 40px; }
         .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
         h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
 
@@ -57,8 +57,64 @@
         #search-input:focus { border-color: var(--colore-primario); box-shadow: 0 0 0 3px var(--colore-primario-trasparente); outline: none; }
         #search-btn { padding: 10px 20px; background-color: var(--colore-primario); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; }
 
+        /* --- Navbar Styles --- */
+.main-navbar {
+    background-color: #343A40; /* Stesso colore scuro delle intestazioni */
+    padding: 10px 0;
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    z-index: 1050; /* Sopra la maggior parte degli elementi */
+    position: absolute; /* Rende la navbar fissa in alto durante lo scorrimento */
+    top: 0;
+}
+.navbar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.main-navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 25px; /* Spazio tra i link */
+}
+.main-navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+.main-navbar a:hover {
+    background-color: var(--colore-primario-trasparente);
+}
+.main-navbar a.active {
+    background-color: var(--colore-primario);
+    font-weight: bold;
+}
+
+/* Responsive Navbar */
+@media (max-width: 800px) {
+    .navbar-container {
+        justify-content: center;
+    }
+    .main-navbar ul {
+        gap: 10px;
+    }
+    .main-navbar a {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+}
+
         /* Navigation */
-        .date-navigation { display: flex; justify-content: space-between; align-items: center; gap: 10px; background-color: var(--colore-superficie); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow-md); flex-wrap: wrap; }
+        .date-navigation { display: flex; justify-content: space-between; align-items: center; gap: 10px; background-color: var(--colore-superficie); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow-md); flex-wrap: wrap; margin-top: 20px; }
         .date-navigation button { background: none; border: 1px solid var(--colore-bordo); color: var(--colore-primario); padding: 10px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px; }
         .date-navigation button:hover { background-color: var(--colore-primario); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); }
         .date-navigation #today-btn { color: var(--colore-successo); border-color: var(--colore-successo); }
@@ -327,6 +383,15 @@
     </style>
 </head>
 <body>
+    <nav class="main-navbar">
+    <div class="navbar-container">
+        <ul>
+            <li><a href="soci.html">Socio</a></li>
+            <li><a href="calendario.html" class="active">Calendario</a></li>
+           
+        </ul>
+    </div>
+</nav>
     <div id="toast-container"></div>
 
     <div class="container">
@@ -1270,7 +1335,7 @@
                         
                         let daSalvareDaHtml = '';
                         if (b.pagato === 'partially_paid' && b.daSalvareDa) {
-                            daSalvareDaHtml = `<span style="font-weight: normal; color: var(--colore-testo-secondario); font-size: 0.8rem; display: block;">Saldo da: <strong>${b.daSalvareDa}</strong></span>`;
+                            daSalvareDaHtml = `<span style="font-weight: normal; color: var(--colore-testo-secondario); font-size: 0.8rem; display: block;">Saldo mancante da: <strong>${b.daSalvareDa}</strong></span>`;
                         }
                         
                         li.innerHTML = `

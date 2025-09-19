@@ -30,35 +30,44 @@
         h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
         button { font-family: 'Noto Sans', sans-serif; }
 
-        /* --- Main Navigation --- */
-        .main-nav {
+        /* --- Navbar Styles --- */
+        .main-navbar {
             background-color: #343A40;
-            padding: 10px 20px;
-            border-radius: 12px;
-            margin: 20px auto;
-            max-width: 1400px;
+            padding: 10px 0;
             box-shadow: var(--shadow-md);
+            width: 100%;
+            z-index: 1050;
+            position: sticky;
+            top: 0;
         }
-        .main-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .navbar-container {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
-        .main-nav a {
+        .main-navbar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 25px;
+        }
+        .main-navbar a {
             color: white;
             text-decoration: none;
             font-weight: 500;
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: background-color 0.3s;
+            font-size: 1rem;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .main-nav a:hover, .main-nav a.active {
+        .main-navbar a:hover, .main-navbar a.active {
             background-color: var(--colore-primario);
         }
 
@@ -147,15 +156,6 @@
             font-weight: 600;
         }
         #members-table tbody tr:hover { background-color: var(--colore-primario-trasparente); }
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: white;
-        }
-        .status-paid { background-color: var(--colore-successo); }
-        .status-unpaid { background-color: var(--colore-accento); }
         .actions-cell button {
             background: none;
             border: none;
@@ -205,21 +205,23 @@
 <body>
     <div id="toast-container"></div>
 
-    <nav class="main-nav">
-        <ul>
-            <li><a href="index.html"><i class="fa-solid fa-calendar-days"></i> Dashboard Prenotazioni</a></li>
-            <li><a href="soci.html" class="active"><i class="fa-solid fa-users"></i> Gestione Soci</a></li>
-        </ul>
+    <nav class="main-navbar">
+        <div class="navbar-container">
+            <ul>
+                <li><a href="soci.html" class="active">Socio</a></li>
+            <li><a href="dashboard.html">Calendario</a></li>
+                
+            </ul>
+        </div>
     </nav>
 
     <div class="container">
-        <!-- Member List Panel -->
         <div class="list-panel">
             <div class="panel-header">
                 <h2>Elenco Soci</h2>
                 <button id="add-member-btn"><i class="fa-solid fa-user-plus"></i> Aggiungi Socio</button>
             </div>
-            <input type="search" id="search-member-input" placeholder="Cerca per nome, email, telefono...">
+            <input type="search" id="search-member-input" placeholder="Cerca per nome, cognome, email, telefono...">
             <div class="table-container">
                 <table id="members-table">
                     <thead>
@@ -227,13 +229,11 @@
                             <th>Nome</th>
                             <th>Email</th>
                             <th>Telefono</th>
-                            <th>Quota</th>
                             <th>Azioni</th>
                         </tr>
                     </thead>
                     <tbody id="members-table-body">
-                        <!-- Member rows will be injected here by JS -->
-                    </tbody>
+                        </tbody>
                 </table>
                 <div id="loading-state">
                     <p><i class="fa-solid fa-spinner fa-spin"></i> Caricamento soci...</p>
@@ -245,7 +245,6 @@
         </div>
     </div>
 
-    <!-- Add/Edit Member Modal -->
     <div id="member-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -268,19 +267,11 @@
                     <label for="member-phone">Telefono</label>
                     <input type="tel" id="member-phone">
                 </div>
-                <div class="form-group">
-                    <label for="member-fee-status">Stato Quota Mensile</label>
-                    <select id="member-fee-status">
-                        <option value="paid">Pagata</option>
-                        <option value="unpaid" selected>Non Pagata</option>
-                    </select>
-                </div>
                 <button type="submit" class="submit-btn" id="submit-btn-text">Aggiungi Socio</button>
             </form>
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
     <div id="confirm-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -293,7 +284,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
@@ -326,7 +316,6 @@
         const memberSurnameInput = document.getElementById('member-surname');
         const memberEmailInput = document.getElementById('member-email');
         const memberPhoneInput = document.getElementById('member-phone');
-        const memberFeeStatusSelect = document.getElementById('member-fee-status');
         const submitBtnText = document.getElementById('submit-btn-text');
         
         const membersTableBody = document.getElementById('members-table-body');
@@ -372,13 +361,10 @@
                 const member = membersToRender[key];
                 const tr = document.createElement('tr');
                 tr.dataset.id = key;
-                const feeStatusClass = member.quota === 'paid' ? 'status-paid' : 'status-unpaid';
-                const feeStatusText = member.quota === 'paid' ? 'Pagata' : 'Non Pagata';
                 tr.innerHTML = `
                     <td>${member.nome} ${member.cognome}</td>
                     <td>${member.email}</td>
                     <td>${member.telefono || '-'}</td>
-                    <td><span class="status-badge ${feeStatusClass}">${feeStatusText}</span></td>
                     <td class="actions-cell">
                         <button class="edit-btn" title="Modifica Socio"><i class="fa-solid fa-pencil"></i></button>
                         <button class="delete-btn" title="Elimina Socio"><i class="fa-solid fa-trash-can"></i></button>
@@ -393,7 +379,6 @@
             allMembers = snapshot.val() || {};
             const query = searchInput.value.trim().toLowerCase();
             if (query) {
-                // If a search is active, re-apply the filter
                 searchInput.dispatchEvent(new Event('input'));
             } else {
                 renderMembers(allMembers);
@@ -415,7 +400,6 @@
             memberSurnameInput.value = member.cognome;
             memberEmailInput.value = member.email;
             memberPhoneInput.value = member.telefono;
-            memberFeeStatusSelect.value = member.quota;
 
             memberModal.style.display = 'flex';
         };
@@ -425,7 +409,6 @@
             memberIdInput.value = '';
             modalTitle.textContent = 'Aggiungi Socio';
             submitBtnText.textContent = 'Aggiungi Socio';
-            memberFeeStatusSelect.value = 'unpaid'; // Default to unpaid
             memberModal.style.display = 'flex';
         };
 
@@ -439,7 +422,6 @@
                 cognome: memberSurnameInput.value.trim(),
                 email: memberEmailInput.value.trim(),
                 telefono: memberPhoneInput.value.trim(),
-                quota: memberFeeStatusSelect.value,
             };
 
             const promise = memberId 

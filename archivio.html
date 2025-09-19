@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<!-- The 'dark' class is added here to set the default theme to dark -->
+<html lang="it" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="img/icona.svg">
+    <title>Archivio Storico - Circolo Tennis Tricase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+        // Configure Tailwind CSS to use a class-based dark mode
+        tailwind.config = {
+          darkMode: 'class',
+        }
+    </script>
+    <style>
+        /* Base styles for body */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative; /* Needed for stacking context */
+            isolation: isolate; /* Keeps pseudo-elements behind body content */
+        }
+
+        /* Light Theme base styles */
+        body {
+            background-color: #F5F5F5; /* Light gray background */
+            color: #1f2937; /* Dark gray text */
+            /* Added dot pattern for light theme */
+            background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Dark Theme styles */
+        .dark body {
+            background-color: #141414;
+            color: #F0F0F0;
+            /* Static background pattern for dark theme */
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* --- NEW: Animated Noise Overlay --- */
+        @keyframes noise-animation {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-5%,-5%); }
+            20% { transform: translate(-10%,5%); }
+            30% { transform: translate(5%,-10%); }
+            40% { transform: translate(-5%,15%); }
+            50% { transform: translate(-10%,5%); }
+            60% { transform: translate(15%,0); }
+            70% { transform: translate(0,10%); }
+            80% { transform: translate(-15%,0); }
+            90% { transform: translate(10%,5%); }
+            100% { transform: translate(5%,0); }
+        }
+        
+        /* Pseudo-element for the noise effect */
+        body::after {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: -2; /* Positioned behind the glow */
+            pointer-events: none;
+            background-repeat: repeat;
+            opacity: 0.02;
+            animation: noise-animation .5s infinite linear alternate;
+        }
+        
+        /* Dynamic background glow for dark mode */
+        @keyframes move-glow {
+            0% {
+                transform: translate(10vw, -20vh) scale(1.5);
+                background-color: #B3544C; /* Terra */
+            }
+            50% {
+                transform: translate(60vw, 80vh) scale(2);
+                background-color: #C4D831; /* Verde */
+            }
+            100% {
+                transform: translate(10vw, -20vh) scale(1.5);
+                background-color: #B3544C; /* Terra */
+            }
+        }
+
+        /* Pseudo-element for the animated glow */
+        .dark body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50vmax;
+            height: 50vmax;
+            border-radius: 50%;
+            background-color: #B3544C;
+            opacity: 0.1;
+            filter: blur(120px);
+            z-index: -1; /* Places the glow behind all content */
+            animation: move-glow 25s linear infinite;
+            will-change: transform; /* Performance optimization */
+        }
+
+        #hero-archivio {
+             background-image:
+                /* 1. Overlay for text legibility */
+                linear-gradient(rgba(20, 20, 20, 0.85), rgba(20, 20, 20, 0.85)),
+                /* 2. Background image */
+                url('img/gallery2.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .font-display {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        /* --- Colori Personalizzati --- */
+
+        /* Light Theme colors */
+        .bg-terra-light { background-color: #D95D51; }
+        .text-terra-light { color: #B9473B; }
+        .border-terra-light { border-color: #B9473B; }
+        .bg-verde-light { background-color: #AEC521; }
+        .text-verde-light { color: #88A009; }
+        .border-verde-light { border-color: #88A009; }
+
+        /* This color is for the Hero title and is now consistent across themes */
+        .text-verde { color: #C4D831; }
+
+        /* Dark Theme colors */
+        .dark .bg-terra { background-color: #B3544C; }
+        .dark .text-terra { color: #B3544C; }
+        .dark .border-terra { border-color: #B3544C; }
+        .dark .bg-verde { background-color: #C4D831; }
+        .dark .border-verde { border-color: #C4D831; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+        .animate-on-scroll { opacity: 0; transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        .fade-in-left { animation: fadeInLeft 0.6s ease-out forwards; }
+        .fade-in-right { animation: fadeInRight 0.6s ease-out forwards; }
+
+    </style>
+</head>
+<body class="antialiased">
+    
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed bottom-5 right-5 z-50 bg-gray-500/20 dark:bg-zinc-700/50 backdrop-blur-sm p-2 rounded-full hover:bg-gray-500/40 dark:hover:bg-zinc-600/60 transition-colors">
+        <!-- Sun Icon (shown in dark mode) -->
+        <svg id="theme-toggle-sun" class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <!-- Moon Icon (shown in light mode) -->
+        <svg id="theme-toggle-moon" class="w-6 h-6 text-slate-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    </button>
+
+
+    <!-- Header Fisso -->
+    <header class="fixed top-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-3 rounded-xl border border-white/20 dark:border-white/10 text-zinc-800 dark:text-white">
+            <a href="index.html" class="font-mono text-lg font-bold">C.T. TRICASE</a>
+            <nav class="hidden md:flex items-center space-x-6 font-mono text-sm">
+                <a href="index.html#about-us" class="hover:text-verde-light dark:hover:text-verde transition-colors">Chi Siamo</a>
+                <a href="index.html#corsi" class="hover:text-verde-light dark:hover:text-verde transition-colors">Corsi</a>
+                <a href="index.html#tesseramento" class="hover:text-verde-light dark:hover:text-verde transition-colors">Tesseramento</a>
+                <a href="archivio.html" class="text-verde-light dark:text-verde transition-colors font-bold">Archivio</a>
+                <a href="index.html#gallery" class="hover:text-verde-light dark:hover:text-verde transition-colors">Gallery</a>
+            </nav>
+            <a href="#contatti" class="bg-verde-light dark:bg-verde text-black font-bold py-2 px-4 rounded-lg text-sm hover:bg-zinc-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-colors">CONTATTACI</a>
+        </div>
+    </header>
+
+    <!-- Sezione Hero Archivio -->
+    <section id="hero-archivio" class="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden">
+        <div class="text-center z-10 p-4">
+            <h1 class="font-display text-5xl sm:text-6xl md:text-7xl">
+                <span class="text-white">ARCHIVIO</span>
+                <span class="text-verde">STORICO</span>
+            </h1>
+            <p class="font-mono max-w-2xl mx-auto mt-6 text-base md:text-lg text-gray-300">
+                Rivivi i tornei, gli eventi e i momenti che hanno fatto la storia del nostro circolo.
+            </p>
+        </div>
+    </section>
+    
+    <!-- Contenuto Principale -->
+    <main class="container mx-auto px-4 py-16 md:py-24">
+        <div class="space-y-16 md:space-y-20">
+
+            <!-- Sezione Archivio Eventi -->
+            <section id="archivio-eventi" class="animate-on-scroll" data-animation="fade-in">
+                <h2 class="font-display text-3xl md:text-4xl mb-2 text-center text-terra-light dark:text-terra">Eventi Passati</h2>
+                <p class="font-mono text-gray-500 dark:text-gray-400 mb-12 text-center">Una raccolta dei nostri tornei più importanti e degli eventi speciali.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Card Evento 1 -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden group hover:border-terra-light dark:hover:border-terra transition-all duration-300 animate-on-scroll shadow-lg dark:shadow-black/30 hover:shadow-xl hover:-translate-y-1" data-animation="fade-in" style="animation-delay: 100ms;">
+                        <img src="img/vallonea.jpg" alt="Torneo La Vallonea 2024" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <p class="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">LUGLIO 2024</p>
+                            <h3 class="font-mono text-xl mb-3 text-zinc-900 dark:text-white group-hover:text-terra-light dark:group-hover:text-terra transition-colors">TORNEO LA VALLONEA 2024</h3>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">L'edizione 2024 ha visto la partecipazione di atleti da tutta la regione, con match indimenticabili e una grande festa finale.</p>
+                            <a href="#" class="font-mono text-terra-light dark:text-terra font-bold text-sm">VEDI DETTAGLI -></a>
+                        </div>
+                    </div>
+
+                    <!-- Card Evento 2 -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden group hover:border-terra-light dark:hover:border-terra transition-all duration-300 animate-on-scroll shadow-lg dark:shadow-black/30 hover:shadow-xl hover:-translate-y-1" data-animation="fade-in" style="animation-delay: 200ms;">
+                        <img src="https://placehold.co/800x600/ae6b51/FFFFFF?text=Sociale+2023" alt="Torneo Sociale 2023" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <p class="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">AGOSTO 2023</p>
+                            <h3 class="font-mono text-xl mb-3 text-zinc-900 dark:text-white group-hover:text-terra-light dark:group-hover:text-terra transition-colors">TORNEO SOCIALE ESTIVO 2023</h3>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Il tradizionale torneo sociale ha riunito soci di tutte le età per una settimana di sport e divertimento in famiglia.</p>
+                            <a href="#" class="font-mono text-terra-light dark:text-terra font-bold text-sm">VEDI DETTAGLI -></a>
+                        </div>
+                    </div>
+
+                    <!-- Card Evento 3 -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden group hover:border-terra-light dark:hover:border-terra transition-all duration-300 animate-on-scroll shadow-lg dark:shadow-black/30 hover:shadow-xl hover:-translate-y-1" data-animation="fade-in" style="animation-delay: 300ms;">
+                        <img src="https://placehold.co/800x600/51ae6b/FFFFFF?text=Festa+2022" alt="Festa di Fine Anno 2022" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <p class="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">DICEMBRE 2022</p>
+                            <h3 class="font-mono text-xl mb-3 text-zinc-900 dark:text-white group-hover:text-terra-light dark:group-hover:text-terra transition-colors">FESTA DI FINE ANNO 2022</h3>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Una serata speciale per celebrare i successi dell'anno, premiare i nostri atleti e scambiarci gli auguri di buone feste.</p>
+                            <a href="#" class="font-mono text-terra-light dark:text-terra font-bold text-sm">VEDI FOTO -></a>
+                        </div>
+                    </div>
+
+                    <!-- Card Evento 4 -->
+                    <div class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden group hover:border-terra-light dark:hover:border-terra transition-all duration-300 animate-on-scroll shadow-lg dark:shadow-black/30 hover:shadow-xl hover:-translate-y-1" data-animation="fade-in" style="animation-delay: 100ms;">
+                        <img src="https://placehold.co/800x600/6b51ae/FFFFFF?text=Open+2021" alt="Torneo Open 2021" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <p class="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">LUGLIO 2021</p>
+                            <h3 class="font-mono text-xl mb-3 text-zinc-900 dark:text-white group-hover:text-terra-light dark:group-hover:text-terra transition-colors">TORNEO OPEN 2021</h3>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Un'edizione storica del nostro torneo Open che ha segnato la ripartenza dopo un periodo difficile. Grande tennis e partecipazione.</p>
+                            <a href="#" class="font-mono text-terra-light dark:text-terra font-bold text-sm">VEDI DETTAGLI -></a>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer e Contatti -->
+    <footer id="contatti" class="bg-white dark:bg-zinc-900/50 border-t border-gray-200 dark:border-zinc-800 mt-24 py-16 animate-on-scroll" data-animation="fade-in">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="font-display text-4xl md:text-5xl mb-2 text-verde-light dark:text-verde">Contattaci</h2>
+            <p class="font-mono text-gray-500 dark:text-gray-400 mb-8">Siamo a tua disposizione per qualsiasi informazione.</p>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 font-mono">
+                <a href="https://www.google.com/maps/search/?api=1&query=CircoloTennisTricaseASD" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+                    <div class="text-center">
+                        <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-2">INDIRIZZO</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Via Olimpica, snc<br>73039 Tricase (LE)</p>
+                    </div>
+                </a>
+                <div class="text-center">
+                    <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-2">TELEFONO</h3>
+                    <a href="tel:+393347782612" class="block text-gray-600 dark:text-gray-400 underline mb-2">+39 334 778 2612</a>
+                    <a href="tel:+393347782612" class="inline-block bg-verde-light dark:bg-verde text-white font-bold py-2 px-4 rounded hover:opacity-90 transition-opacity duration-300">
+                        Chiamaci
+                    </a>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-2">EMAIL</h3>
+                    <p class="text-gray-600 dark:text-gray-400">circ_tennis_tricase@libero.it</p>
+                </div>
+            </div>
+    
+            <div class="mt-12">
+                <h3 class="text-lg font-bold text-zinc-900 dark:text-white mb-4">Seguici sui Social</h3>
+                <div class="flex justify-center space-x-6">
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/circolo_tennis_tricase/" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-pink-600 dark:hover:text-pink-500 transition-colors duration-300">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.206.056 2.003.24 2.465.403a4.92 4.92 0 011.675 1.093 4.918 4.918 0 011.092 1.675c.163.462.347 1.259.403 2.465.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.056 1.206-.24 2.003-.403 2.465a4.918 4.918 0 01-1.093 1.675 4.92 4.92 0 01-1.675 1.092c-.462.163-1.259.347-2.465.403-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.206-.056-2.003-.24-2.465-.403a4.92 4.92 0 01-1.675-1.093 4.918 4.918 0 01-1.092-1.675c-.163-.462-.347-1.259-.403-2.465C2.175 15.747 2.163 15.367 2.163 12s.012-3.584.07-4.85c.056-1.206.24-2.003.403-2.465a4.918 4.918 0 011.093-1.675A4.92 4.92 0 015.404 2.636c.462-.163 1.259-.347 2.465-.403C8.416 2.175 8.796 2.163 12 2.163zm0 1.837c-3.177 0-3.558.012-4.809.07-1.016.048-1.566.218-1.93.362-.49.19-.84.418-1.21.788a3.084 3.084 0 00-.788 1.21c-.144.364-.314.914-.362 1.93-.058 1.251-.07 1.632-.07 4.809s.012 3.558.07 4.809c.048 1.016.218 1.566.362 1.93.19.49.418.84.788 1.21.37.37.72.598 1.21.788.364.144.914.314 1.93.362 1.251.058 1.632.07 4.809.07s3.558-.012 4.809-.07c1.016-.048 1.566-.218 1.93-.362a3.072 3.072 0 001.21-.788 3.072 3.072 0 00.788-1.21c.144-.364.314-.914.362-1.93.058-1.251.07-1.632.07-4.809s-.012-3.558-.07-4.809c-.048-1.016-.218-1.566-.362-1.93a3.084 3.084 0 00-.788-1.21 3.084 3.084 0 00-1.21-.788c-.364-.144-.914-.314-1.93-.362-1.251-.058-1.632-.07-4.809-.07zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.164a3.999 3.999 0 110-7.998 3.999 3.999 0 010 7.998zm6.406-11.845a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z"/>
+                        </svg>
+                    </a>
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/groups/217685595065608/?locale=it_IT" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 dark:hover:text-blue-500 transition-colors duration-300">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M22.676 0H1.324C.593 0 0 .593 0 1.324v21.352C0 23.407.593 24 1.324 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.894-4.788 4.659-4.788 1.325 0 2.464.099 2.795.143v3.24h-1.918c-1.504 0-1.796.715-1.796 1.763v2.312h3.59l-.467 3.622h-3.123V24h6.127C23.407 24 24 23.407 24 22.676V1.324C24 .593 23.407 0 22.676 0"/>
+                        </svg>
+                    </a>
+                    <!-- WhatsApp -->
+                    <a href="https://wa.me/393347782612" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-green-600 dark:hover:text-green-500 transition-colors duration-300">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 32 32" aria-hidden="true">
+                            <path d="M16.002 2.984c-7.285 0-13.2 5.919-13.2 13.207 0 2.328.613 4.597 1.781 6.596L2.98 29.02l6.43-1.683a13.16 13.16 0 006.59 1.683h.002c7.286 0 13.2-5.919 13.2-13.207s-5.914-13.207-13.2-13.207zm0 24.16c-2.02 0-3.998-.533-5.724-1.545l-.41-.24-3.822 1 1.02-3.727-.267-.433a11.01 11.01 0 01-1.728-6.01c0-6.112 4.975-11.09 11.092-11.09 6.114 0 11.09 4.978 11.09 11.09s-4.976 11.09-11.09 11.09zm6.066-8.293c-.332-.166-1.977-.976-2.286-1.086-.307-.111-.531-.166-.754.166-.22.333-.866 1.086-1.062 1.309-.193.222-.387.25-.719.083-.332-.166-1.403-.516-2.67-1.643-.986-.88-1.652-1.969-1.845-2.301-.193-.333-.021-.513.145-.678.149-.149.332-.387.498-.58.166-.193.221-.333.332-.555.111-.222.055-.416-.027-.582-.083-.166-.754-1.82-1.034-2.49-.272-.652-.548-.563-.754-.573l-.64-.011c-.222 0-.582.083-.886.416-.307.333-1.167 1.14-1.167 2.777s1.194 3.223 1.361 3.446c.166.222 2.352 3.59 5.702 5.035.796.343 1.416.547 1.899.699.797.255 1.524.219 2.098.133.64-.094 1.977-.808 2.256-1.59.276-.777.276-1.442.193-1.59-.083-.149-.305-.222-.637-.388z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+    
+            <div class="mt-16 pt-8 border-t border-gray-200 dark:border-zinc-800">
+                <p class="text-xs text-gray-600 dark:text-gray-500">© 2025 Circolo Tennis Tricase. Tutti i diritti riservati.</p>
+                <p class="text-xs text-gray-600 dark:text-gray-500">C.F. 90009420754 P.Iva 03771960758</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- THEME TOGGLE SCRIPT ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-toggle-sun');
+        const moonIcon = document.getElementById('theme-toggle-moon');
+        const htmlEl = document.documentElement;
+
+        // Function to toggle icons
+        function toggleIcons() {
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+        }
+        
+        // On page load, check for saved theme and apply it
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'light') {
+                htmlEl.classList.remove('dark');
+                toggleIcons();
+            } else {
+                // Default is dark, so no class change needed, just ensure icons are correct
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+
+        // Add click listener for the toggle button
+        themeToggleBtn.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            toggleIcons();
+            
+            // Save the user's preference to localStorage
+            if (htmlEl.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // --- SCROLL ANIMATION SCRIPT ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const animationType = entry.target.dataset.animation || 'fade-in';
+                        entry.target.classList.add(animationType);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1 
+            });
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+
+</body>
+</html>

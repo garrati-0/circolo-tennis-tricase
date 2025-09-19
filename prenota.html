@@ -99,7 +99,6 @@
             border-color: #B9473B !important; /* border-terra-light */
             color: white !important;
             cursor: not-allowed;
-            text-decoration: line-through;
         }
         .dark .time-slot.unavailable {
             background-color: #B3544C !important; /* terra */
@@ -110,7 +109,6 @@
             border-color: #d97706 !important; /* amber-600 */
             color: #141414 !important;
             cursor: not-allowed;
-            text-decoration: line-through;
         }
     </style>
 </head>
@@ -168,6 +166,7 @@
                         <div class="flex flex-wrap gap-x-6 gap-y-2 mt-6 pt-4 border-t border-gray-300 dark:border-zinc-700 text-sm text-gray-600 dark:text-gray-400">
                             <div class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-terra-light dark:bg-terra"></span> Prenotato</div>
                             <div class="flex items-center gap-2"><span class="w-4 h-4 rounded bg-amber-500"></span> Corsi</div>
+                            <div class="flex items-center gap-2"><span class="text-amber-500 font-bold text-lg leading-none">★</span> Solo Soci</div>
                         </div>
                     </div>
                 </div>
@@ -355,6 +354,7 @@
         let unavailableSlots = [];
         let recurringBookings = {};
         let blacklistData = {}; // State for blacklist
+        let sociData = {}; // State for members list
 
         // Helper to format date string correctly, avoiding timezone issues
         const toLocalISOString = (date) => {
@@ -364,35 +364,29 @@
             return `${year}-${month}-${day}`;
         };
 
-        // Renders the date picker based on the booking week logic
+        // Renders the date picker for the week from Sunday to the following Sunday
         const renderDatePicker = () => {
             datePicker.innerHTML = '';
             const today = new Date();
-            const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+            today.setHours(0, 0, 0, 0); // Normalize to the start of the day
 
-            let loopStartDate;
+            // Calculate the start of the week (Sunday)
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
 
-            // If today is Sunday, we show the next week (Mon-Sat)
-            if (dayOfWeek === 0) {
-                loopStartDate = new Date(today);
-                loopStartDate.setDate(today.getDate() + 1); // Start from next Monday
-            } else {
-            // Otherwise, we show the rest of the current week (today until Sat)
-                loopStartDate = new Date(today);
-            }
+            let selectionMade = false;
 
-            // Find the Saturday of the week that loopStartDate is in.
-            const endOfWeek = new Date(loopStartDate);
-            endOfWeek.setDate(loopStartDate.getDate() + (6 - loopStartDate.getDay()));
+            // Display up to 8 days, from Sunday to the next Sunday, but hide past days
+            for (let i = 0; i < 8; i++) {
+                const date = new Date(startOfWeek);
+                date.setDate(startOfWeek.getDate() + i);
 
-            let firstDayRendered = false;
-            
-            // Loop from the calculated start date until that week's Saturday.
-            for (let d = new Date(loopStartDate); d <= endOfWeek; d.setDate(d.getDate() + 1)) {
-                const date = new Date(d); // Create a copy to avoid mutation issues in the loop
-                
+                // If the date is in the past, don't display it
+                if (date < today) {
+                    continue;
+                }
+
                 const dateValue = toLocalISOString(date);
-                
                 const dayName = new Intl.DateTimeFormat('it-IT', { weekday: 'short' }).format(date);
                 const dayNum = date.getDate();
                 const option = document.createElement('div');
@@ -400,17 +394,18 @@
                 option.className = 'date-option flex-grow text-center font-semibold p-3 bg-gray-50 border border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde';
                 option.dataset.date = dateValue;
                 option.innerHTML = `<div class="text-xs uppercase text-gray-500 dark:text-gray-400">${dayName}</div><div class="text-2xl">${dayNum}</div>`;
-                
-                // Select the first available day in the sequence
-                if (!firstDayRendered) {
-                    booking.date = dateValue;
-                    option.classList.add('selected');
-                    firstDayRendered = true;
-                }
 
+                // Automatically select the first available date (which will be today)
+                if (!selectionMade) {
+                    option.classList.add('selected');
+                    booking.date = dateValue;
+                    selectionMade = true;
+                }
+                
                 datePicker.appendChild(option);
             }
         };
+
 
         // Renders available time slots for the selected date and field
         const renderTimeSlots = () => {
@@ -423,18 +418,23 @@
             else if (booking.field === '3') minuteOffset = 30;
 
             const selectedDate = new Date(booking.date + "T00:00:00");
-            const selectedDayOfWeek = selectedDate.getDay(); 
+            const selectedDayOfWeek = selectedDate.getDay(); // 0=Sun, 1=Mon, ...
 
-            for (let hour = 8; hour < 22; hour++) {
-                if (hour >= 13 && hour <= 15 || hour == 21) { // Lunch break
-                    continue;
-                }
+            for (let hour = 7; hour <= 22; hour++) {
                 const time = `${String(hour).padStart(2, '0')}:${String(minuteOffset).padStart(2, '0')}`;
                 const slot = document.createElement('div');
-                // DESIGN UPDATE: Changed classes for a cleaner light theme look
+                
                 slot.className = 'time-slot text-center font-semibold p-3 bg-gray-50 border border-gray-200 dark:bg-zinc-800 dark:border-zinc-700 rounded-lg cursor-pointer transition hover:border-verde-light dark:hover:border-verde';
                 slot.dataset.time = time;
-                slot.textContent = time;
+                
+                // Always add the star for members-only slots first
+                const isMembersOnly = (selectedDayOfWeek === 0) || [7, 13, 14, 15, 21, 22].includes(hour);
+                if (isMembersOnly) {
+                    slot.innerHTML = `${time} <span class="text-amber-500 text-lg leading-none">★</span>`;
+                    slot.dataset.memberOnly = "true";
+                } else {
+                    slot.textContent = time;
+                }
 
                 const isRegularlyBooked = unavailableSlots.includes(time);
 
@@ -448,6 +448,7 @@
                     }
                 }
 
+                // Then, apply unavailable/recurring styles without removing the star
                 if (isRecurringlyBooked) {
                     slot.classList.add('recurring');
                 } else if (isRegularlyBooked) {
@@ -460,6 +461,7 @@
                 timeSlotsContainer.appendChild(slot);
             }
         };
+
 
         // Updates the summary panel with the current selection
         const updateSummary = () => {
@@ -514,9 +516,37 @@
             });
         };
 
+        // Fetches members data
+        const listenToSoci = () => {
+            const sociRef = database.ref('soci');
+            sociRef.on('value', (snapshot) => {
+                sociData = snapshot.val() || {};
+            });
+        };
+        
+        // Checks if the user details match a registered member
+        const isMember = (name, surname, email) => {
+            const formattedName = name.trim().toLowerCase();
+            const formattedSurname = surname.trim().toLowerCase();
+            const formattedEmail = email.trim().toLowerCase();
+
+            for (const key in sociData) {
+                const socio = sociData[key];
+                const dbName = (socio.nome || '').trim().toLowerCase();
+                const dbSurname = (socio.cognome || '').trim().toLowerCase();
+                const dbEmail = (socio.email || '').trim().toLowerCase();
+
+                if (dbName === formattedName && dbSurname === formattedSurname && dbEmail === formattedEmail) {
+                    return true; // Match found
+                }
+            }
+            return false; // No match found
+        };
+
         // Event listener for date selection
         datePicker.addEventListener('click', e => {
             const target = e.target.closest('.date-option');
+            // Prevent action on non-existent or already selected dates
             if (!target || target.classList.contains('selected')) return;
             
             database.ref(`prenotazioni/${booking.date}/campo-${booking.field}`).off();
@@ -575,28 +605,21 @@
             }
             updateSummary();
         });
-
-        // --- FIX APPLIED HERE ---
-        // The function now accepts `bookingDate` to check the correct week.
+        
         async function checkWeeklyBookingLimit(email, bookingDate) {
-            // It now uses the passed `bookingDate` instead of `new Date()`
             const bookingDay = new Date(bookingDate + "T00:00:00");
-            const dayOfWeek = bookingDay.getDay(); // 0=Sun, 1=Mon...
+            const dayOfWeek = bookingDay.getDay(); 
             
-            // Calculate the first day (Monday) of the booking week
             const firstDayOfWeek = new Date(bookingDay);
-            // Adjust to Monday. In JS, Sunday is 0, so if it's Sunday (0), we subtract 6 days. Otherwise, subtract `dayOfWeek - 1`.
             firstDayOfWeek.setDate(bookingDay.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
             firstDayOfWeek.setHours(0, 0, 0, 0);
 
-            // Calculate the last day (Sunday) of the booking week
             const lastDayOfWeek = new Date(firstDayOfWeek);
             lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
             lastDayOfWeek.setHours(23, 59, 59, 999);
 
             const firstDayISO = toLocalISOString(firstDayOfWeek);
             const lastDayISO = toLocalISOString(lastDayOfWeek);
-            // --- END OF FIX ---
 
             let totalHoursThisWeek = 0;
             const indexRef = database.ref('indicePrenotazioni');
@@ -606,7 +629,6 @@
             if (snapshot.exists()) {
                 snapshot.forEach(childSnapshot => {
                     const bookingData = childSnapshot.val();
-                    // Check if the existing booking falls within the calculated week
                     if (bookingData.data >= firstDayISO && bookingData.data <= lastDayISO) {
                         totalHoursThisWeek += bookingData.orari.length;
                     }
@@ -619,12 +641,14 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const name = form.Nome.value;
+            const surname = form.Cognome.value;
             const email = form.Email.value.trim().toLowerCase();
             const phone = form.Telefono.value.trim();
             const confirmEmail = document.getElementById('confirm-email').value.trim().toLowerCase();
 
             // Form validation
-            if (!form.Nome.value.trim() || !form.Cognome.value.trim() || !email || !phone) {
+            if (!name.trim() || !surname.trim() || !email || !phone) {
                 showModal("Per favore, compila tutti i campi anagrafici.");
                 return;
             }
@@ -644,6 +668,25 @@
             const submitBtn = form.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Verifica in corso...';
+
+            // Member verification for members-only slots
+            let requiresMember = false;
+            for (const time of booking.timeSlots) {
+                const slotElement = timeSlotsContainer.querySelector(`[data-time="${time}"]`);
+                if (slotElement && slotElement.dataset.memberOnly === "true") {
+                    requiresMember = true;
+                    break;
+                }
+            }
+
+            if (requiresMember) {
+                if (!isMember(name, surname, email)) {
+                    showModal("Le ore contrassegnate con ⭐ sono riservate ai soli soci. I dati inseriti non corrispondono a nessun socio registrato.");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Conferma Prenotazione';
+                    return;
+                }
+            }
             
             // Blacklist check
             for (const id in blacklistData) {
@@ -660,10 +703,7 @@
             }
 
             // Check weekly booking limit
-            // --- FIX APPLIED HERE ---
-            // Pass the selected booking date to the check function
             const bookedHours = await checkWeeklyBookingLimit(email, booking.date);
-            // --- END OF FIX ---
             const hoursToBook = booking.timeSlots.length;
 
             if (bookedHours + hoursToBook > 2) {
@@ -678,8 +718,8 @@
             
             const userData = {
                 bookingId: bookingId,
-                nome: form.Nome.value,
-                cognome: form.Cognome.value,
+                nome: name,
+                cognome: surname,
                 email: email,
                 telefono: phone,
                 prenotatoIl: firebase.database.ServerValue.TIMESTAMP,
@@ -726,7 +766,6 @@
                         document.getElementById('confirmation-message').innerHTML = `La tua prenotazione è andata a buon fine. Riceverai una mail di riepilogo all'indirizzo <strong>${userData.email}</strong> con un link per annullare la prenotazione se necessario. Se non trova l'email controllare la cartella spam.`;
                         confirmationContainer.classList.remove('hidden');
 
-                        // Send confirmation email with cancellation link
                         sendFinalConfirmationEmail(bookingIndexData);
 
                     }).catch(indexError => {
@@ -764,6 +803,7 @@
         listenToRecurringBookings(); 
         listenForBookings();
         listenToBlacklist(); // Fetch blacklist data on load
+        listenToSoci(); // Fetch members data on load
         updateSummary();
     });
     </script>
