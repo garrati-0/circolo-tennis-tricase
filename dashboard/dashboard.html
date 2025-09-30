@@ -27,7 +27,7 @@
             --shadow-sm: 0 2px 5px rgba(0,0,0,0.08); /* Made slightly stronger */
             --shadow-md: 0 4px 12px rgba(0,0,0,0.1); /* Made slightly stronger */
         }
-        body { font-family: 'Noto Sans', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); margin: 0; }
+        body { font-family: 'Noto Sans', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); margin: 0; padding-top: 40px; }
         .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
         h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
 
@@ -57,8 +57,64 @@
         #search-input:focus { border-color: var(--colore-primario); box-shadow: 0 0 0 3px var(--colore-primario-trasparente); outline: none; }
         #search-btn { padding: 10px 20px; background-color: var(--colore-primario); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; }
 
+        /* --- Navbar Styles --- */
+.main-navbar {
+    background-color: #343A40; /* Stesso colore scuro delle intestazioni */
+    padding: 10px 0;
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    z-index: 1050; /* Sopra la maggior parte degli elementi */
+    position: absolute; /* Rende la navbar fissa in alto durante lo scorrimento */
+    top: 0;
+}
+.navbar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.main-navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 25px; /* Spazio tra i link */
+}
+.main-navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+.main-navbar a:hover {
+    background-color: var(--colore-primario-trasparente);
+}
+.main-navbar a.active {
+    background-color: var(--colore-primario);
+    font-weight: bold;
+}
+
+/* Responsive Navbar */
+@media (max-width: 800px) {
+    .navbar-container {
+        justify-content: center;
+    }
+    .main-navbar ul {
+        gap: 10px;
+    }
+    .main-navbar a {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+}
+
         /* Navigation */
-        .date-navigation { display: flex; justify-content: space-between; align-items: center; gap: 10px; background-color: var(--colore-superficie); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow-md); flex-wrap: wrap; }
+        .date-navigation { display: flex; justify-content: space-between; align-items: center; gap: 10px; background-color: var(--colore-superficie); padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow-md); flex-wrap: wrap; margin-top: 20px; }
         .date-navigation button { background: none; border: 1px solid var(--colore-bordo); color: var(--colore-primario); padding: 10px 15px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 8px; }
         .date-navigation button:hover { background-color: var(--colore-primario); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); }
         .date-navigation #today-btn { color: var(--colore-successo); border-color: var(--colore-successo); }
@@ -84,6 +140,7 @@
 
         .booking-card.paid { background: linear-gradient(135deg, var(--colore-successo), #1e7e34); }
         .booking-card.unpaid { background: linear-gradient(135deg, var(--colore-accento), #a71d2a); }
+        .booking-card.partially-paid { background: linear-gradient(135deg, var(--colore-warning), #d39e00); }
         .booking-card .booking-card-content { cursor: pointer; }
         .booking-card p.booking-notes { font-style: italic; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px; white-space: pre-wrap; }
         
@@ -112,21 +169,25 @@
 
         #no-bookings { text-align: center; font-size: 1.2rem; padding: 50px; color: var(--colore-testo-secondario); display: none; }
 
-        /* Recurring Bookings Panel */
-        .recurring-bookings-panel { margin-top: 40px; padding: 25px; background-color: var(--colore-superficie); border-radius: 12px; box-shadow: var(--shadow-md); }
-        .recurring-bookings-panel h2 { margin-top: 0; border-bottom: 1px solid var(--colore-bordo); padding-bottom: 15px; margin-bottom: 20px; }
-        .recurring-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
-        #recurring-form { display: flex; flex-direction: column; gap: 15px; }
+        /* Recurring Bookings Panel & Blacklist Panel */
+        .management-panel { margin-top: 40px; padding: 25px; background-color: var(--colore-superficie); border-radius: 12px; box-shadow: var(--shadow-md); }
+        .management-panel h2 { margin-top: 0; border-bottom: 1px solid var(--colore-bordo); padding-bottom: 15px; margin-bottom: 20px; }
+        .management-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        .management-panel form { display: flex; flex-direction: column; gap: 15px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group label { margin-bottom: 5px; font-weight: 500; color: var(--colore-testo-secondario); font-size: 0.9rem; }
         .form-group input, .form-group select, .form-group textarea { padding: 10px; border-radius: 6px; border: 1px solid var(--colore-bordo); font-size: 1rem; font-family: 'Noto Sans', sans-serif; transition: border-color 0.2s, box-shadow 0.2s; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--colore-primario); box-shadow: 0 0 0 3px var(--colore-primario-trasparente); outline: none; }
         #recurring-form button { background-color: var(--colore-ricorrente); color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background-color 0.2s; }
         #recurring-form button:hover { background-color: #5a329a; }
+        #blacklist-form button { background-color: #343a40; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background-color 0.2s; }
+        #blacklist-form button:hover { background-color: #23272b; }
         
-        #recurring-list ul { list-style: none; padding: 0; margin: 0; }
-        #recurring-list li { display: flex; justify-content: space-between; align-items: center; padding: 12px; background-color: var(--colore-sfondo); border-radius: 6px; margin-bottom: 8px; }
-        #recurring-list .delete-recurring-btn { background-color: var(--colore-accento); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
+        .list-container ul { list-style: none; padding: 0; margin: 0; }
+        .list-container li { display: flex; flex-direction: column; padding: 12px; background-color: var(--colore-sfondo); border-radius: 6px; margin-bottom: 8px; }
+        .list-container .list-item-main { display: flex; justify-content: space-between; align-items: center; }
+        .list-container .list-item-details { font-size: 0.85rem; color: var(--colore-testo-secondario); margin-top: 5px; }
+        .list-container .delete-btn-list { background-color: var(--colore-accento); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; flex-shrink: 0; }
 
         .recurring-day-header { background-color: #E2E6EA; color: var(--colore-testo-principale); cursor: pointer; padding: 15px; width: 100%; border: none; text-align: left; outline: none; font-size: 1.1rem; font-weight: bold; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease; border-radius: 8px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
         .recurring-day-header:hover, .recurring-day-header.active { background-color: #D5DCE2; }
@@ -134,6 +195,7 @@
         .recurring-day-header.active::after { transform: rotate(-180deg); }
         .recurring-day-content { padding: 0 18px; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; border-radius: 0 0 8px 8px; border: 1px solid var(--colore-bordo); border-top: none; }
         .recurring-day-content ul { padding: 10px 0; }
+        .recurring-day-content li { flex-direction: row; } /* Override for recurring list items */
 
         /* Modals */
         .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
@@ -153,7 +215,7 @@
         .unpaid-person-header .booking-count { color: var(--colore-testo-secondario); font-weight: normal; font-size: 0.9rem; }
         .unpaid-person-content { padding: 0; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; border-radius: 0 0 8px 8px; }
         .unpaid-person-content ul { list-style: none; padding: 0; margin: 0; }
-        .unpaid-person-content li { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--colore-bordo); }
+        .unpaid-person-content li { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid var(--colore-bordo); flex-direction: row;}
         .unpaid-person-content li:last-child { border-bottom: none; }
         .mark-as-paid-btn { background-color: var(--colore-successo); color: white; border: none; padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; cursor: pointer; }
         
@@ -300,8 +362,8 @@
             }
 
 
-            /* Recurring bookings layout */
-            .recurring-layout {
+            /* Management panels layout */
+            .management-layout {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
@@ -321,6 +383,15 @@
     </style>
 </head>
 <body>
+    <nav class="main-navbar">
+    <div class="navbar-container">
+        <ul>
+            <li><a href="soci.html">Socio</a></li>
+            <li><a href="calendario.html" class="active">Calendario</a></li>
+           
+        </ul>
+    </div>
+</nav>
     <div id="toast-container"></div>
 
     <div class="container">
@@ -329,13 +400,15 @@
             <button id="today-btn"><i class="fa-solid fa-calendar-day"></i> Oggi</button>
             <button id="datepicker-btn"><i class="fa-solid fa-calendar-alt"></i> Data</button>
             <button id="unpaid-btn"><i class="fa-solid fa-file-invoice-dollar"></i> Da Pagare</button>
+            
             <h2 id="current-date">Caricamento...</h2>
+            
             <button id="next-day"><i class="fa-solid fa-chevron-right"></i></button>
             <a href="settimana.html">
-        <button id="unpaid-btn">
-            <i class="fa-solid fa-file-invoice-dollar"></i>settimana
-        </button>
-    </a>
+                <button id="unpaid-btn">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>settimana
+                </button>
+            </a>    
         </div>
         
         <!-- MOBILE ONLY: Field selector tabs -->
@@ -369,9 +442,9 @@
     </div>
 
     <div class="container">
-        <div class="recurring-bookings-panel">
+        <div class="management-panel">
             <h2>Gestione Prenotazioni Ricorrenti</h2>
-            <div class="recurring-layout">
+            <div class="management-layout">
                 <div id="recurring-form-container">
                     <h3>Aggiungi / Blocca Periodo</h3>
                     <form id="recurring-form">
@@ -383,13 +456,40 @@
                         <button type="submit">Aggiungi Ricorrente</button>
                     </form>
                 </div>
-                <div id="recurring-list-container">
+                <div id="recurring-list-container" class="list-container">
                     <h3>Prenotazioni Attive</h3>
                     <div id="recurring-list"></div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- BLACKLIST SECTION START -->
+    <div class="container">
+        <div class="management-panel">
+            <h2><i class="fa-solid fa-user-slash"></i> Gestione Blacklist</h2>
+            <div class="management-layout">
+                <div>
+                    <h3>Aggiungi a Blacklist</h3>
+                    <form id="blacklist-form">
+                        <div class="form-group"><label for="blacklist-name">Nome</label><input type="text" id="blacklist-name" placeholder="Nome" required></div>
+                        <div class="form-group"><label for="blacklist-surname">Cognome</label><input type="text" id="blacklist-surname" placeholder="Cognome" required></div>
+                        <div class="form-group"><label for="blacklist-email">Email</label><input type="email" id="blacklist-email" placeholder="cliente@email.com"></div>
+                        <div class="form-group"><label for="blacklist-phone">Telefono</label><input type="tel" id="blacklist-phone" placeholder="3331234567"></div>
+                        <p style="font-size: 0.8rem; color: var(--colore-testo-secondario);">È sufficiente inserire o l'email o il telefono per bloccare un utente.</p>
+                        <button type="submit">Aggiungi a Blacklist</button>
+                    </form>
+                </div>
+                <div class="list-container">
+                    <h3>Clienti in Blacklist</h3>
+                    <div id="blacklist-list">
+                        <!-- Blacklist items will be rendered here by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- BLACKLIST SECTION END -->
 
     <!-- Modals -->
     <div id="booking-modal" class="modal">
@@ -414,18 +514,21 @@
             <h2 id="edit-modal-title">Modifica Prenotazione</h2>
             <div id="edit-modal-subtitle" style="color: var(--colore-testo-secondario); margin-bottom: 20px;"></div>
             <form id="edit-booking-form">
-                <!-- MODIFICATION START: Added fields to edit customer data -->
                 <div class="form-group"><label for="edit-name">Nome</label><input type="text" id="edit-name" required></div>
                 <div class="form-group"><label for="edit-surname">Cognome</label><input type="text" id="edit-surname" required></div>
                 <div class="form-group"><label for="edit-email">Email</label><input type="email" id="edit-email" required></div>
                 <div class="form-group"><label for="edit-phone">Telefono</label><input type="tel" id="edit-phone" required></div>
-                <!-- MODIFICATION END -->
                  <div class="form-group">
                     <label for="edit-payment-status">Stato Pagamento</label>
                     <select id="edit-payment-status">
                         <option value="unpaid">Non Pagato</option>
+                        <option value="partially_paid">Parzialmente Pagato</option>
                         <option value="paid">Pagato</option>
                     </select>
+                </div>
+                <div class="form-group" id="edit-daSalvareDa-group" style="display: none;">
+                    <label for="edit-daSalvareDa">Mancante da (Nome)</label>
+                    <input type="text" id="edit-daSalvareDa" placeholder="Nome di chi deve ancora pagare">
                 </div>
                 <div class="form-group">
                     <label for="edit-notes">Note</label>
@@ -492,6 +595,989 @@
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/it.js"></script>
-    <script src="js/logic.js"></script>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+            authDomain: "ct-tricase.firebaseapp.com",
+            databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ct-tricase",
+            storageBucket: "ct-tricase.appspot.com",
+            messagingSenderId: "931504527474",
+            appId: "1:931504527474:web:165880ec30f3785ff54aeb",
+            measurementId: "G-7M4D22L352"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // --- DOM Elements ---
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const prevDayBtn = document.getElementById('prev-day');
+        const nextDayBtn = document.getElementById('next-day');
+        const todayBtn = document.getElementById('today-btn');
+        const datepickerBtn = document.getElementById('datepicker-btn');
+        const unpaidBtn = document.getElementById('unpaid-btn');
+        const currentDateElem = document.getElementById('current-date');
+        const calendarGrid = document.getElementById('calendar-grid');
+        const noBookingsMsg = document.getElementById('no-bookings');
+        
+        const recurringForm = document.getElementById('recurring-form');
+        const recurringListDiv = document.getElementById('recurring-list');
+        const recurringFieldSelect = document.getElementById('recurring-field');
+        const recurringTimeStartSelect = document.getElementById('recurring-time-start');
+        const recurringTimeEndSelect = document.getElementById('recurring-time-end');
+        
+        // BLACKLIST DOM Elements
+        const blacklistForm = document.getElementById('blacklist-form');
+        const blacklistListDiv = document.getElementById('blacklist-list');
+        
+        // MOBILE ONLY
+        const mobileFieldSelector = document.querySelector('.mobile-field-selector');
+
+        // Modals
+        const bookingModal = document.getElementById('booking-modal');
+        const editBookingModal = document.getElementById('edit-booking-modal');
+        const cancellationModal = document.getElementById('cancellation-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const unpaidModal = document.getElementById('unpaid-modal');
+        const searchResultsModal = document.getElementById('search-results-modal');
+        const unpaidSearchInput = document.getElementById('unpaid-search-input');
+        const unpaidSearchForm = document.getElementById('unpaid-search-form');
+        
+        const manualBookingForm = document.getElementById('manual-booking-form');
+        const editBookingForm = document.getElementById('edit-booking-form');
+        const cancellationForm = document.getElementById('cancellation-form');
+        const editPaymentStatusSelect = document.getElementById('edit-payment-status');
+        const editDaSalvareDaGroup = document.getElementById('edit-daSalvareDa-group');
+
+        // --- State ---
+        let currentDate = new Date();
+        let currentBookingsListener = null;
+        let recurringBookings = {};
+        let blacklistData = {}; // State for blacklist
+
+        // --- FIX: Timezone-safe date formatting helper ---
+        const toLocalISOString = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // +1 because getMonth() is 0-indexed
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        // --- Initialization ---
+        const fp = flatpickr(datepickerBtn, {
+            locale: "it",
+            dateFormat: "Y-m-d",
+            defaultDate: "today",
+            onChange: function(selectedDates, dateStr, instance) {
+                currentDate = selectedDates[0];
+                listenToBookingsForDate();
+            },
+        });
+
+        // --- Toast Notification Function ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            let iconClass = 'fa-solid fa-circle-info';
+            if (type === 'success') iconClass = 'fa-solid fa-circle-check';
+            if (type === 'error') iconClass = 'fa-solid fa-circle-xmark';
+
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="${iconClass}"></i></div>
+                <div class="toast-message">${message}</div>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, 4000);
+        }
+        
+        // --- Skeleton Loader ---
+        function showSkeletonLoader() {
+            calendarGrid.innerHTML = '';
+            const skeletonContainer = document.createElement('div');
+            skeletonContainer.className = 'skeleton-loader';
+            skeletonContainer.id = 'skeleton-loader';
+
+            let skeletonHTML = '';
+            for (let i = 0; i < 17; i++) { // 17 hours from 7 to 23
+                skeletonHTML += '<div class="skeleton-item time-label-skeleton"></div>';
+                for (let j = 0; j < 3; j++) {
+                    skeletonHTML += '<div class="skeleton-item"></div>';
+                }
+            }
+            skeletonContainer.innerHTML = skeletonHTML;
+            calendarGrid.appendChild(skeletonContainer);
+        }
+
+        function hideSkeletonLoader() {
+            const loader = document.getElementById('skeleton-loader');
+            if (loader) loader.remove();
+        }
+
+        // --- Calendar Rendering ---
+        const renderCalendar = (dayBookings = {}) => {
+            hideSkeletonLoader();
+            calendarGrid.innerHTML = '';
+            
+            const currentDayOfWeek = currentDate.getDay();
+            for (const id in recurringBookings) {
+                const rb = recurringBookings[id];
+                if (parseInt(rb.giornoSettimana) === currentDayOfWeek) {
+                    const fieldId = `campo-${rb.campo}`;
+                    const timeKey = rb.orario.replace(':', '-');
+                    if (!dayBookings[fieldId]) dayBookings[fieldId] = {};
+                    if (!dayBookings[fieldId][timeKey]) {
+                        dayBookings[fieldId][timeKey] = {
+                            nome: rb.nome, cognome: '(Ricorrente)', telefono: 'N/A',
+                            email: 'N/A', isRecurring: true,
+                        };
+                    }
+                }
+            }
+            
+            let totalBookings = 0;
+            Object.values(dayBookings).forEach(field => {
+                totalBookings += Object.values(field).filter(Boolean).length;
+            });
+
+            noBookingsMsg.style.display = totalBookings === 0 ? 'block' : 'none';
+            
+            const fragment = document.createDocumentFragment();
+            const slots = {}; 
+
+            for (let hour = 7; hour < 24; hour++) {
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                timeLabel.textContent = `${String(hour).padStart(2, '0')}:00`;
+                fragment.appendChild(timeLabel);
+                for (let field = 1; field <= 3; field++) {
+                    const slotId = `slot-${hour}-${field}`;
+                    const slotDiv = document.createElement('div');
+                    slotDiv.className = `time-slot field-${field}`;
+                    slotDiv.id = slotId;
+                    slots[slotId] = slotDiv; 
+                    fragment.appendChild(slotDiv);
+                }
+            }
+
+            for (const fieldId in dayBookings) {
+                const fieldBookings = dayBookings[fieldId];
+                const fieldNumber = fieldId.split('-')[1];
+
+                for (const time in fieldBookings) {
+                    const booking = fieldBookings[time];
+                    if (!booking) continue;
+                    const [startHour] = time.replace('-',':').split(':').map(Number);
+                    const targetSlotId = `slot-${startHour}-${fieldNumber}`;
+                    const targetSlot = slots[targetSlotId];
+                    
+                    if (targetSlot) {
+                        const card = document.createElement('div');
+                        card.className = 'booking-card';
+                        card.dataset.bookingIdentifier = `${fieldId}-${time}`;
+                        
+                        if (booking.isRecurring) {
+                            card.classList.add('recurring');
+                        } else {
+                            if (booking.pagato === 'paid' || booking.pagato === true) {
+                                card.classList.add('paid');
+                            } else if (booking.pagato === 'partially_paid') {
+                                card.classList.add('partially-paid');
+                            } else {
+                                card.classList.add('unpaid');
+                            }
+                        }
+                        
+                        let deleteButtonHTML = '';
+                        if (!booking.isRecurring) {
+                            deleteButtonHTML = `<button class="delete-btn" data-field="${fieldId}" data-time="${time.replace(':', '-')}" data-booking-id="${booking.bookingId || ''}" title="Cancella prenotazione"><i class="fa-solid fa-trash-can"></i></button>`;
+                        }
+
+                        card.innerHTML = `
+                            ${deleteButtonHTML}
+                            <div class="booking-card-content" data-field="${fieldId}" data-time="${time}">
+                                <strong>${booking.nome || 'N/A'} ${booking.cognome || ''}</strong>
+                                <p><i class="fa-solid fa-clock fa-fw"></i> ${time.replace('-',':')} ${booking.isRecurring ? '<i class="fa-solid fa-sync recurring-icon" title="Ricorrente"></i>' : ''}</p>
+                                <p><i class="fa-solid fa-phone fa-fw"></i> ${booking.telefono || '-'}</p>
+                                <p><i class="fa-solid fa-envelope fa-fw"></i> ${booking.email || '-'}</p>
+                                ${booking.note ? `<p class="booking-notes"><i class="fa-solid fa-note-sticky fa-fw"></i> ${booking.note}</p>` : ''}
+                                ${(booking.pagato === 'partially_paid' && booking.daSalvareDa) ? `<p class="booking-notes"><i class="fa-solid fa-user-clock fa-fw"></i> Saldo: <strong>${booking.daSalvareDa}</strong></p>` : ''}
+                            </div>`;
+                        
+                        targetSlot.appendChild(card);
+                    }
+                }
+            }
+
+            Object.values(slots).forEach(slot => {
+                if (slot.childElementCount === 0) {
+                    slot.classList.add('empty');
+                    const [, hour, field] = slot.id.split('-');
+                    let minutes = '00';
+                    if (field === '2') minutes = '15';
+                    else if (field === '3') minutes = '30';
+                    const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
+                    
+                    slot.dataset.time = timeString;
+                    slot.dataset.field = field;
+                }
+            });
+
+            calendarGrid.appendChild(fragment);
+        };
+
+        const listenToBookingsForDate = () => {
+            if (currentBookingsListener) { currentBookingsListener.off(); }
+            showSkeletonLoader();
+            noBookingsMsg.style.display = 'none';
+            currentDateElem.textContent = new Intl.DateTimeFormat('it-IT', { dateStyle: 'full' }).format(currentDate);
+            fp.setDate(currentDate, false);
+            
+            const dateString = toLocalISOString(currentDate);
+
+            const bookingsRef = database.ref('prenotazioni/' + dateString);
+            currentBookingsListener = bookingsRef;
+            
+            bookingsRef.on('value', (snapshot) => {
+                const bookings = snapshot.val() || {};
+                renderCalendar(bookings);
+            }, (error) => {
+                console.error("Errore di Firebase:", error);
+                showToast("Errore nel caricamento dei dati.", 'error');
+                hideSkeletonLoader();
+            });
+        };
+        
+        const renderRecurringList = () => {
+            recurringListDiv.innerHTML = '';
+            if (Object.keys(recurringBookings).length === 0) {
+                recurringListDiv.innerHTML = '<p>Nessuna prenotazione ricorrente impostata.</p>';
+                return;
+            }
+
+            const bookingsByDay = {};
+            for (const id in recurringBookings) {
+                const booking = { ...recurringBookings[id], id }; 
+                const day = booking.giornoSettimana;
+                if (!bookingsByDay[day]) bookingsByDay[day] = [];
+                bookingsByDay[day].push(booking);
+            }
+
+            const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+            const dayOrder = [1, 2, 3, 4, 5, 6, 0]; 
+
+            dayOrder.forEach(dayIndex => {
+                if (bookingsByDay[dayIndex]) {
+                    const dayName = days[dayIndex];
+                    const dayBookings = bookingsByDay[dayIndex];
+                    dayBookings.sort((a, b) => a.orario.localeCompare(b.orario));
+
+                    const header = document.createElement('button');
+                    header.className = 'recurring-day-header';
+                    header.innerHTML = `<span>${dayName}</span> <span style="font-weight:normal; color: var(--colore-testo-secondario); font-size: 0.9rem;">${dayBookings.length} prenotazioni</span>`;
+                    
+                    const content = document.createElement('div');
+                    content.className = 'recurring-day-content';
+                    const ul = document.createElement('ul');
+                    
+                    dayBookings.forEach(rb => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <div class="list-item-main">
+                                <span><strong>${rb.nome}</strong> - ore ${rb.orario}, Campo ${rb.campo}</span>
+                                <button class="delete-btn-list" data-id="${rb.id}" title="Cancella ricorrente"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        `;
+                        ul.appendChild(li);
+                    });
+                    
+                    content.appendChild(ul);
+                    recurringListDiv.appendChild(header);
+                    recurringListDiv.appendChild(content);
+                }
+            });
+        };
+
+        calendarGrid.addEventListener('click', async (e) => {
+            const deleteBtn = e.target.closest('.delete-btn');
+            const emptySlot = e.target.closest('.time-slot.empty');
+            const editTrigger = e.target.closest('.booking-card-content');
+
+            if (deleteBtn) {
+                const { field, time, bookingId } = deleteBtn.dataset;
+                const dateString = toLocalISOString(currentDate);
+                const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
+
+                database.ref(bookingPath).once('value', (snapshot) => {
+                    const bookingData = snapshot.val();
+                    if (!bookingData) {
+                        showToast('Impossibile trovare i dati della prenotazione.', 'error');
+                        return;
+                    }
+                    
+                    cancellationForm.reset();
+                    Object.assign(cancellationForm.dataset, {
+                        bookingPath,
+                        indexPath: `indicePrenotazioni/${bookingId}`,
+                        bookingId,
+                        userEmail: bookingData.email,
+                        userName: bookingData.nome,
+                        bookingDate: new Date(dateString + 'T12:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                        bookingTime: time.replace('-',':')
+                    });
+                    document.getElementById('cancellation-info').textContent = `Stai per cancellare la prenotazione di ${bookingData.nome} ${bookingData.cognome} per le ore ${time.replace('-',':')}.`;
+                    cancellationModal.style.display = 'flex';
+                });
+
+            } else if (emptySlot) {
+                const { time, field } = emptySlot.dataset;
+                document.getElementById('modal-title').textContent = `Aggiungi Prenotazione - Campo ${field} ore ${time}`;
+                manualBookingForm.reset();
+                document.getElementById('manual-field').value = field;
+                document.getElementById('manual-time').value = time;
+                bookingModal.style.display = 'flex';
+            
+            } else if (editTrigger && !editTrigger.closest('.booking-card.recurring')) {
+                const { field, time } = editTrigger.dataset;
+                const dateString = toLocalISOString(currentDate);
+                const bookingPath = `prenotazioni/${dateString}/${field}/${time}`;
+
+                database.ref(bookingPath).once('value', (snapshot) => {
+                    const bookingData = snapshot.val();
+                    if (!bookingData) return;
+
+                    const fieldNumber = field.split('-')[1];
+                    const timeFormatted = time.replace('-', ':');
+                    
+                    document.getElementById('edit-modal-subtitle').textContent = `${bookingData.nome} ${bookingData.cognome} - Campo ${fieldNumber} ore ${timeFormatted}`;
+                    document.getElementById('edit-name').value = bookingData.nome || '';
+                    document.getElementById('edit-surname').value = bookingData.cognome || '';
+                    document.getElementById('edit-email').value = bookingData.email || '';
+                    document.getElementById('edit-phone').value = bookingData.telefono || '';
+                    
+                    let paymentStatus = 'unpaid';
+                    if (bookingData.pagato === true || bookingData.pagato === 'paid') {
+                        paymentStatus = 'paid';
+                    } else if (bookingData.pagato === 'partially_paid') {
+                        paymentStatus = 'partially_paid';
+                    }
+                    editPaymentStatusSelect.value = paymentStatus;
+
+                    const daSalvareDaInput = document.getElementById('edit-daSalvareDa');
+                    if (paymentStatus === 'partially_paid') {
+                        editDaSalvareDaGroup.style.display = 'block';
+                        daSalvareDaInput.value = bookingData.daSalvareDa || '';
+                    } else {
+                        editDaSalvareDaGroup.style.display = 'none';
+                        daSalvareDaInput.value = '';
+                    }
+
+                    document.getElementById('edit-notes').value = bookingData.note || '';
+                    editBookingForm.dataset.bookingPath = bookingPath;
+                    editBookingForm.dataset.bookingId = bookingData.bookingId;
+
+                    editBookingModal.style.display = 'flex';
+                });
+            }
+        });
+        
+        prevDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() - 1); listenToBookingsForDate(); });
+        nextDayBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() + 1); listenToBookingsForDate(); });
+        todayBtn.addEventListener('click', () => { currentDate = new Date(); listenToBookingsForDate(); });
+        
+        mobileFieldSelector.addEventListener('click', (e) => {
+            if (e.target.classList.contains('field-tab')) {
+                const field = e.target.dataset.field;
+                mobileFieldSelector.querySelectorAll('.field-tab').forEach(tab => tab.classList.remove('active'));
+                e.target.classList.add('active');
+                calendarGrid.className = 'calendar-container';
+                calendarGrid.classList.add(`show-field-${field}`);
+            }
+        });
+
+        function populateRecurringTimes() {
+            recurringTimeStartSelect.innerHTML = '';
+            recurringTimeEndSelect.innerHTML = '<option value="">Singola Ora</option>';
+            const field = recurringFieldSelect.value;
+            let minutes = '00';
+            if (field === '2') minutes = '15';
+            else if (field === '3') minutes = '30';
+
+            for (let hour = 7; hour < 24; hour++) {
+                const timeString = `${String(hour).padStart(2, '0')}:${minutes}`;
+                recurringTimeStartSelect.add(new Option(timeString, timeString));
+                recurringTimeEndSelect.add(new Option(timeString, timeString));
+            }
+        }
+        recurringFieldSelect.addEventListener('change', populateRecurringTimes);
+
+        recurringForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const submitBtn = recurringForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+
+            const name = document.getElementById('recurring-name').value.trim();
+            const dayOfWeek = document.getElementById('recurring-day').value;
+            const field = document.getElementById('recurring-field').value;
+            const startTime = document.getElementById('recurring-time-start').value;
+            const endTime = document.getElementById('recurring-time-end').value;
+
+            const updates = {};
+            const startHour = parseInt(startTime.split(':')[0]);
+            const minutes = startTime.split(':')[1];
+            const endHour = endTime ? parseInt(endTime.split(':')[0]) : startHour;
+
+            if (endTime && startHour > endHour) {
+                showToast("L'orario di fine deve essere successivo a quello di inizio.", 'error');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            for (let hour = startHour; hour <= endHour; hour++) {
+                const time = `${String(hour).padStart(2, '0')}:${minutes}`;
+                const newRecurringBooking = {
+                    giornoSettimana: dayOfWeek, orario: time, campo: field, nome: name,
+                    email: 'ricorrente@cttricase.it', telefono: 'N/A'
+                };
+                const newKey = database.ref('prenotazioniRicorrenti').push().key;
+                updates[`/prenotazioniRicorrenti/${newKey}`] = newRecurringBooking;
+            }
+            
+            database.ref().update(updates)
+                .then(() => {
+                    recurringForm.reset();
+                    populateRecurringTimes();
+                    showToast('Prenotazione/i ricorrente aggiunta!', 'success');
+                })
+                .catch(err => showToast('Errore: ' + err.message, 'error'))
+                .finally(() => submitBtn.disabled = false);
+        });
+
+        recurringListDiv.addEventListener('click', (e) => {
+            const header = e.target.closest('.recurring-day-header');
+            if (header) {
+                header.classList.toggle('active');
+                const content = header.nextElementSibling;
+                content.style.maxHeight = content.style.maxHeight ? null : content.scrollHeight + "px";
+                return;
+            }
+
+            const deleteBtn = e.target.closest('.delete-btn-list');
+            if (deleteBtn) {
+                const id = deleteBtn.dataset.id;
+                document.getElementById('confirm-title').textContent = 'Cancella Ricorrenza';
+                document.getElementById('confirm-message').textContent = 'Sei sicuro di voler cancellare questa prenotazione ricorrente? L\'azione è irreversibile.';
+                
+                const confirmActionBtn = document.getElementById('confirm-action-btn');
+                const newConfirmActionBtn = confirmActionBtn.cloneNode(true);
+                confirmActionBtn.parentNode.replaceChild(newConfirmActionBtn, confirmActionBtn);
+
+                newConfirmActionBtn.addEventListener('click', () => {
+                    database.ref(`prenotazioniRicorrenti/${id}`).remove()
+                        .then(() => showToast('Ricorrenza cancellata.', 'info'))
+                        .catch(err => showToast('Errore: ' + err.message, 'error'));
+                    confirmModal.style.display = 'none';
+                }, { once: true });
+                
+                confirmModal.style.display = 'flex';
+            }
+        });
+
+        // Modal Management
+        [bookingModal, editBookingModal, cancellationModal, confirmModal, unpaidModal, searchResultsModal].forEach(modal => {
+            modal.querySelector('.close-btn').addEventListener('click', () => modal.style.display = 'none');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.style.display = 'none';
+            });
+        });
+        
+        document.getElementById('confirm-cancel-btn').addEventListener('click', () => confirmModal.style.display = 'none');
+        
+        document.getElementById('fill-placeholder-data').addEventListener('click', () => {
+            document.getElementById('manual-email').value = 'cliente@interno.it';
+            document.getElementById('manual-phone').value = '0000000000';
+        });
+        
+        editPaymentStatusSelect.addEventListener('change', () => {
+            editDaSalvareDaGroup.style.display = (editPaymentStatusSelect.value === 'partially_paid') ? 'block' : 'none';
+        });
+
+        manualBookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = manualBookingForm.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+
+            const email = document.getElementById('manual-email').value.trim().toLowerCase();
+            const phone = document.getElementById('manual-phone').value.trim();
+
+            for (const id in blacklistData) {
+                const blockedUser = blacklistData[id];
+                const blockedEmail = (blockedUser.email || '').trim().toLowerCase();
+                const blockedPhone = (blockedUser.telefono || '').trim();
+
+                if ((blockedEmail && blockedEmail === email) || (blockedPhone && blockedPhone === phone)) {
+                    showToast('Questo cliente è in blacklist e non può prenotare.', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
+            }
+
+            const field = document.getElementById('manual-field').value;
+            const time = document.getElementById('manual-time').value;
+            const dateString = toLocalISOString(currentDate);
+            const bookingRef = database.ref(`prenotazioni/${dateString}/campo-${field}`);
+            const bookingId = bookingRef.push().key;
+
+            const bookingData = {
+                bookingId: bookingId,
+                nome: document.getElementById('manual-name').value.trim(),
+                cognome: document.getElementById('manual-surname').value.trim(),
+                email: email,
+                telefono: phone,
+                prenotatoIl: firebase.database.ServerValue.TIMESTAMP,
+                pagato: 'unpaid',
+                note: ''
+            };
+
+            const timeKey = time.replace(':', '-');
+            const bookingPath = `prenotazioni/${dateString}/campo-${field}/${timeKey}`;
+            const indexPath = `indicePrenotazioni/${bookingId}`;
+            
+            const updates = {};
+            updates[bookingPath] = bookingData;
+            updates[indexPath] = {
+                data: dateString, campo: field, orari: [time],
+                nome: bookingData.nome, cognome: bookingData.cognome,
+                email: bookingData.email, prenotatoIl: bookingData.prenotatoIl
+            };
+
+            try {
+                await database.ref().update(updates);
+                
+                const CANCELLATION_PAGE_URL = "cancella.html"; 
+                const cancellationLink = `https://www.circolotennistricase.it/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJAXEg-M5Y_wZS37n-avMvoWGQdrmWqrK4-K8212n4WcYziuOUiMR-b8ItFFyKC11ymg/exec";
+                const emailData = {
+                    type: 'confirmation',
+                    nome: bookingData.nome, email: bookingData.email,
+                    data: new Date(dateString + 'T12:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                    campo: field, orari: time, id: bookingId, linkCancellazione: cancellationLink
+                };
+                
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(emailData), headers: { 'Content-Type': 'application/json' } })
+                    .then(() => console.log("Richiesta di invio email di conferma partita."))
+                    .catch(error => console.error("Errore script:", error));
+
+                showToast('Prenotazione salvata e email inviata!', 'success');
+                bookingModal.style.display = 'none';
+
+            } catch (error) {
+                showToast('Errore nel salvataggio: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        editBookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = editBookingForm.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+
+            const bookingPath = editBookingForm.dataset.bookingPath;
+            const bookingId = editBookingForm.dataset.bookingId;
+
+            if (!bookingPath) {
+                showToast('Errore: percorso del booking non trovato.', 'error');
+                submitBtn.disabled = false; return;
+            }
+
+            const paymentStatus = document.getElementById('edit-payment-status').value;
+            const daSalvareDa = document.getElementById('edit-daSalvareDa').value.trim();
+
+            const updates = {};
+            updates[`${bookingPath}/nome`] = document.getElementById('edit-name').value.trim();
+            updates[`${bookingPath}/cognome`] = document.getElementById('edit-surname').value.trim();
+            updates[`${bookingPath}/email`] = document.getElementById('edit-email').value.trim();
+            updates[`${bookingPath}/telefono`] = document.getElementById('edit-phone').value.trim();
+            updates[`${bookingPath}/pagato`] = paymentStatus;
+            updates[`${bookingPath}/note`] = document.getElementById('edit-notes').value.trim();
+            
+            if (paymentStatus === 'partially_paid') {
+                updates[`${bookingPath}/daSalvareDa`] = daSalvareDa;
+            } else {
+                updates[`${bookingPath}/daSalvareDa`] = null; // Remove if not partially paid
+            }
+
+            if (bookingId) {
+                updates[`indicePrenotazioni/${bookingId}/nome`] = updates[`${bookingPath}/nome`];
+                updates[`indicePrenotazioni/${bookingId}/cognome`] = updates[`${bookingPath}/cognome`];
+                updates[`indicePrenotazioni/${bookingId}/email`] = updates[`${bookingPath}/email`];
+            }
+
+            try {
+                await database.ref().update(updates);
+                showToast('Modifiche salvate!', 'success');
+                editBookingModal.style.display = 'none';
+            } catch (error) {
+                showToast('Errore salvataggio: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        cancellationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = cancellationForm.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+
+            const { bookingPath, indexPath, bookingId, userEmail, userName, bookingDate, bookingTime } = e.target.dataset;
+            const reason = document.getElementById('cancellation-reason').value.trim();
+
+            try {
+                const indexSnapshot = await database.ref(indexPath).once('value');
+                const indexData = indexSnapshot.val();
+                
+                const updates = { [bookingPath]: null };
+                if (indexData && indexData.orari && indexData.orari.length > 1) {
+                    updates[`${indexPath}/orari`] = indexData.orari.filter(t => t !== bookingTime.replace('-', ':'));
+                } else {
+                    updates[indexPath] = null;
+                }
+                await database.ref().update(updates);
+                
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJAXEg-M5Y_wZS37n-avMvoWGQdrmWqrK4-K8212n4WcYziuOUiMR-b8ItFFyKC11ymg/exec";
+                const emailData = {
+                    type: 'cancellation',
+                    nome: userName,
+                    email: userEmail,
+                    data: bookingDate,
+                    orari: bookingTime,
+                    causale: reason
+                };
+
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(emailData), headers: { 'Content-Type': 'application/json' } })
+                    .then(() => console.log("Richiesta di invio email di cancellazione partita."))
+                    .catch(error => console.error("Errore script:", error));
+                
+                showToast('Prenotazione cancellata e notifica inviata.', 'info');
+                cancellationModal.style.display = 'none';
+
+            } catch (error) {
+                showToast(`Errore cancellazione: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        const showUnpaidBookings = async (searchTerm = '') => {
+            const unpaidListContainer = document.getElementById('unpaid-list-container');
+            unpaidListContainer.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Caricamento...';
+            unpaidModal.style.display = 'flex';
+
+            try {
+                const snapshot = await database.ref('prenotazioni').once('value');
+                const bookingsByDate = snapshot.val() || {};
+                const unpaidByPerson = {};
+
+                for (const date in bookingsByDate) {
+                    for (const fieldId in bookingsByDate[date]) {
+                        for (const time in bookingsByDate[date][fieldId]) {
+                            const booking = bookingsByDate[date][fieldId][time];
+                            if (booking && (booking.pagato === 'unpaid' || booking.pagato === 'partially_paid' || booking.pagato === false) && !booking.isRecurring) {
+                                const personKey = `${booking.nome} ${booking.cognome}`.trim().toLowerCase();
+                                if (searchTerm && !personKey.includes(searchTerm)) {
+                                    continue;
+                                }
+                                if (!unpaidByPerson[personKey]) {
+                                    unpaidByPerson[personKey] = { name: `${booking.nome} ${booking.cognome}`.trim(), bookings: [] };
+                                }
+                                unpaidByPerson[personKey].bookings.push({
+                                    ...booking, date, field: fieldId, time,
+                                    path: `prenotazioni/${date}/${fieldId}/${time}`
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                unpaidListContainer.innerHTML = '';
+                if (Object.keys(unpaidByPerson).length === 0) {
+                    unpaidListContainer.innerHTML = `<p>Nessun pagamento in sospeso trovato${searchTerm ? ' per "' + searchTerm + '"' : ''}.</p>`;
+                    return;
+                }
+
+                for (const personKey in unpaidByPerson) {
+                    const personData = unpaidByPerson[personKey];
+                    const card = document.createElement('div');
+                    card.className = 'unpaid-person-card';
+                    const header = document.createElement('button');
+                    header.className = 'unpaid-person-header';
+                    header.innerHTML = `<span>${personData.name}</span> <span class="booking-count">${personData.bookings.length} prenotazioni da saldare</span>`;
+                    const content = document.createElement('div');
+                    content.className = 'unpaid-person-content';
+                    const ul = document.createElement('ul');
+
+                    personData.bookings.forEach(b => {
+                        const li = document.createElement('li');
+                        const statusText = b.pagato === 'partially_paid' ? 'Parzialmente Pagato' : 'Non Pagato';
+                        const statusColor = b.pagato === 'partially_paid' ? 'var(--colore-warning)' : 'var(--colore-accento)';
+                        
+                        let daSalvareDaHtml = '';
+                        if (b.pagato === 'partially_paid' && b.daSalvareDa) {
+                            daSalvareDaHtml = `<span style="font-weight: normal; color: var(--colore-testo-secondario); font-size: 0.8rem; display: block;">Saldo mancante da: <strong>${b.daSalvareDa}</strong></span>`;
+                        }
+                        
+                        li.innerHTML = `
+                            <div>
+                                <span>${new Date(b.date + 'T12:00:00').toLocaleDateString('it-IT')} ore ${b.time.replace('-',':')} (Campo ${b.field.split('-')[1]})</span>
+                                <span style="font-weight: bold; color: ${statusColor}; font-size: 0.8rem; display: block;">${statusText}</span>
+                                ${daSalvareDaHtml}
+                            </div>
+                            <button class="mark-as-paid-btn" data-path="${b.path}">Segna Pagato</button>
+                        `;
+                        ul.appendChild(li);
+                    });
+
+                    content.appendChild(ul);
+                    card.appendChild(header);
+                    card.appendChild(content);
+                    unpaidListContainer.appendChild(card);
+                    header.addEventListener('click', () => {
+                        content.style.maxHeight = content.style.maxHeight ? null : content.scrollHeight + "px";
+                    });
+                }
+            } catch (error) {
+                unpaidListContainer.innerHTML = '<p>Errore nel caricamento dei dati.</p>';
+                console.error("Error fetching unpaid bookings:", error);
+            }
+        };
+        
+        unpaidBtn.addEventListener('click', () => {
+            unpaidSearchInput.value = '';
+            showUnpaidBookings();
+        });
+
+        unpaidSearchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            showUnpaidBookings(unpaidSearchInput.value.trim().toLowerCase());
+        });
+
+
+        document.getElementById('unpaid-list-container').addEventListener('click', (e) => {
+            if (e.target.classList.contains('mark-as-paid-btn')) {
+                const path = e.target.dataset.path;
+                database.ref(path).update({ pagato: 'paid' })
+                    .then(() => {
+                        showToast('Stato pagamento aggiornato!', 'success');
+                        showUnpaidBookings(unpaidSearchInput.value.trim().toLowerCase());
+                        if (path.split('/')[1] === toLocalISOString(currentDate)) {
+                            listenToBookingsForDate();
+                        }
+                    })
+                    .catch(err => showToast('Errore: ' + err.message, 'error'));
+            }
+        });
+
+        // --- Search Functionality ---
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim().toLowerCase();
+            if (query.length < 3) {
+                showToast("Inserisci almeno 3 caratteri per la ricerca.", "error");
+                return;
+            }
+
+            const resultsList = document.getElementById('search-results-list');
+            resultsList.innerHTML = '<li><i class="fa-solid fa-spinner fa-spin"></i> Ricerca in corso...</li>';
+            searchResultsModal.style.display = 'flex';
+
+            const bookingsRef = database.ref('prenotazioni');
+            const snapshot = await bookingsRef.once('value');
+            const allBookings = snapshot.val();
+            const results = [];
+
+            if (allBookings) {
+                for (const date in allBookings) {
+                    for (const fieldId in allBookings[date]) {
+                        for (const time in allBookings[date][fieldId]) {
+                            const booking = allBookings[date][fieldId][time];
+                            if (booking && !booking.isRecurring) {
+                                const fullName = `${booking.nome || ''} ${booking.cognome || ''}`.toLowerCase();
+                                const email = (booking.email || '').toLowerCase();
+                                const phone = (booking.telefono || '').toLowerCase();
+
+                                if (fullName.includes(query) || email.includes(query) || phone.includes(query)) {
+                                    results.push({ ...booking, date, fieldId, time });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            renderSearchResults(results, query);
+        });
+
+        function renderSearchResults(results, query) {
+            const resultsList = document.getElementById('search-results-list');
+            document.getElementById('search-results-title').textContent = `Risultati per "${query}"`;
+            resultsList.innerHTML = '';
+
+            if (results.length === 0) {
+                resultsList.innerHTML = '<li>Nessun risultato trovato.</li>';
+                return;
+            }
+            
+            results.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            results.forEach(res => {
+                const li = document.createElement('li');
+                li.dataset.date = res.date;
+                li.dataset.field = res.fieldId;
+                li.dataset.time = res.time;
+                
+                li.innerHTML = `
+                    <strong>${res.nome} ${res.cognome}</strong>
+                    <span>
+                        <i class="fa-solid fa-calendar-day"></i> ${new Date(res.date + 'T12:00:00').toLocaleDateString('it-IT')} 
+                        <i class="fa-solid fa-clock"></i> ${res.time.replace('-',':')} 
+                        <i class="fa-solid fa-person-shelter"></i> Campo ${res.fieldId.split('-')[1]}
+                    </span>
+                `;
+                resultsList.appendChild(li);
+            });
+        }
+
+        document.getElementById('search-results-list').addEventListener('click', (e) => {
+            const targetLi = e.target.closest('li');
+            if (!targetLi || !targetLi.dataset.date) return;
+
+            const { date, field, time } = targetLi.dataset;
+            
+            currentDate = new Date(date + 'T12:00:00'); // Use noon to avoid timezone shifts
+            listenToBookingsForDate();
+
+            setTimeout(() => {
+                const identifier = `${field}-${time}`;
+                const cardToHighlight = document.querySelector(`.booking-card[data-booking-identifier="${identifier}"]`);
+                if (cardToHighlight) {
+                    cardToHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    cardToHighlight.classList.add('highlight');
+                    setTimeout(() => cardToHighlight.classList.remove('highlight'), 2000);
+                }
+            }, 500);
+
+            searchResultsModal.style.display = 'none';
+        });
+
+        // --- BLACKLIST FUNCTIONS ---
+        function renderBlacklist() {
+            blacklistListDiv.innerHTML = '';
+            if (Object.keys(blacklistData).length === 0) {
+                blacklistListDiv.innerHTML = '<p>La blacklist è vuota.</p>';
+                return;
+            }
+            const ul = document.createElement('ul');
+            for (const id in blacklistData) {
+                const user = blacklistData[id];
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="list-item-main">
+                        <span><strong>${user.nome} ${user.cognome}</strong></span>
+                        <button class="delete-btn-list" data-id="${id}" title="Rimuovi dalla blacklist"><i class="fa-solid fa-user-check"></i></button>
+                    </div>
+                    <div class="list-item-details">
+                        ${user.email ? `<i class="fa-solid fa-envelope fa-fw"></i> ${user.email}` : ''}
+                        ${user.telefono ? `<br><i class="fa-solid fa-phone fa-fw"></i> ${user.telefono}` : ''}
+                    </div>
+                `;
+                ul.appendChild(li);
+            }
+            blacklistListDiv.appendChild(ul);
+        }
+
+        blacklistForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('blacklist-name').value.trim();
+            const surname = document.getElementById('blacklist-surname').value.trim();
+            const email = document.getElementById('blacklist-email').value.trim();
+            const phone = document.getElementById('blacklist-phone').value.trim();
+
+            if (!email && !phone) {
+                showToast("È necessario inserire almeno un'email o un numero di telefono.", "error");
+                return;
+            }
+
+            database.ref('blacklist').push({
+                nome: name,
+                cognome: surname,
+                email: email,
+                telefono: phone
+            }).then(() => {
+                showToast(`${name} ${surname} aggiunto/a alla blacklist.`, 'success');
+                blacklistForm.reset();
+            }).catch(err => {
+                showToast(`Errore: ${err.message}`, 'error');
+            });
+        });
+        
+        blacklistListDiv.addEventListener('click', (e) => {
+             const deleteBtn = e.target.closest('.delete-btn-list');
+             if (deleteBtn) {
+                const id = deleteBtn.dataset.id;
+                const user = blacklistData[id];
+                document.getElementById('confirm-title').textContent = 'Rimuovi dalla Blacklist';
+                document.getElementById('confirm-message').textContent = `Sei sicuro di voler rimuovere ${user.nome} ${user.cognome} dalla blacklist? Potrà nuovamente prenotare.`;
+                
+                const confirmActionBtn = document.getElementById('confirm-action-btn');
+                const newConfirmActionBtn = confirmActionBtn.cloneNode(true);
+                confirmActionBtn.parentNode.replaceChild(newConfirmActionBtn, confirmActionBtn);
+
+                newConfirmActionBtn.addEventListener('click', () => {
+                    database.ref(`blacklist/${id}`).remove()
+                        .then(() => showToast('Utente rimosso dalla blacklist.', 'info'))
+                        .catch(err => showToast('Errore: ' + err.message, 'error'));
+                    confirmModal.style.display = 'none';
+                }, { once: true });
+                
+                confirmModal.style.display = 'flex';
+             }
+        });
+
+        function listenToBlacklist() {
+            const blacklistRef = database.ref('blacklist');
+            blacklistRef.on('value', (snapshot) => {
+                blacklistData = snapshot.val() || {};
+                renderBlacklist();
+            });
+        }
+        
+        // --- FINAL INITIALIZATION CALLS ---
+        populateRecurringTimes();
+        
+        function listenToRecurringBookings() {
+            const recurringRef = database.ref('prenotazioniRicorrenti');
+            recurringRef.on('value', (snapshot) => {
+                recurringBookings = snapshot.val() || {};
+                renderRecurringList();
+                listenToBookingsForDate(); 
+            });
+        }
+
+        listenToRecurringBookings();
+        listenToBlacklist();
+    });
+    </script>
 </body>
 </html>

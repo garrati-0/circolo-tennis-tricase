@@ -19,6 +19,7 @@
             --colore-warning: #ffc107;
             --colore-info: #17a2b8;
             --colore-ricorrente: #6f42c1;
+            --colore-annullata: #343A40;
             --colore-sfondo: #F4F7FC;
             --colore-superficie: #FFFFFF;
             --colore-bordo: #CED4DA; /* Made darker for better contrast */
@@ -141,6 +142,7 @@
         .booking-card.paid { background: linear-gradient(135deg, var(--colore-successo), #1e7e34); }
         .booking-card.unpaid { background: linear-gradient(135deg, var(--colore-accento), #a71d2a); }
         .booking-card.partially-paid { background: linear-gradient(135deg, var(--colore-warning), #d39e00); }
+        .booking-card.cancelled { background: linear-gradient(135deg, var(--colore-annullata), #111); }
         .booking-card .booking-card-content { cursor: pointer; }
         .booking-card p.booking-notes { font-style: italic; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 5px; margin-top: 5px; white-space: pre-wrap; }
         
@@ -196,6 +198,10 @@
         .recurring-day-content { padding: 0 18px; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; border-radius: 0 0 8px 8px; border: 1px solid var(--colore-bordo); border-top: none; }
         .recurring-day-content ul { padding: 10px 0; }
         .recurring-day-content li { flex-direction: row; } /* Override for recurring list items */
+
+        .recurring-field-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f1f3f5; margin-top: 10px; border-radius: 4px; font-weight: bold; }
+        .delete-all-btn-list { background-color: var(--colore-accento); color: white; border: none; padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; }
+        .delete-all-btn-list:hover { opacity: 1; }
 
         /* Modals */
         .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
@@ -524,6 +530,7 @@
                         <option value="unpaid">Non Pagato</option>
                         <option value="partially_paid">Parzialmente Pagato</option>
                         <option value="paid">Pagato</option>
+                        <option value="annullata">Annullata</option>
                     </select>
                 </div>
                 <div class="form-group" id="edit-daSalvareDa-group" style="display: none;">
@@ -794,6 +801,8 @@
                                 card.classList.add('paid');
                             } else if (booking.pagato === 'partially_paid') {
                                 card.classList.add('partially-paid');
+                            } else if (booking.pagato === 'annullata') {
+                                card.classList.add('cancelled');
                             } else {
                                 card.classList.add('unpaid');
                             }
@@ -866,43 +875,65 @@
                 return;
             }
 
-            const bookingsByDay = {};
+            const bookingsByDayAndField = {};
             for (const id in recurringBookings) {
-                const booking = { ...recurringBookings[id], id }; 
+                const booking = { ...recurringBookings[id], id };
                 const day = booking.giornoSettimana;
-                if (!bookingsByDay[day]) bookingsByDay[day] = [];
-                bookingsByDay[day].push(booking);
+                const field = booking.campo;
+                if (!bookingsByDayAndField[day]) {
+                    bookingsByDayAndField[day] = {};
+                }
+                if (!bookingsByDayAndField[day][field]) {
+                    bookingsByDayAndField[day][field] = [];
+                }
+                bookingsByDayAndField[day][field].push(booking);
             }
 
             const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
-            const dayOrder = [1, 2, 3, 4, 5, 6, 0]; 
+            const dayOrder = [1, 2, 3, 4, 5, 6, 0];
 
             dayOrder.forEach(dayIndex => {
-                if (bookingsByDay[dayIndex]) {
+                if (bookingsByDayAndField[dayIndex]) {
                     const dayName = days[dayIndex];
-                    const dayBookings = bookingsByDay[dayIndex];
-                    dayBookings.sort((a, b) => a.orario.localeCompare(b.orario));
+                    const dayData = bookingsByDayAndField[dayIndex];
+                    let totalBookingsForDay = 0;
+                    Object.values(dayData).forEach(arr => totalBookingsForDay += arr.length);
 
                     const header = document.createElement('button');
                     header.className = 'recurring-day-header';
-                    header.innerHTML = `<span>${dayName}</span> <span style="font-weight:normal; color: var(--colore-testo-secondario); font-size: 0.9rem;">${dayBookings.length} prenotazioni</span>`;
+                    header.innerHTML = `<span>${dayName}</span> <span style="font-weight:normal; color: var(--colore-testo-secondario); font-size: 0.9rem;">${totalBookingsForDay} prenotazioni</span>`;
                     
                     const content = document.createElement('div');
                     content.className = 'recurring-day-content';
-                    const ul = document.createElement('ul');
-                    
-                    dayBookings.forEach(rb => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `
-                            <div class="list-item-main">
-                                <span><strong>${rb.nome}</strong> - ore ${rb.orario}, Campo ${rb.campo}</span>
-                                <button class="delete-btn-list" data-id="${rb.id}" title="Cancella ricorrente"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
+
+                    Object.keys(dayData).sort().forEach(field => {
+                        const fieldBookings = dayData[field];
+                        fieldBookings.sort((a, b) => a.orario.localeCompare(b.orario));
+
+                        const fieldHeader = document.createElement('div');
+                        fieldHeader.className = 'recurring-field-header';
+                        fieldHeader.innerHTML = `
+                            <span>Campo ${field}</span>
+                            <button class="delete-all-btn-list" data-day="${dayIndex}" data-field="${field}" title="Elimina tutte le ricorrenze per questo campo in questo giorno">
+                                <i class="fa-solid fa-trash-can"></i> Elimina Tutte
+                            </button>
                         `;
-                        ul.appendChild(li);
+                        content.appendChild(fieldHeader);
+                        
+                        const ul = document.createElement('ul');
+                        fieldBookings.forEach(rb => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                                <div class="list-item-main">
+                                    <span><strong>${rb.nome}</strong> - ore ${rb.orario}</span>
+                                    <button class="delete-btn-list" data-id="${rb.id}" title="Cancella ricorrente singola"><i class="fa-solid fa-trash-can"></i></button>
+                                </div>
+                            `;
+                            ul.appendChild(li);
+                        });
+                        content.appendChild(ul);
                     });
                     
-                    content.appendChild(ul);
                     recurringListDiv.appendChild(header);
                     recurringListDiv.appendChild(content);
                 }
@@ -971,6 +1002,8 @@
                         paymentStatus = 'paid';
                     } else if (bookingData.pagato === 'partially_paid') {
                         paymentStatus = 'partially_paid';
+                    } else if (bookingData.pagato === 'annullata') {
+                        paymentStatus = 'annullata';
                     }
                     editPaymentStatusSelect.value = paymentStatus;
 
@@ -1087,6 +1120,42 @@
                     database.ref(`prenotazioniRicorrenti/${id}`).remove()
                         .then(() => showToast('Ricorrenza cancellata.', 'info'))
                         .catch(err => showToast('Errore: ' + err.message, 'error'));
+                    confirmModal.style.display = 'none';
+                }, { once: true });
+                
+                confirmModal.style.display = 'flex';
+            }
+            
+            const deleteAllBtn = e.target.closest('.delete-all-btn-list');
+            if(deleteAllBtn) {
+                const day = deleteAllBtn.dataset.day;
+                const field = deleteAllBtn.dataset.field;
+                const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+                const dayName = days[day];
+
+                document.getElementById('confirm-title').textContent = 'Cancella Ricorrenze Multiple';
+                document.getElementById('confirm-message').textContent = `Sei sicuro di voler cancellare TUTTE le prenotazioni ricorrenti per il Campo ${field} di ${dayName}? L'azione è irreversibile.`;
+
+                const confirmActionBtn = document.getElementById('confirm-action-btn');
+                const newConfirmActionBtn = confirmActionBtn.cloneNode(true);
+                confirmActionBtn.parentNode.replaceChild(newConfirmActionBtn, confirmActionBtn);
+
+                newConfirmActionBtn.addEventListener('click', () => {
+                    const updates = {};
+                    const idsToDelete = Object.keys(recurringBookings).filter(id => {
+                        const booking = recurringBookings[id];
+                        return booking.giornoSettimana == day && booking.campo == field;
+                    });
+
+                    if(idsToDelete.length > 0) {
+                        idsToDelete.forEach(id => {
+                            updates[`/prenotazioniRicorrenti/${id}`] = null;
+                        });
+
+                        database.ref().update(updates)
+                            .then(() => showToast(`Tutte le ricorrenze per Campo ${field} di ${dayName} sono state cancellate.`, 'info'))
+                            .catch(err => showToast('Errore: ' + err.message, 'error'));
+                    }
                     confirmModal.style.display = 'none';
                 }, { once: true });
                 
