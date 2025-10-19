@@ -1233,7 +1233,7 @@
 
             try {
                 await database.ref().update(updates);
-                
+                 if (bookingData.email !== 'cliente@interno.it') {
                 const CANCELLATION_PAGE_URL = "cancella.html"; 
                 const cancellationLink = `https://www.circolotennistricase.it/${CANCELLATION_PAGE_URL}?id=${bookingId}`;
                 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJAXEg-M5Y_wZS37n-avMvoWGQdrmWqrK4-K8212n4WcYziuOUiMR-b8ItFFyKC11ymg/exec";
@@ -1249,8 +1249,14 @@
                     .catch(error => console.error("Errore script:", error));
 
                 showToast('Prenotazione salvata e email inviata!', 'success');
-                bookingModal.style.display = 'none';
+                
+            }else {
+                    // Se l'email è quella generica, mostra solo la conferma senza menzionare l'email
+                    showToast('Prenotazione salvata!', 'success');
+                    console.log("Email di conferma non inviata perché l'indirizzo è quello generico.");
+                }
 
+bookingModal.style.display = 'none';
             } catch (error) {
                 showToast('Errore nel salvataggio: ' + error.message, 'error');
             } finally {
