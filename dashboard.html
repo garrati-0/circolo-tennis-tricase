@@ -1371,9 +1371,17 @@ bookingModal.style.display = 'none';
                             const booking = bookingsByDate[date][fieldId][time];
                             if (booking && (booking.pagato === 'unpaid' || booking.pagato === 'partially_paid' || booking.pagato === false) && !booking.isRecurring) {
                                 const personKey = `${booking.nome} ${booking.cognome}`.trim().toLowerCase();
-                                if (searchTerm && !personKey.includes(searchTerm)) {
-                                    continue;
-                                }
+                                let matches = true; // Assume che corrisponda se la ricerca è vuota
+                                if (searchTerm) {
+                                    // Dividi il termine di ricerca in parole singole (es. "rossi mario" -["rossi", "mario"])
+                                	const searchWords = searchTerm.toLowerCase().split(' ').filter(w => w.length > 0);
+                                	// Controlla che OGNI parola cercata sia inclusa nel nome completo (es. "mario rossi")
+                                	matches = searchWords.every(word => personKey.includes(word));
+                                }
+
+                                if (!matches) {
+                                    continue; // Salta questo booking se non corrisponde
+                                }
                                 if (!unpaidByPerson[personKey]) {
                                     unpaidByPerson[personKey] = { name: `${booking.nome} ${booking.cognome}`.trim(), bookings: [] };
                                 }
