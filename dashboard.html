@@ -1369,8 +1369,11 @@ bookingModal.style.display = 'none';
                     for (const fieldId in bookingsByDate[date]) {
                         for (const time in bookingsByDate[date][fieldId]) {
                             const booking = bookingsByDate[date][fieldId][time];
-                            if (booking && (booking.pagato === 'unpaid' || booking.pagato === 'partially_paid' || booking.pagato === false) && !booking.isRecurring) {
-                                const personKey = `${booking.nome} ${booking.cognome}`.trim().toLowerCase();
+                            const isPaid = booking.pagato === 'paid' || booking.pagato === true;
+const isCancelled = booking.pagato === 'annullata';
+
+if (booking && !isPaid && !isCancelled && !booking.isRecurring) {
+                                const personKey = `${booking.nome || ''} ${booking.cognome || ''}`.trim().toLowerCase();
                                 let matches = true; // Assume che corrisponda se la ricerca è vuota
                                 if (searchTerm) {
                                     // Dividi il termine di ricerca in parole singole (es. "rossi mario" -["rossi", "mario"])

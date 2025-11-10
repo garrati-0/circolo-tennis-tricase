@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiche Prenotazioni</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --colore-primario: #007BFF;
+            --colore-primario-trasparente: rgba(0, 123, 255, 0.1);
+            --colore-accento: #DC3545;
+            --colore-successo: #28a745;
+            --colore-warning: #ffc107;
+            --colore-info: #17a2b8;
+            --colore-ricorrente: #6f42c1;
+            --colore-sfondo: #F4F7FC;
+            --colore-superficie: #FFFFFF;
+            --colore-bordo: #CED4DA;
+            --colore-testo-principale: #212529;
+            --colore-testo-secondario: #5A6268;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        body { font-family: 'Noto Sans', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo-principale); margin: 0; padding-top: 80px; }
+        .container { padding: 20px; max-width: 1600px; margin: 0 auto; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* --- Navbar Styles --- */
+        .main-navbar {
+            background-color: #343A40;
+            padding: 10px 0;
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            z-index: 1050;
+            position: absolute;
+            top: 0;
+        }
+        .navbar-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .main-navbar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 25px;
+        }
+        .main-navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        .main-navbar a:hover {
+            background-color: var(--colore-primario-trasparente);
+        }
+        .main-navbar a.active {
+            background-color: var(--colore-primario);
+            font-weight: bold;
+        }
+
+        /* Loading Spinner */
+        #loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--colore-testo-secondario);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--colore-sfondo);
+            border-top-color: var(--colore-primario);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background-color: var(--colore-superficie);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .stat-card .icon {
+            font-size: 2.5rem;
+            padding: 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+        }
+        .stat-card .icon.total { color: var(--colore-primario); background-color: var(--colore-primario-trasparente); }
+        .stat-card .icon.online { color: var(--colore-successo); background-color: rgba(40, 167, 69, 0.1); }
+        .stat-card .icon.users { color: var(--colore-ricorrente); background-color: rgba(111, 66, 193, 0.1); }
+        .stat-card .icon.unpaid { color: var(--colore-accento); background-color: rgba(220, 53, 69, 0.1); }
+
+        .stat-card .info .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--colore-testo-principale);
+            margin: 0;
+        }
+        .stat-card .info .label {
+            font-size: 0.9rem;
+            color: var(--colore-testo-secondario);
+            margin: 0;
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            background-color: var(--colore-superficie);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .chart-container h3 {
+            margin-top: 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .full-width {
+            grid-column: 1 / -1; /* Span full width */
+        }
+        
+        /* Lists */
+        .list-container {
+            background-color: var(--colore-superficie);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .list-container h3 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--colore-bordo);
+            padding-bottom: 15px;
+        }
+        .list-container ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .list-container li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--colore-sfondo);
+        }
+        .list-container li:last-child {
+            border-bottom: none;
+        }
+        .list-container .name {
+            font-weight: 500;
+            color: var(--colore-testo-principale);
+        }
+        .list-container .count {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--colore-accento);
+        }
+        .list-container .count.info {
+             color: var(--colore-primario);
+        }
+        
+        /* Date Range Selector */
+        #date-range-form {
+            background-color: var(--colore-superficie);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        #date-range-form label {
+            font-weight: 500;
+            margin-right: 5px;
+        }
+        #date-range-form input {
+            padding: 8px 12px;
+            border: 1px solid var(--colore-bordo);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        #date-range-form button {
+            padding: 9px 20px;
+            background-color: var(--colore-primario);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+
+        @media (max-width: 900px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+         @media (max-width: 800px) {
+            body { padding-top: 60px; }
+            .navbar-container {
+                justify-content: center;
+            }
+            .main-navbar ul {
+                gap: 10px;
+            }
+            .main-navbar a {
+                font-size: 0.9rem;
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="main-navbar">
+        <div class="navbar-container">
+            <ul>
+                <li><a href="soci.html">Socio</a></li>
+                <li><a href="calendario.html">Calendario</a></li>
+                <li><a href="analytics.html" class="active">Statistiche</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Dashboard Statistiche</h1>
+
+        <!-- Date Range -->
+        <form id="date-range-form">
+            <label for="start-date">Da:</label>
+            <input type="date" id="start-date">
+            <label for="end-date">A:</label>
+            <input type="date" id="end-date">
+            <button type="submit">Filtra</button>
+        </form>
+
+        <!-- Loader -->
+        <div id="loader-container">
+            <div class="spinner"></div>
+            <p>Caricamento dati e generazione statistiche...</p>
+        </div>
+
+        <!-- Analytics Content (hidden by default) -->
+        <div id="analytics-content" style="display: none;">
+            <!-- Key Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon total"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div class="info">
+                        <p id="total-bookings" class="value">0</p>
+                        <p class="label">Prenotazioni Totali</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon online"><i class="fa-solid fa-desktop"></i></div>
+                    <div class="info">
+                        <p id="online-bookings" class="value">0</p>
+                        <p class="label">Prenotazioni Online</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon users"><i class="fa-solid fa-users"></i></div>
+                    <div class="info">
+                        <p id="unique-clients" class="value">0</p>
+                        <p class="label">Clienti Unici</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon unpaid"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    <div class="info">
+                        <p id="total-unpaid" class="value">0</p>
+                        <p class="label">Pagamenti Sospesi</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3><i class="fa-solid fa-chart-pie"></i> Origine Prenotazioni</h3>
+                    <canvas id="origin-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3><i class="fa-solid fa-ranking-star"></i> Clienti con Più Sospesi</h3>
+                    <div class="list-container" style="box-shadow: none; padding: 0;">
+                        <ul id="late-payers-list">
+                            <!-- JS will populate this -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="chart-container full-width">
+                    <h3><i class="fa-solid fa-clock"></i> Prenotazioni per Orario</h3>
+                    <canvas id="hourly-chart"></canvas>
+                </div>
+                 <div class="chart-container full-width">
+                    <h3><i class="fa-solid fa-calendar-week"></i> Prenotazioni per Giorno</h3>
+                    <canvas id="daily-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxetNrmEOQJYwunOo-OQddzCMfP7DEtIU",
+            authDomain: "ct-tricase.firebaseapp.com",
+            databaseURL: "https://ct-tricase-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ct-tricase",
+            storageBucket: "ct-tricase.appspot.com",
+            messagingSenderId: "931504527474",
+            appId: "1:931504527474:web:165880ec30f3785ff54aeb",
+            measurementId: "G-7M4D22L352"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const loader = document.getElementById('loader-container');
+        const content = document.getElementById('analytics-content');
+        const dateRangeForm = document.getElementById('date-range-form');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+
+        let allBookingsData = null; // Cache for all bookings
+        let originChart, hourlyChart, dailyChart; // Chart instances
+
+        // Set default dates: last 30 days
+        const today = new Date();
+        const thirtyDaysAgo = new Date(new Date().setDate(today.getDate() - 30));
+        endDateInput.value = toLocalISOString(today);
+        startDateInput.value = toLocalISOString(thirtyDaysAgo);
+
+        // --- Helper: Date Formatter ---
+        function toLocalISOString(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // --- Helper: Get CSS Variable ---
+        function getCssVariable(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        // --- 1. Fetch All Data ---
+        async function fetchAllData() {
+            loader.style.display = 'flex';
+            content.style.display = 'none';
+            try {
+                const snapshot = await database.ref('prenotazioni').once('value');
+                allBookingsData = snapshot.val() || {};
+                processAndRenderAnalytics(); // Initial render with default dates
+            } catch (error) {
+                console.error("Errore nel caricamento dati:", error);
+                loader.innerHTML = '<p style="color: var(--colore-accento);">Errore nel caricamento dei dati. Riprova più tardi.</p>';
+            }
+        }
+
+        // --- 2. Process Data ---
+        function processAndRenderAnalytics() {
+            if (!allBookingsData) return;
+
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            let totalBookings = 0;
+            let onlineBookings = 0;
+            let manualBookings = 0;
+            let totalUnpaid = 0;
+            const latePayers = {};
+            const uniqueClients = new Set();
+            const bookingsByHour = {};
+            const bookingsByDay = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }; // 0: Dom, 1: Lun...
+
+            for (const date in allBookingsData) {
+                // Apply date filter
+                if (date < startDate || date > endDate) {
+                    continue;
+                }
+
+                const dayOfWeek = new Date(date + 'T12:00:00').getDay();
+
+                for (const fieldId in allBookingsData[date]) {
+                    for (const time in allBookingsData[date][fieldId]) {
+                        const booking = allBookingsData[date][fieldId][time];
+                        if (!booking || booking.isRecurring) continue;
+
+                        totalBookings++;
+
+                        // Get client key
+                        const clientKey = `${(booking.nome || 'N/A').trim()} ${(booking.cognome || '').trim()}`.toLowerCase();
+                        uniqueClients.add(clientKey);
+
+                        // 1. Online vs Manual
+                        if (booking.email === 'cliente@interno.it') {
+                            manualBookings++;
+                        } else {
+                            onlineBookings++;
+                        }
+
+                        // 2. Late Payers
+                        if (booking.pagato === 'unpaid' || booking.pagato === 'partially_paid' || booking.pagato === false) {
+                            totalUnpaid++;
+                            latePayers[clientKey] = (latePayers[clientKey] || 0) + 1;
+                        }
+
+                        // 3. Bookings by Hour
+                        const hour = time.split('-')[0];
+                        bookingsByHour[hour] = (bookingsByHour[hour] || 0) + 1;
+
+                        // 4. Bookings by Day
+                        bookingsByDay[dayOfWeek]++;
+                    }
+                }
+            }
+
+            // --- 3. Render Dashboard ---
+            renderStats(totalBookings, onlineBookings, manualBookings, uniqueClients.size, totalUnpaid);
+            renderLatePayers(latePayers);
+            renderCharts(onlineBookings, manualBookings, bookingsByHour, bookingsByDay);
+
+            loader.style.display = 'none';
+            content.style.display = 'block';
+        }
+
+        // --- 3a. Render Key Stats ---
+        function renderStats(total, online, manual, unique, unpaid) {
+            document.getElementById('total-bookings').textContent = total;
+            document.getElementById('online-bookings').textContent = `${online} (${total > 0 ? Math.round((online / total) * 100) : 0}%)`;
+            document.getElementById('unique-clients').textContent = unique;
+            document.getElementById('total-unpaid').textContent = unpaid;
+        }
+
+        // --- 3b. Render Late Payers List ---
+        function renderLatePayers(latePayers) {
+            const list = document.getElementById('late-payers-list');
+            list.innerHTML = '';
+            
+            const sortedPayers = Object.entries(latePayers).sort(([, a], [, b]) => b - a);
+
+            if (sortedPayers.length === 0) {
+                list.innerHTML = '<li>Nessun pagamento in sospeso. Ottimo!</li>';
+                return;
+            }
+
+            sortedPayers.slice(0, 10).forEach(([name, count]) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="name" style="text-transform: capitalize;">${name}</span>
+                    <span class="count">${count} Sospesi</span>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // --- 3c. Render Charts ---
+        function renderCharts(online, manual, hourlyData, dailyData) {
+            const daysLabels = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+            const chartBorderColor = getCssVariable('--colore-superficie'); // Leggi la variabile CSS
+            
+            // --- Origin Chart (Doughnut) ---
+            const originCtx = document.getElementById('origin-chart').getContext('2d');
+            if (originChart) originChart.destroy();
+            originChart = new Chart(originCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Online', 'Manuali'],
+                    datasets: [{
+                        data: [online, manual],
+                        backgroundColor: ['#28a745', '#5A6268'],
+                        borderColor: chartBorderColor, // ERRORE CORRETTO: Usa la variabile JS
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+
+            // --- Hourly Chart (Bar) ---
+            const hourlyCtx = document.getElementById('hourly-chart').getContext('2d');
+            const sortedHours = Object.keys(hourlyData).sort((a,b) => parseInt(a) - parseInt(b));
+            const hourLabels = sortedHours.map(h => `${h}:00`);
+            const hourValues = sortedHours.map(h => hourlyData[h]);
+
+            if (hourlyChart) hourlyChart.destroy();
+            hourlyChart = new Chart(hourlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: hourLabels,
+                    datasets: [{
+                        label: 'N. Prenotazioni',
+                        data: hourValues,
+                        backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // --- Daily Chart (Bar) ---
+            const dailyCtx = document.getElementById('daily-chart').getContext('2d');
+            const dailyValues = daysLabels.map((_, index) => dailyData[index]);
+
+            if (dailyChart) dailyChart.destroy();
+            dailyChart = new Chart(dailyCtx, {
+                type: 'bar',
+                data: {
+                    labels: daysLabels,
+                    datasets: [{
+                        label: 'N. Prenotazioni',
+                        data: dailyValues,
+                        backgroundColor: 'rgba(111, 66, 193, 0.6)',
+                        borderColor: 'rgba(111, 66, 193, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+        
+        // --- Event Listeners ---
+        dateRangeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            loader.style.display = 'flex';
+            content.style.display = 'none';
+            // Dati già in cache, basta ri-processare
+            setTimeout(() => { // Simula un piccolo ritardo per feedback
+                 processAndRenderAnalytics();
+            }, 250);
+        });
+
+        // --- Initial Load ---
+        fetchAllData();
+    });
+    </script>
+</body>
+</html>
+
